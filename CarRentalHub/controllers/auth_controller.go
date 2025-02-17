@@ -19,15 +19,15 @@ func Register(c *gin.Context) {
 	}
 
 	// Chiamata al servizio di registrazione
-	newUser, err := services.RegisterUser(user)
+	newUser, message, err := services.RegisterUser(user)
 	if err != nil {
 		// Gestisce eventuali errori durante la registrazione
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Errore durante la registrazione"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": message})
 		return
 	}
 
 	// Restituisce una risposta di successo con i dati dell'utente
-	c.JSON(http.StatusOK, gin.H{"message": "Utente registrato con successo", "user": newUser})
+	c.JSON(http.StatusOK, gin.H{"message": message, "user": newUser})
 }
 
 // Login gestisce il login degli utenti esistenti.
@@ -37,18 +37,18 @@ func Login(c *gin.Context) {
 	// Legge i dati del corpo della richiesta
 	if err := c.ShouldBindJSON(&user); err != nil {
 		// Se i dati non sono corretti, restituisce errore
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Dati non validi"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Dati non validi"})
 		return
 	}
 
 	// Chiamata al servizio di autenticazione
-	token, err := services.AuthenticateUser(user.Username, user.Password)
+	message, token, err := services.AuthenticateUser(user.Username, user.Password)
 	if err != nil {
 		// Se l'autenticazione fallisce, restituisce errore
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Autenticazione fallita"})
+		c.JSON(http.StatusOK, gin.H{"message": message})
 		return
 	}
 
 	// Restituisce il token JWT se l'autenticazione ha avuto successo
-	c.JSON(http.StatusOK, gin.H{"message": "Login riuscito", "token": token})
+	c.JSON(http.StatusOK, gin.H{"message": message, "token": token})
 }

@@ -10,7 +10,7 @@ var DB *sql.DB
 
 func SetupDB() error {
 	var err error
-	connStr := "user=postgres password=yourpassword dbname=carrentalhub sslmode=disable"
+	connStr := "user=admin password=yourpassword dbname=carrentalhub sslmode=disable"
 	DB, err = sql.Open("postgres", connStr)
 	if err != nil {
 		return fmt.Errorf("Errore di connessione al database: %v", err)
