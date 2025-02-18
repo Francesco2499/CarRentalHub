@@ -3,6 +3,7 @@ package helpers
 import (
 	"fmt"
 	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -27,7 +28,7 @@ func GenerateJWT(userID int, role string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtSecretKey)
 	if err != nil {
-		return "", fmt.Errorf("impossibile generare il token: %v", err)
+		return "", fmt.Errorf("unable to generate token: %v", err)
 	}
 	return tokenString, nil
 }
@@ -38,12 +39,12 @@ func ValidateJWT(tokenString string) (*Claims, error) {
 	})
 
 	if err != nil || !token.Valid {
-		return nil, fmt.Errorf("token non valido")
+		return nil, fmt.Errorf("Invalid token")
 	}
 
 	claims, ok := token.Claims.(*Claims)
 	if !ok {
-		return nil, fmt.Errorf("token malformato")
+		return nil, fmt.Errorf("token malformed")
 	}
 
 	return claims, nil

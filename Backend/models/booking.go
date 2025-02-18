@@ -6,5 +6,6 @@ type Booking struct {
 	ID        int       `json:"id"`
 	UserID    int       `json:"user_id"`
 	VehicleID int       `json:"vehicle_id"`
-	Date      time.Time `json:"date"`
+	StartDate time.Time `json:"start_date"`
+	EndDate   time.Time `json:"end_date"`
 }

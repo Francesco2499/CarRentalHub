@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"CarRentalHub/services"
-	"CarRentalHub/models"
+	"Backend/models"
+	"Backend/services"
 	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
 
