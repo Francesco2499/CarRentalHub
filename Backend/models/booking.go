@@ -8,4 +8,6 @@ type Booking struct {
 	VehicleID int       `json:"vehicle_id"`
 	StartDate time.Time `json:"start_date"`
 	EndDate   time.Time `json:"end_date"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

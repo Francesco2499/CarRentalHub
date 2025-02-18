@@ -1,26 +1,5 @@
 package config
 
-/*import (
-	"database/sql"
-	"fmt"
-	_ "github.com/lib/pq"
-)
-
-var DB *sql.DB
-
-func SetupDB() error {
-	var err error
-	connStr := "user=admin password=yourpassword dbname=carrentalhub sslmode=disable"
-	DB, err = sql.Open("postgres", connStr)
-	if err != nil {
-		return fmt.Errorf("Errore di connessione al database: %v", err)
-	}
-	if err := DB.Ping(); err != nil {
-		return fmt.Errorf("Errore nel ping del database: %v", err)
-	}
-	return nil
-}*/
-
 import (
 	"database/sql"
 	"fmt"
@@ -28,21 +7,51 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
+	"github.com/joho/godotenv"
 )
 
 var db *sql.DB
 
 func InitDB() (*sql.DB, error) {
+
+	// Carica il file .env (se esiste)
+	if err := godotenv.Load(); err != nil {
+		log.Println("Warning: No .env file found, using system environment variables")
+	}
+
+	host, err := getEnv("DB_HOST")
+	if err != nil {
+		log.Fatal(err)
+	}
+	user, err := getEnv("DB_USER")
+	if err != nil {
+		log.Fatal(err)
+	}
+	password, err := getEnv("DB_PASSWORD")
+	if err != nil {
+		log.Fatal(err)
+	}
+	dbname, err := getEnv("DB_NAME")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Usa variabili d'ambiente per la connessione al database
-	dsn := fmt.Sprintf(
+	/*dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s sslmode=disable",
 		getEnv("DB_HOST", "localhost"),
 		getEnv("DB_USER", "postgres"),
 		getEnv("DB_PASSWORD", "password"),
 		getEnv("DB_NAME", "CarRentalHub"),
+	)*/
+
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s sslmode=disable",
+		host, user, password, dbname,
 	)
 
-	var err error
+
+	//var err error
 	db, err = sql.Open("postgres", dsn)
 	if err != nil {
 		log.Fatal("Errore nella connessione al database:", err)
@@ -88,6 +97,16 @@ func CreateTables() error {
 			password TEXT NOT NULL,
 			role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'customer'))
 		);`,
+
+		`CREATE TABLE IF NOT EXISTS bookings (
+			id SERIAL PRIMARY KEY,
+			user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+			vehicle_id INT NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+			start_date TIMESTAMP NOT NULL,
+			end_date TIMESTAMP NOT NULL,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		);`,
 	}
 
 	for _, table := range tables {
@@ -98,6 +117,43 @@ func CreateTables() error {
 	}
 
 	fmt.Println("Tables created/verified successfully!")
+
+	// Creazione della funzione per aggiornare `updated_at`
+	_, err := db.Exec(`
+		CREATE OR REPLACE FUNCTION update_timestamp()
+		RETURNS TRIGGER AS $$
+		BEGIN
+			NEW.updated_at = NOW();
+			RETURN NEW;
+		END;
+		$$ LANGUAGE plpgsql;
+	`)
+	if err != nil {
+		return fmt.Errorf("error creating update_timestamp function: %w", err)
+	}
+
+	// Verifica se il trigger esiste prima di crearlo
+	var triggerExists bool
+	err = db.QueryRow("SELECT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trigger_update_booking_timestamp')").Scan(&triggerExists)
+	if err != nil {
+		return fmt.Errorf("error checking if trigger exists: %w", err)
+	}
+
+	if !triggerExists {
+		_, err = db.Exec(`
+			CREATE TRIGGER trigger_update_booking_timestamp
+			BEFORE UPDATE ON bookings
+			FOR EACH ROW
+			EXECUTE FUNCTION update_timestamp();
+		`)
+		if err != nil {
+			return fmt.Errorf("error creating update_timestamp trigger: %w", err)
+		}
+		fmt.Println("Trigger for updating `updated_at` in bookings created successfully!")
+	} else {
+		fmt.Println("Trigger `trigger_update_booking_timestamp` already exists.")
+	}
+
 	return nil
 }
 
@@ -144,6 +200,26 @@ func SeedData() error {
 		fmt.Println("Data vehicle already present, no new entries inserted.")
 	}
 
+	// Seeding for bookings
+	err = db.QueryRow("SELECT COUNT(*) FROM bookings").Scan(&count)
+	if err != nil {
+		return err
+	}
+
+	if count == 0 { // Insert data only if the bookings table is empty
+		_, err := db.Exec(`
+			INSERT INTO bookings (user_id, vehicle_id, start_date, end_date) VALUES 
+			(1, 2, '2025-03-01 10:00:00', '2025-03-10 10:00:00'),
+			(2, 3, '2025-04-05 08:00:00', '2025-04-12 08:00:00');
+		`)
+		if err != nil {
+			return err
+		}
+		fmt.Println("Initial booking data inserted successfully!")
+	} else {
+		fmt.Println("Bookings table already populated, no new entries added.")
+	}
+
 	return nil
 }
 
@@ -154,9 +230,18 @@ func GetDB() *sql.DB {
 	return db
 }
 
-func getEnv(key, fallback string) string {
+/*func getEnv(key, fallback string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
 	}
 	return fallback
+}*/
+
+func getEnv(key string) (string, error) {
+	value, exists := os.LookupEnv(key)
+	if !exists {
+		return "", fmt.Errorf("environment variable %s not set", key)
+	}
+	return value, nil
 }
+
