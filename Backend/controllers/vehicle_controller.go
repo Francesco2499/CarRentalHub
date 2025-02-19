@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -96,4 +97,41 @@ func DeleteVehicle(c *gin.Context) {
 	}
 	log.Printf("Vehicle ID %d deleted successfully", id)
 	c.Status(http.StatusNoContent)
+}
+
+func GetAvailableVehicles(c *gin.Context) {
+	log.Println("Received request to fetch available vehicles")
+
+	startDateStr := c.Query("start_date")
+	endDateStr := c.Query("end_date")
+
+	if startDateStr == "" || endDateStr == "" {
+		log.Println("Error: Missing start_date or end_date query parameters")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing start_date or end_date query parameters"})
+		return
+	}
+
+	startDate, err := time.Parse("2006-01-02", startDateStr)
+	if err != nil {
+		log.Println("Error: Invalid start_date format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid start_date format. Use YYYY-MM-DD."})
+		return
+	}
+
+	endDate, err := time.Parse("2006-01-02", endDateStr)
+	if err != nil {
+		log.Println("Error: Invalid end_date format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid end_date format. Use YYYY-MM-DD."})
+		return
+	}
+
+	vehicles, err := services.GetAvailableVehicles(startDate, endDate)
+	if err != nil {
+		log.Printf("Error retrieving available vehicles: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Printf("Successfully retrieved %d available vehicles", len(vehicles))
+	c.JSON(http.StatusOK, vehicles)
 }

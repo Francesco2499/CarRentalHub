@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/lib/pq"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 var db *sql.DB
@@ -49,7 +49,6 @@ func InitDB() (*sql.DB, error) {
 		"host=%s user=%s password=%s dbname=%s sslmode=disable",
 		host, user, password, dbname,
 	)
-
 
 	//var err error
 	db, err = sql.Open("postgres", dsn)
@@ -168,8 +167,9 @@ func SeedData() error {
 	if count == 0 { // Inserisce i dati solo se la tabella è vuota
 		_, err := db.Exec(`
 			INSERT INTO users (username, email, password, role) 
-			VALUES ('adminUser', 'admin@example.com', 'hashed_password', 'admin'),
-       		('customerUser', 'customer@example.com', 'hashed_password', 'customer');
+			VALUES ('testadmin', 'admin@example.com', '$2a$10$9XLtbksVUlDcoPQ0uz4Pe.kiyrfr3QOEJ1e9FqcuHMgb5HBI7Fi7O', 'admin'),
+       		('testcustomer', 'testcustomer@example.com', '$2a$10$bHUA0bk60fLdfD5du8lFGeF1PpqT42mvqE6Wn4uQRSfvvD39Scqva', 'customer'),
+			('testuser', 'testuser@example.com', '$2a$10$BgqOX8eoqerj8lm0Lo96yuq7JtRfjQiPxyT0jYTIIzypjsxfebob.', 'customer');
 		`)
 
 		if err != nil {
@@ -209,8 +209,8 @@ func SeedData() error {
 	if count == 0 { // Insert data only if the bookings table is empty
 		_, err := db.Exec(`
 			INSERT INTO bookings (user_id, vehicle_id, start_date, end_date) VALUES 
-			(1, 2, '2025-03-01 10:00:00', '2025-03-10 10:00:00'),
-			(2, 3, '2025-04-05 08:00:00', '2025-04-12 08:00:00');
+			(2, 2, '2025-03-01 10:00:00', '2025-03-10 10:00:00'),
+			(3, 3, '2025-04-05 08:00:00', '2025-04-13 08:00:00');
 		`)
 		if err != nil {
 			return err
@@ -244,4 +244,3 @@ func getEnv(key string) (string, error) {
 	}
 	return value, nil
 }
-

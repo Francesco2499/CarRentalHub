@@ -6,8 +6,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
 	//"log"
-	//"time"
+	"time"
 )
 
 func GetAllVehicles() ([]models.Vehicle, error) {
@@ -86,4 +87,34 @@ func DeleteVehicle(id int) error {
 		return errors.New("vehicle not found")
 	}
 	return nil
+}
+
+func GetAvailableVehicles(startDate, endDate time.Time) ([]models.Vehicle, error) {
+	db := config.GetDB()
+	query := `SELECT id, model, category, price, available, location 
+		FROM vehicles 
+		WHERE id NOT IN (
+			SELECT vehicle_id FROM bookings 
+			WHERE (start_date, end_date) OVERLAPS ($1, $2)
+		)`
+
+	rows, err := db.Query(query, startDate, endDate)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving available vehicles: %w", err)
+	}
+	defer rows.Close()
+
+	var vehicles []models.Vehicle
+	for rows.Next() {
+		var vehicle models.Vehicle
+		if err := rows.Scan(&vehicle.ID, &vehicle.Model, &vehicle.Category, &vehicle.Price, &vehicle.Available, &vehicle.Location); err != nil {
+			return nil, fmt.Errorf("error scanning vehicle data: %w", err)
+		}
+		vehicles = append(vehicles, vehicle)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error after iteration: %w", err)
+	}
+	return vehicles, nil
 }

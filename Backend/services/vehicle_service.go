@@ -3,6 +3,7 @@ package services
 import (
 	"Backend/models"
 	"Backend/repositories"
+	"time"
 )
 
 func CreateVehicle(vehicle *models.Vehicle) error {
@@ -23,4 +24,8 @@ func GetAllVehicles() ([]models.Vehicle, error) {
 
 func GetVehicleById(id int) (*models.Vehicle, error) {
 	return repositories.GetVehicleById(id)
+}
+
+func GetAvailableVehicles(startDate, endDate time.Time) ([]models.Vehicle, error) {
+	return repositories.GetAvailableVehicles(startDate, endDate)
 }
