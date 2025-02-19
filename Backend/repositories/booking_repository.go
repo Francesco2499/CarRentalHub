@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"log"
 )
 
 func GetAllBookings(userID int, isAdmin bool) ([]models.Booking, error) {
@@ -17,9 +18,11 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.Booking, error) {
 
 	if isAdmin {
 		query = `SELECT id, user_id, vehicle_id, start_date, end_date, created_at, updated_at FROM bookings`
+		log.Printf("Executing query: %s", query)
 		rows, err = db.Query(query)
 	} else {
 		query = `SELECT id, user_id, vehicle_id, start_date, end_date, created_at, updated_at FROM bookings WHERE user_id = $1`
+		log.Printf("Executing query: %s with userID: %d", query, userID)
 		rows, err = db.Query(query, userID)
 	}
 

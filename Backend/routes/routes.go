@@ -11,6 +11,10 @@ import (
 func SetupRoutes() *gin.Engine {
 	// Gruppo di rotte per l'autenticazione
 	router := gin.Default()
+	/*err := router.SetTrustedProxies([]string{"127.0.0.1"}) // Imposta solo proxy locali fidati
+	if err != nil {
+		log.Fatalf("Errore nella configurazione dei proxy: %v", err)
+	}*/
 
 	auth := router.Group("/api/v1/auth")
 	{
@@ -19,34 +23,25 @@ func SetupRoutes() *gin.Engine {
 	}
 
 	vehicle := router.Group("/api/v1/vehicle")
+	vehicle.Use(middleware.AuthMiddleware(""))
 	{
 		vehicle.GET("/getAll", controllers.GetAllVehicles)
 		vehicle.GET("/getById/:id", controllers.GetVehicleById)
 		vehicle.GET("/getAllAvailable", controllers.GetAvailableVehicles)
-	}
-
-	vehicleProtected := router.Group("/api/v1/vehicle")
-	vehicleProtected.Use(middleware.AuthMiddleware(""))
-	{
-		vehicleProtected.POST("/new", middleware.AuthMiddleware("admin"), controllers.CreateVehicle)
-		vehicleProtected.PUT("/update/:id", middleware.AuthMiddleware("admin"), controllers.UpdateVehicle)
-		vehicleProtected.DELETE("/delete/:id", middleware.AuthMiddleware("admin"), controllers.DeleteVehicle)
+		vehicle.POST("/new", middleware.AuthMiddleware("admin"), controllers.CreateVehicle)
+		vehicle.PUT("/update/:id", middleware.AuthMiddleware("admin"), controllers.UpdateVehicle)
+		vehicle.DELETE("/delete/:id", middleware.AuthMiddleware("admin"), controllers.DeleteVehicle)
 	}
 
 	booking := router.Group("/api/v1/booking")
+	booking.Use(middleware.AuthMiddleware("")) // Protezione generale per TUTTE le route
 	{
-		booking.POST("/new", controllers.CreateBooking)
-		booking.GET("/getAll", controllers.GetAllBookings)
-		booking.GET("/getById/:id", controllers.GetBookingById)
-	}
-
-	bookingProtected := router.Group("/api/v1/booking")
-	bookingProtected.Use(middleware.AuthMiddleware("admin"))
-	{
-		//bookingProtected.POST("/new", controllers.CreateBooking)
-		bookingProtected.GET("/getByUser/:user_id", controllers.GetBookingsByUser)
-		bookingProtected.PUT("/update/:id", controllers.UpdateBooking)
-		bookingProtected.DELETE("/delete/:id", controllers.DeleteBooking)
+		booking.POST("/new", middleware.AuthMiddleware("admin"), controllers.CreateBooking)                   // Solo admin
+		booking.GET("/getAll", controllers.GetAllBookings)                                                    // Accesso per utenti autenticati
+		booking.GET("/getById/:id", controllers.GetBookingById)                                               // Accesso per utenti autenticati
+		booking.GET("/getByUser/:user_id", middleware.AuthMiddleware("admin"), controllers.GetBookingsByUser) // Solo admin
+		booking.PUT("/update/:id", middleware.AuthMiddleware("admin"), controllers.UpdateBooking)             // Solo admin
+		booking.DELETE("/delete/:id", middleware.AuthMiddleware("admin"), controllers.DeleteBooking)          // Solo admin
 	}
 
 	return router

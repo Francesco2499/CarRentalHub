@@ -117,6 +117,12 @@ func DeleteBooking(c *gin.Context) {
 }
 
 func extractUserFromContext(c *gin.Context) (int, bool) {
+	log.Println("[DEBUG] - Contenuto del contesto Gin:")
+
+	for key, value := range c.Keys {
+		log.Printf("Key: %s, Value: %v", key, value)
+	}
+
 	// Recupera userID dal contesto della richiesta
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -124,10 +130,13 @@ func extractUserFromContext(c *gin.Context) (int, bool) {
 	}
 
 	// Recupera il ruolo dell'utente (admin o customer)
-	isAdmin, exists := c.Get("isAdmin")
+	role, exists := c.Get("role")
 	if !exists {
 		return userID.(int), false // Assume che sia un cliente di default
 	}
 
-	return userID.(int), isAdmin.(bool)
+	isAdmin := (role == "admin")
+
+	log.Printf("UserID: %v, isAdmin: %v", userID, isAdmin)
+	return userID.(int), isAdmin
 }

@@ -30,6 +30,7 @@ func GenerateJWT(userID int, role string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("unable to generate token: %v", err)
 	}
+
 	return tokenString, nil
 }
 
