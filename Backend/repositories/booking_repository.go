@@ -143,7 +143,7 @@ func DeleteBooking(id int) error {
 	return nil
 }
 
-func GetVehicleIdFromBooking(bookingID int) (int, error) {
+/*func GetVehicleIdFromBooking(bookingID int) (int, error) {
 	db := config.GetDB()
 	query := `SELECT vehicle_id FROM bookings WHERE id = $1`
 
@@ -156,4 +156,4 @@ func GetVehicleIdFromBooking(bookingID int) (int, error) {
 		return 0, fmt.Errorf("database query error: %w", err)
 	}
 	return vehicleID, nil
-}
+}*/

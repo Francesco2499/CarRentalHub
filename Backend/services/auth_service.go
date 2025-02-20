@@ -73,3 +73,12 @@ func AuthenticateUser(username, password string) (string, string, error) {
 
 	return "Login done", token, nil
 }
+
+func GetUserIdByUsername(username string) (int, error) {
+	// 🔥 Usiamo direttamente `FindByUsername`
+	user, err := repositories.FindByUsername(username)
+	if err != nil {
+		return 0, fmt.Errorf("user %s not found: %w", username, err)
+	}
+	return user.ID, nil
+}

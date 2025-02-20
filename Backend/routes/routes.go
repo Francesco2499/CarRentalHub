@@ -39,7 +39,8 @@ func SetupRoutes() *gin.Engine {
 		booking.POST("/new", controllers.CreateBooking)
 		booking.GET("/getAll", controllers.GetAllBookings)                                                    // Accesso per utenti autenticati
 		booking.GET("/getById/:id", controllers.GetBookingById)                                               // Accesso per utenti autenticati
-		booking.GET("/getByUser/:user_id", middleware.AuthMiddleware("admin"), controllers.GetBookingsByUser) // Solo admin
+		booking.GET("/getByUser/:user_id", middleware.AuthMiddleware("admin"), controllers.GetBookingsByUser) // Solo admin con userID
+		booking.GET("/getByUser", middleware.AuthMiddleware("admin"), controllers.GetBookingsByUser)          // Solo admin con username
 		booking.PUT("/update/:id", middleware.AuthMiddleware("admin"), controllers.UpdateBooking)             // Solo admin
 		booking.DELETE("/delete/:id", middleware.AuthMiddleware("admin"), controllers.DeleteBooking)          // Solo admin
 	}

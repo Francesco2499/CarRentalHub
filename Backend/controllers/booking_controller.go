@@ -23,7 +23,7 @@ func GetAllBookings(c *gin.Context) {
 	c.JSON(http.StatusOK, bookings)
 }
 
-func GetBookingsByUser(c *gin.Context) {
+/*func GetBookingsByUser(c *gin.Context) {
 	log.Println("Received request to fetch bookings by user")
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
@@ -38,7 +38,52 @@ func GetBookingsByUser(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, bookings)
+}*/
+
+func GetBookingsByUser(c *gin.Context) {
+	log.Println("Received request to fetch bookings by user")
+
+	var userID int
+	var err error
+
+	// Controlliamo se abbiamo ricevuto `user_id` come parametro nella richiesta
+	userIDParam := c.Param("user_id")
+	if userIDParam != "" {
+		userID, err = strconv.Atoi(userIDParam)
+		if err != nil {
+			log.Println("Error: Invalid user ID format")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+			return
+		}
+	} else {
+		// Se `user_id` non è presente, proviamo con `username`
+		username := c.Query("username")
+		if username == "" {
+			log.Println("Error: No user ID or username provided")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "You must provide either user_id or username"})
+			return
+		}
+
+		// Recuperiamo user_id dal database usando lo username
+		userID, err = services.GetUserIdByUsername(username)
+		if err != nil {
+			log.Printf("Error retrieving user ID for username %s: %v", username, err)
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			return
+		}
+	}
+
+	// Recuperiamo le prenotazioni dell'utente
+	bookings, err := services.GetBookingsByUser(userID)
+	if err != nil {
+		log.Printf("Error retrieving bookings: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, bookings)
 }
+
 
 func GetBookingById(c *gin.Context) {
 	log.Println("Received request to fetch a booking")
@@ -60,12 +105,21 @@ func GetBookingById(c *gin.Context) {
 
 func CreateBooking(c *gin.Context) {
 	log.Println("Received request to create a new booking")
+	userID, _ := extractUserFromContext(c)
+	if userID == 0 {
+		log.Println("Unauthorized: Missing or invalid token")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
 	var booking models.Booking
 	if err := c.ShouldBindJSON(&booking); err != nil {
 		log.Printf("Invalid request payload: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	booking.UserID = userID
 	if err := services.CreateBooking(&booking); err != nil {
 		log.Printf("Error saving booking: %v", err)
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
