@@ -117,7 +117,6 @@ func DeleteBooking(c *gin.Context) {
 }
 
 func extractUserFromContext(c *gin.Context) (int, bool) {
-	log.Println("[DEBUG] - Contenuto del contesto Gin:")
 
 	for key, value := range c.Keys {
 		log.Printf("Key: %s, Value: %v", key, value)

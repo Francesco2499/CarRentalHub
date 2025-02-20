@@ -20,26 +20,27 @@ func GetBookingById(id int, userID int, isAdmin bool) (*models.Booking, error) {
 }
 
 func CreateBooking(booking *models.Booking) error {
-	// Controllo se il veicolo è disponibile nel range di date
-	/*available, err := repositories.IsVehicleAvailable(booking.VehicleID, booking.StartDate, booking.EndDate)
-	if err != nil {
-		return fmt.Errorf("error checking vehicle availability: %w", err)
-	}
-	if !available {
-		return errors.New("vehicle is not available for the selected dates")
-	}*/
 	return repositories.CreateBooking(booking)
 }
 
 func UpdateBooking(booking *models.Booking) error {
-	// Controllo se il veicolo è disponibile nel nuovo range di date
-	available, err := repositories.IsVehicleAvailable(booking.VehicleID, booking.StartDate, booking.EndDate)
+	// Recuperiamo il veicolo attuale della prenotazione
+	currentVehicleID, err := repositories.GetVehicleIdFromBooking(booking.ID)
 	if err != nil {
-		return fmt.Errorf("error checking vehicle availability: %w", err)
+		return fmt.Errorf("Error retrieving current booking: %w", err)
 	}
-	if !available {
-		return errors.New("vehicle is not available for the selected dates")
+
+	// Se il veicolo è cambiato, controlliamo la disponibilità
+	if booking.VehicleID != currentVehicleID {
+		available, err := repositories.IsVehicleAvailable(booking.VehicleID, booking.ID, booking.StartDate, booking.EndDate)
+		if err != nil {
+			return fmt.Errorf("Error checking vehicle availability: %w", err)
+		}
+		if !available {
+			return errors.New("Vehicle is not available for the selected dates")
+		}
 	}
+
 	return repositories.UpdateBooking(booking)
 }
 

@@ -36,7 +36,7 @@ func SetupRoutes() *gin.Engine {
 	booking := router.Group("/api/v1/booking")
 	booking.Use(middleware.AuthMiddleware("")) // Protezione generale per TUTTE le route
 	{
-		booking.POST("/new", middleware.AuthMiddleware("admin"), controllers.CreateBooking)                   // Solo admin
+		booking.POST("/new", controllers.CreateBooking)
 		booking.GET("/getAll", controllers.GetAllBookings)                                                    // Accesso per utenti autenticati
 		booking.GET("/getById/:id", controllers.GetBookingById)                                               // Accesso per utenti autenticati
 		booking.GET("/getByUser/:user_id", middleware.AuthMiddleware("admin"), controllers.GetBookingsByUser) // Solo admin

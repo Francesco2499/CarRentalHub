@@ -15,7 +15,7 @@ func Register(c *gin.Context) {
 	// Legge i dati del corpo della richiesta
 	if err := c.ShouldBindJSON(&user); err != nil {
 		// Se la richiesta non è valida, restituisce errore
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Dati non validi"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
 		return
 	}
 
@@ -38,7 +38,7 @@ func Login(c *gin.Context) {
 	// Legge i dati del corpo della richiesta
 	if err := c.ShouldBindJSON(&user); err != nil {
 		// Se i dati non sono corretti, restituisce errore
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Dati non validi"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid data"})
 		return
 	}
 
