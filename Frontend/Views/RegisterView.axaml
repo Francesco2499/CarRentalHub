@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Frontend.Views.RegisterView"
+             xmlns:vm="using:Frontend.ViewModels"
+             x:DataType="vm:RegisterViewModel">
+
+    <StackPanel Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center">
+        
+        <TextBlock Text="Registrazione" FontSize="24" FontWeight="Bold" TextAlignment="Center" Margin="10"/>
+
+        <TextBox Watermark="Email" Width="250" Height="40"
+                 Text="{Binding Email}" />
+
+        <TextBox Watermark="Username" Width="250" Height="40"
+                 Text="{Binding Username}" />
+
+        <TextBox Watermark="Password" Width="250" Height="40" PasswordChar="*"
+                 Text="{Binding Password}" />
+
+        <TextBox Watermark="Conferma Password" Width="250" Height="40" PasswordChar="*"
+                 Text="{Binding ConfirmPassword}" />
+
+        <TextBlock Text="{Binding RegisterMessage}" Foreground="Red" TextAlignment="Center"/>
+
+        <Button Content="Vai al Login!" IsVisible="{Binding ShowGoToLogin}" Width="250" Height="40"
+                Command="{Binding GoToLoginCommand}" Background="#28A745" Foreground="White"/>
+
+        <Button Content="Registrati" IsVisible="{Binding ShowSubmitForm}" Width="250" Height="40"
+                Command="{Binding SubmitRegistrationCommand}" Background="#28A745" Foreground="White"/>
+
+        <Button Content="Torna Indietro" IsVisible="{Binding ShowSubmitForm}" Width="250" Height="40"
+                Command="{Binding BackCommand}" Background="Gray" Foreground="White"/>
+    </StackPanel>
+</UserControl>

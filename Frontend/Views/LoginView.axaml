@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Frontend.Views.LoginView"
+             xmlns:vm="using:Frontend.ViewModels"
+             x:DataType="vm:LoginViewModel">
+
+    <StackPanel Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center">
+        
+        <TextBlock Text="Login" FontSize="24" FontWeight="Bold" TextAlignment="Center" Margin="10"/>
+
+        <TextBox Watermark="Email o Username" Width="250" Height="40"
+                 Text="{Binding EmailOrUsername}" />
+
+        <TextBox Watermark="Password" Width="250" Height="40" PasswordChar="*"
+                 Text="{Binding Password}" />
+
+        <TextBlock Text="{Binding LoginMessage}" Foreground="Red" TextAlignment="Center"/>
+
+        <Button Content="Accedi" Width="250" Height="40"
+                Command="{Binding SubmitLoginCommand}" Background="#007ACC" Foreground="White"/>
+
+        <Button Content="Torna Indietro" Width="250" Height="40"
+                Command="{Binding BackCommand}" Background="Gray" Foreground="White"/>
+    </StackPanel>
+</UserControl>
