@@ -7,7 +7,12 @@ import (
 	"fmt"
 )
 
-func GetAllBookings(userID int, isAdmin bool) ([]models.Booking, error) {
+/*
+	func GetAllBookings(userID int, isAdmin bool) ([]models.Booking, error) {
+		return repositories.GetAllBookings(userID, isAdmin)
+	}
+*/
+func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, error) {
 	return repositories.GetAllBookings(userID, isAdmin)
 }
 
@@ -24,7 +29,7 @@ func CreateBooking(booking *models.Booking) error {
 }
 
 func UpdateBooking(booking *models.Booking) error {
-	
+
 	available, err := repositories.IsVehicleAvailable(booking.VehicleID, booking.ID, booking.StartDate, booking.EndDate)
 	if err != nil {
 		return fmt.Errorf("Error checking vehicle availability: %w", err)
@@ -32,7 +37,7 @@ func UpdateBooking(booking *models.Booking) error {
 	if !available {
 		return errors.New("Vehicle is not available for the selected dates")
 	}
-	
+
 	return repositories.UpdateBooking(booking)
 }
 
