@@ -43,7 +43,7 @@ func Login(c *gin.Context) {
 	}
 
 	// Chiamata al servizio di autenticazione
-	message, token, err := services.AuthenticateUser(user.Username, user.Password)
+	message, token, isAdmin, err := services.AuthenticateUser(user.Username, user.Password)
 	if err != nil {
 		// Se l'autenticazione fallisce, restituisce errore
 		c.JSON(http.StatusOK, gin.H{"message": message})
@@ -51,5 +51,5 @@ func Login(c *gin.Context) {
 	}
 
 	// Restituisce il token JWT se l'autenticazione ha avuto successo
-	c.JSON(http.StatusOK, gin.H{"message": message, "token": token})
+	c.JSON(http.StatusOK, gin.H{"message": message, "token": token, "isAdmin": isAdmin})
 }

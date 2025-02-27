@@ -71,7 +71,7 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, e
 	return bookings, nil
 }
 
-func GetBookingsByUser(userID int) ([]models.Booking, error) {
+/*func GetBookingsByUser(userID int) ([]models.Booking, error) {
 	cacheKey := fmt.Sprintf("bookings_user_%d", userID)
 
 	// Controllo se il dato è in cache
@@ -90,9 +90,9 @@ func GetBookingsByUser(userID int) ([]models.Booking, error) {
 	bookingCache.Set(cacheKey, bookings)
 
 	return bookings, nil
-}
+}*/
 
-func GetBookingById(id int, userID int, isAdmin bool) (*models.Booking, error) {
+/*func GetBookingById(id int, userID int, isAdmin bool) (*models.Booking, error) {
 	cacheKey := fmt.Sprintf("booking_id_%d_user_%d_admin_%t", id, userID, isAdmin)
 
 	// Controllo se il dato è in cache
@@ -111,7 +111,7 @@ func GetBookingById(id int, userID int, isAdmin bool) (*models.Booking, error) {
 	bookingCache.Set(cacheKey, booking)
 
 	return booking, nil
-}
+}*/
 
 func UpdateBooking(booking *models.Booking) error {
 

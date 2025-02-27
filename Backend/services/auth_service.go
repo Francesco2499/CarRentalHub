@@ -45,9 +45,10 @@ func RegisterUser(user models.User) (*models.User, string, error) {
 }
 
 // AuthenticateUser esegue l'autenticazione dell'utente e restituisce un token JWT.
-func AuthenticateUser(username, password string) (string, string, error) {
+func AuthenticateUser(username, password string) (string, string, bool, error) {
 	var user *models.User
 	var err error
+	var isAdmin bool
 
 	// Verifica se il valore passato è un'email o uno username
 	if isEmail(username) {
@@ -57,25 +58,27 @@ func AuthenticateUser(username, password string) (string, string, error) {
 	}
 
 	if err != nil {
-		return "User not found", "", fmt.Errorf("error: %v", err)
+		return "User not found", "", false, fmt.Errorf("error: %v", err)
 	}
 
 	// Verifica la password
 	if err := VerifyPassword(user.Password, password); err != nil {
-		return "Invalid password", "", fmt.Errorf("password error")
+		return "Invalid password", "", false, fmt.Errorf("password error")
 	}
 
 	// Genera il token JWT
 	token, err := helpers.GenerateJWT(user.ID, user.Role)
 	if err != nil {
-		return "Error genereating token", "", fmt.Errorf("error genereating token: %v", err)
+		return "Error genereating token", "", false, fmt.Errorf("error genereating token: %v", err)
 	}
 
-	return "Login done", token, nil
+	isAdmin = user.Role == "admin"
+
+	return "Login done", token, isAdmin, nil
 }
 
 func GetUserIdByUsername(username string) (int, error) {
-	// 🔥 Usiamo direttamente `FindByUsername`
+
 	user, err := repositories.FindByUsername(username)
 	if err != nil {
 		return 0, fmt.Errorf("user %s not found: %w", username, err)

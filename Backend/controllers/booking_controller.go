@@ -23,7 +23,7 @@ func GetAllBookings(c *gin.Context) {
 	c.JSON(http.StatusOK, bookingsDTO)
 }
 
-func GetBookingsByUser(c *gin.Context) {
+/*func GetBookingsByUser(c *gin.Context) {
 	log.Println("Received request to fetch bookings by user")
 
 	var userID int
@@ -57,17 +57,17 @@ func GetBookingsByUser(c *gin.Context) {
 	}
 
 	// Recuperiamo le prenotazioni dell'utente
-	bookings, err := services.GetBookingsByUser(userID)
+	bookingsDTO, err := services.GetBookingsByUser(userID)
 	if err != nil {
 		log.Printf("Error retrieving bookings: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, bookings)
-}
+	c.JSON(http.StatusOK, bookingsDTO)
+}*/
 
-func GetBookingById(c *gin.Context) {
+/*func GetBookingById(c *gin.Context) {
 	log.Println("Received request to fetch a booking")
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -76,14 +76,14 @@ func GetBookingById(c *gin.Context) {
 		return
 	}
 	userID, isAdmin := extractUserFromContext(c)
-	booking, err := services.GetBookingById(id, userID, isAdmin)
+	bookingDTO, err := services.GetBookingById(id, userID, isAdmin)
 	if err != nil {
 		log.Printf("Error retrieving booking: %v", err)
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, booking)
-}
+	c.JSON(http.StatusOK, bookingDTO)
+}*/
 
 func CreateBooking(c *gin.Context) {
 	log.Println("Received request to create a new booking")
