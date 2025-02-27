@@ -7,22 +7,17 @@ import (
 	"fmt"
 )
 
-/*
-	func GetAllBookings(userID int, isAdmin bool) ([]models.Booking, error) {
-		return repositories.GetAllBookings(userID, isAdmin)
-	}
-*/
 func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, error) {
 	return repositories.GetAllBookings(userID, isAdmin)
 }
 
-func GetBookingsByUser(userID int) ([]models.Booking, error) {
+/*func GetBookingsByUser(userID int) ([]models.BookingWithVehicleDTO, error) {
 	return repositories.GetBookingsByUser(userID)
-}
+}*/
 
-func GetBookingById(id int, userID int, isAdmin bool) (*models.Booking, error) {
+/*func GetBookingById(id int, userID int, isAdmin bool) (*models.BookingWithVehicleDTO, error) {
 	return repositories.GetBookingById(id, userID, isAdmin)
-}
+}*/
 
 func CreateBooking(booking *models.Booking) error {
 	return repositories.CreateBooking(booking)
