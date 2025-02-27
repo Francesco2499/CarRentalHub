@@ -23,23 +23,6 @@ func GetAllBookings(c *gin.Context) {
 	c.JSON(http.StatusOK, bookingsDTO)
 }
 
-/*func GetBookingsByUser(c *gin.Context) {
-	log.Println("Received request to fetch bookings by user")
-	userID, err := strconv.Atoi(c.Param("user_id"))
-	if err != nil {
-		log.Println("Error: Invalid user ID")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
-		return
-	}
-	bookings, err := services.GetBookingsByUser(userID)
-	if err != nil {
-		log.Printf("Error retrieving bookings: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, bookings)
-}*/
-
 func GetBookingsByUser(c *gin.Context) {
 	log.Println("Received request to fetch bookings by user")
 
@@ -166,14 +149,15 @@ func DeleteBooking(c *gin.Context) {
 		return
 	}
 	log.Printf("Booking ID %d deleted successfully", id)
-	c.Status(http.StatusNoContent)
+	//c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, gin.H{"message": "Booking deleted successfully"})
 }
 
 func extractUserFromContext(c *gin.Context) (int, bool) {
 
-	for key, value := range c.Keys {
+	/*for key, value := range c.Keys {
 		log.Printf("Key: %s, Value: %v", key, value)
-	}
+	}*/
 
 	// Recupera userID dal contesto della richiesta
 	userID, exists := c.Get("userID")
