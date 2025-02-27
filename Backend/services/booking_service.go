@@ -10,14 +10,14 @@ import (
 	"time"
 )
 
-// Cache per le prenotazioni (TTL di 30 secondi)
-var bookingCache = cache.NewCache(30 * time.Second)
-
 // Struttura per la richiesta di prenotazione
 type BookingRequest struct {
 	Booking  models.Booking
 	Response chan error // Canale per la risposta
 }
+
+// Cache per le prenotazioni (TTL di 30 secondi)
+var bookingCache = cache.NewCache(30 * time.Second)
 
 // Canale globale per la gestione concorrente delle prenotazioni
 var bookingChannel = make(chan BookingRequest, 100)
