@@ -42,9 +42,7 @@ public partial class LoginViewModel : ViewModelBase
 
         if (response != null && !string.IsNullOrEmpty(response.Token)) 
         {
-                        LoginMessage = response.IsAdmin ? "htcy" : "a";
-
-            //_mainViewModel.ChangeViewModel(new UserMainViewModel(response.IsAdmin));
+            _mainViewModel.ChangeViewModel(new UserMainViewModel(response.IsAdmin));
         } else {
             LoginMessage = response.Message;
             return;
