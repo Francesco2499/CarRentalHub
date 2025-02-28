@@ -122,13 +122,39 @@ func IsVehicleAvailable(vehicleID int, bookingID int, startDate, endDate time.Ti
 	return count == 0, nil
 }
 
+/*
+	func CreateBooking(booking *models.Booking) error {
+		db := config.GetDB()
+		query := `INSERT INTO bookings (user_id, vehicle_id, start_date, end_date) VALUES ($1, $2, $3, $4)`
+		_, err := db.Exec(query, booking.UserID, booking.VehicleID, booking.StartDate, booking.EndDate)
+		if err != nil {
+			return fmt.Errorf("booking entry error: %w", err)
+		}
+		return nil
+	}
+*/
 func CreateBooking(booking *models.Booking) error {
 	db := config.GetDB()
-	query := `INSERT INTO bookings (user_id, vehicle_id, start_date, end_date) VALUES ($1, $2, $3, $4)`
-	_, err := db.Exec(query, booking.UserID, booking.VehicleID, booking.StartDate, booking.EndDate)
+
+	// Query per inserire una nuova prenotazione SOLO se il veicolo è disponibile
+	query := `
+		INSERT INTO bookings (user_id, vehicle_id, start_date, end_date) 
+		SELECT $1, $2, $3, $4
+		WHERE NOT EXISTS (
+			SELECT 1 FROM bookings 
+			WHERE vehicle_id = $2 AND (start_date, end_date) OVERLAPS ($3, $4)
+		)
+		RETURNING id`
+
+	var bookingID int
+	err := db.QueryRow(query, booking.UserID, booking.VehicleID, booking.StartDate, booking.EndDate).Scan(&bookingID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("Vehicle is no longer available, booking rejected")
+		}
 		return fmt.Errorf("booking entry error: %w", err)
 	}
+
 	return nil
 }
 

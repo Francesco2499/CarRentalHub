@@ -23,14 +23,18 @@ var bookingCache = cache.NewCache(30 * time.Second)
 var bookingChannel = make(chan BookingRequest, 100)
 
 func init() {
+	log.Println("Avviando Goroutine processBookingRequests()...")
 	go processBookingRequests() // Avvio della Goroutine worker
 }
 
 // Goroutine che processa le richieste di prenotazione
 func processBookingRequests() {
+	log.Println("Goroutine processBookingRequests avviata!")
 	for req := range bookingChannel {
+		log.Println("Ricevuta richiesta di prenotazione, elaborazione in corso...")
 		err := CreateBooking(&req.Booking)
 		req.Response <- err // Invia la risposta sul canale
+		log.Println("Prenotazione elaborata e risposta inviata")
 	}
 }
 
@@ -47,8 +51,10 @@ func CreateBooking(booking *models.Booking) error {
 
 // Funzione chiamata dal controller per gestire la prenotazione
 func RequestBooking(booking models.Booking) error {
+	log.Println("Inviando richiesta di prenotazione al canale...")
 	response := make(chan error)
 	bookingChannel <- BookingRequest{Booking: booking, Response: response}
+	log.Println("Richiesta inserita nel canale, in attesa di risposta...")
 	return <-response // Attende la risposta dalla Goroutine
 }
 
