@@ -64,6 +64,10 @@
               "target": "Package",
               "version": "[11.2.1, )"
             },
+            "CefNet.Avalonia": {
+              "target": "Package",
+              "version": "[105.3.22248.142, )"
+            },
             "CommunityToolkit.Mvvm": {
               "target": "Package",
               "version": "[8.4.0, )"

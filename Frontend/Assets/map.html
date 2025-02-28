@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mappa Auto</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        #map { height: 100vh; width: 100vw; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        var map = L.map('map').setView([45.4642, 9.1900], 12); // Milano
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Posizioni auto (puoi aggiornare queste coordinate da Avalonia)
+        var autoLocations = [
+            { lat: 45.4642, lon: 9.1900, model: "Fiat Panda" },
+            { lat: 45.4668, lon: 9.1885, model: "Tesla Model 3" }
+        ];
+
+        autoLocations.forEach(auto => {
+            L.marker([auto.lat, auto.lon])
+             .addTo(map)
+             .bindPopup(`<b>${auto.model}</b>`);
+        });
+    </script>
+</body>
+</html>

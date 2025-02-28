@@ -22,6 +22,8 @@
 /Users/ciccio/.nuget/packages/avalonia/11.2.1/ref/net8.0/Avalonia.Vulkan.dll
 /Users/ciccio/.nuget/packages/avalonia.win32/11.2.1/lib/net8.0/Avalonia.Win32.dll
 /Users/ciccio/.nuget/packages/avalonia.x11/11.2.1/lib/net8.0/Avalonia.X11.dll
+/Users/ciccio/.nuget/packages/cefnet.avalonia/105.3.22248.142/lib/net6.0/CefNet.Avalonia.dll
+/Users/ciccio/.nuget/packages/cefnet/105.3.22248.142/lib/net6.0/CefNet.dll
 /Users/ciccio/.nuget/packages/communitytoolkit.mvvm/8.4.0/lib/net8.0/CommunityToolkit.Mvvm.dll
 /Users/ciccio/.nuget/packages/harfbuzzsharp/7.3.0.2/lib/net6.0/HarfBuzzSharp.dll
 /Users/ciccio/.nuget/packages/microcom.runtime/0.11.0/lib/net5.0/MicroCom.Runtime.dll

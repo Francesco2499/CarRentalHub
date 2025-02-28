@@ -30,5 +30,10 @@ namespace Frontend.Services
 
             return await _httpService.GetAsync<List<VehicleModel>>(url);
         }
+
+        public async Task<List<VehicleModel>?> GetAllVehicles()
+        {
+            return await _httpService.GetAsync<List<VehicleModel>>("http://localhost:8085/api/v1/vehicle/getAll");
+        }
     }
 }

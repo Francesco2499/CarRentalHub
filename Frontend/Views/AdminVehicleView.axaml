@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:Frontend.ViewModels"
+             xmlns:converters="clr-namespace:Frontend.Converters"
+             xmlns:models="clr-namespace:Frontend.Models"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:AdminVehicleViewModel"
+             x:Class="Frontend.Views.AdminVehicleView">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <Button Content="Aggiungi Veicolo" Command="{Binding AddVehicleCommand}" Margin="5"/>
+            <Button Content="Modifica Veicolo" Command="{Binding EditVehicleCommand}" Margin="5"/>
+            <Button Content="Elimina Veicolo" Command="{Binding DeleteVehicleCommand}" Margin="5"/>
+        </StackPanel>
+
+        <TextBox Grid.Row="1" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" 
+                 Watermark="Cerca per modello o marca..." Width="300" Margin="10"/>
+        <Button Grid.Row="1" Content="Cerca" Command="{Binding SearchVehiclesCommand}" Margin="10"/>
+
+        <DataGrid Grid.Row="2" ItemsSource="{Binding Vehicles}" SelectedItem="{Binding SelectedVehicle}"
+                  AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Modello" Binding="{Binding Model}" Width="200"/>
+                <DataGridTextColumn Header="Prezzo" Binding="{Binding Price}" Width="100"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+            <Button Content="←" Command="{Binding GoToPreviousPageCommand}" IsEnabled="{Binding IsPreviousPageEnabled}"/>
+            <TextBlock Text="{Binding CurrentPage}" Margin="10"/>
+            <Button Content="→" Command="{Binding GoToNextPageCommand}" IsEnabled="{Binding IsNextPageEnabled}"/>
+        </StackPanel>
+
+        <TextBlock Grid.Row="4" Text="{Binding ErrorMessage}" Foreground="Red" Margin="10"/>
+    </Grid>
+</UserControl>

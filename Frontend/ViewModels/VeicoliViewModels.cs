@@ -13,6 +13,18 @@ namespace Frontend.ViewModels
 {
     public partial class VeicoliViewModel : ViewModelBase
     {
+        [ObservableProperty]
+        private bool _isPreviousPageEnabled = true;
+
+        [ObservableProperty]
+        private bool _isNextPageEnabled = true;
+
+        [ObservableProperty]
+        private double _previousPageOpacity = 1.0;
+
+        [ObservableProperty]
+        private double _nextPageOpacity = 1.0;
+
         private readonly VehicleService _vehicleService;
         private readonly BookingService _bookingService;
 
@@ -124,14 +136,15 @@ namespace Frontend.ViewModels
             var take = PageSize;
             var results = vehicles;
 
-            if (listVehicle != null && listVehicle.Any()) {
+            if (listVehicle != null && listVehicle.Any())
+            {
                 results = listVehicle;
             }
 
-            // Ottieni i veicoli per la pagina corrente
+            // Ottieni la lista dei veicoli per la pagina corrente
             var paginatedList = results.Skip(skip).Take(take).ToList();
 
-            // Imposta la lista paginata
+            // Imposta la lista dei veicoli
             VeicoliDisponibili.Clear();
             foreach (var vehicle in paginatedList)
             {
@@ -140,6 +153,13 @@ namespace Frontend.ViewModels
 
             // Verifica se la paginazione è necessaria
             IsPaginationVisible = _totalVehiclesCount > PageSize;
+
+            // Abilita/disabilita i pulsanti di paginazione e modifica l'opacità
+            IsPreviousPageEnabled = CurrentPage > 1;
+            IsNextPageEnabled = CurrentPage * PageSize < _totalVehiclesCount;
+
+            PreviousPageOpacity = IsPreviousPageEnabled ? 1.0 : 0.5; // Riduci l'opacità se disabilitato
+            NextPageOpacity = IsNextPageEnabled ? 1.0 : 0.5; // Riduci l'opacità se disabilitato
         }
 
         [RelayCommand]

@@ -13,6 +13,7 @@
           "Avalonia.Diagnostics": "11.2.1",
           "Avalonia.Fonts.Inter": "11.2.1",
           "Avalonia.Themes.Fluent": "11.2.1",
+          "CefNet.Avalonia": "105.3.22248.142",
           "CommunityToolkit.Mvvm": "8.4.0",
           "Microsoft.Extensions.DependencyInjection": "9.0.2"
         },
@@ -256,6 +257,26 @@
           "lib/net8.0/Avalonia.X11.dll": {
             "assemblyVersion": "11.2.1.0",
             "fileVersion": "11.2.1.0"
+          }
+        }
+      },
+      "CefNet/105.3.22248.142": {
+        "runtime": {
+          "lib/net6.0/CefNet.dll": {
+            "assemblyVersion": "105.3.22248.142",
+            "fileVersion": "105.3.22248.142"
+          }
+        }
+      },
+      "CefNet.Avalonia/105.3.22248.142": {
+        "dependencies": {
+          "Avalonia": "11.2.1",
+          "CefNet": "105.3.22248.142"
+        },
+        "runtime": {
+          "lib/net6.0/CefNet.Avalonia.dll": {
+            "assemblyVersion": "105.3.22248.142",
+            "fileVersion": "105.3.22248.142"
           }
         }
       },
@@ -561,6 +582,20 @@
       "sha512": "sha512-h2aCpyLmxGkldPK7cbncEgyobrJ5En7gQtrwVARLmN32Rw6dHut3jyF3P8at2DmWxRuKwZVXgWBSSI62hINgrQ==",
       "path": "avalonia.x11/11.2.1",
       "hashPath": "avalonia.x11.11.2.1.nupkg.sha512"
+    },
+    "CefNet/105.3.22248.142": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-wC1nLsJ94bIHGSBYPUzPdo7hUknCcdFUD0hg/y9MKmuJ7Ht7XeegADfhlzHcc/JP++p+K39rSDC69oj0VjwqkA==",
+      "path": "cefnet/105.3.22248.142",
+      "hashPath": "cefnet.105.3.22248.142.nupkg.sha512"
+    },
+    "CefNet.Avalonia/105.3.22248.142": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-7mSwj9CECvDtxZG5lhw1FAeFd+nyQlnAmJNnNTrfd2RgC8ZlOSz71Iqz95SNvwTwYk9Y7OVhVUqcaA+OsLKRAw==",
+      "path": "cefnet.avalonia/105.3.22248.142",
+      "hashPath": "cefnet.avalonia.105.3.22248.142.nupkg.sha512"
     },
     "CommunityToolkit.Mvvm/8.4.0": {
       "type": "package",

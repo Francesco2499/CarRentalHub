@@ -40,9 +40,14 @@ public partial class LoginViewModel : ViewModelBase
         }        
         var response = await _userService.Authenticate(EmailOrUsername, Password);
 
-        if (response != null) 
+        if (response != null && !string.IsNullOrEmpty(response.Token)) 
         {
-            _mainViewModel.ChangeViewModel(new MainViewModel());
+                        LoginMessage = response.IsAdmin ? "htcy" : "a";
+
+            //_mainViewModel.ChangeViewModel(new UserMainViewModel(response.IsAdmin));
+        } else {
+            LoginMessage = response.Message;
+            return;
         }
     }
 

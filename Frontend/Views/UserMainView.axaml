@@ -6,12 +6,11 @@
              xmlns:converters="clr-namespace:Frontend.Converters"
              xmlns:models="clr-namespace:Frontend.Models"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Frontend.Views.MainView"
-             x:DataType="viewModels:MainViewModel">
+             x:Class="Frontend.Views.UserMainView"
+             x:DataType="viewModels:UserMainViewModel">
   <Design.DataContext>
-    <viewModels:MainViewModel />
+    <viewModels:UserMainViewModel />
   </Design.DataContext>
-
 
   <SplitView IsPaneOpen="{Binding IsPaneOpen}"
              CompactPaneLength="45"

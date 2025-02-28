@@ -58,7 +58,7 @@ public class UserService
 
 public record RegistrationResponse(string Message, UserResponse? User);
 
-public record UserResponse(int Id, string Username, string Email, string Password, string Role);
+public record UserResponse(string username, string email, string password, string role);
 
-public record LoginResponse(string Message, string? Token);
+public record LoginResponse(string Message, string? Token, bool IsAdmin);
 

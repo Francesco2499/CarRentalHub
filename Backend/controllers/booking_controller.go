@@ -13,14 +13,14 @@ import (
 func GetAllBookings(c *gin.Context) {
 	log.Println("Received request to fetch all bookings")
 	userID, isAdmin := extractUserFromContext(c)
-	bookings, err := services.GetAllBookings(userID, isAdmin)
+	bookingsDTO, err := services.GetAllBookings(userID, isAdmin)
 	if err != nil {
 		log.Printf("Error retrieving bookings: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	log.Printf("Successfully retrieved %d bookings", len(bookings))
-	c.JSON(http.StatusOK, bookings)
+	log.Printf("Successfully retrieved %d bookings", len(bookingsDTO))
+	c.JSON(http.StatusOK, bookingsDTO)
 }
 
 /*func GetBookingsByUser(c *gin.Context) {
@@ -83,7 +83,6 @@ func GetBookingsByUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, bookings)
 }
-
 
 func GetBookingById(c *gin.Context) {
 	log.Println("Received request to fetch a booking")

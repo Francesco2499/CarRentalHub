@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func GetAllBookings(userID int, isAdmin bool) ([]models.Booking, error) {
+/*func GetAllBookings(userID int, isAdmin bool) ([]models.Booking, error) {
 	db := config.GetDB()
 	var query string
 	var rows *sql.Rows
@@ -35,6 +35,50 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.Booking, error) {
 	for rows.Next() {
 		var booking models.Booking
 		if err := rows.Scan(&booking.ID, &booking.UserID, &booking.VehicleID, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("data scan error: %w", err)
+		}
+		bookings = append(bookings, booking)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error after iteration: %w", err)
+	}
+	return bookings, nil
+}*/
+
+func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, error) {
+	db := config.GetDB()
+	var query string
+	var rows *sql.Rows
+	var err error
+
+	if isAdmin {
+		query = `
+			SELECT 
+				b.id, b.user_id, v.model, b.start_date, b.end_date, b.created_at, b.updated_at
+			FROM bookings b
+			JOIN vehicles v ON b.vehicle_id = v.id`
+		log.Printf("Executing query: %s", query)
+		rows, err = db.Query(query)
+	} else {
+		query = `
+			SELECT 
+				b.id, b.user_id, v.model, b.start_date, b.end_date, b.created_at, b.updated_at
+			FROM bookings b
+			JOIN vehicles v ON b.vehicle_id = v.id
+			WHERE b.user_id = $1`
+		log.Printf("Executing query: %s with userID: %d", query, userID)
+		rows, err = db.Query(query, userID)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("query error: %w", err)
+	}
+	defer rows.Close()
+
+	var bookings []models.BookingWithVehicleDTO
+	for rows.Next() {
+		var booking models.BookingWithVehicleDTO
+		if err := rows.Scan(&booking.ID, &booking.UserID, &booking.VehicleModel, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("data scan error: %w", err)
 		}
 		bookings = append(bookings, booking)

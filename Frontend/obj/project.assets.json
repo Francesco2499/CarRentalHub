@@ -337,6 +337,36 @@
           }
         }
       },
+      "CefNet/105.3.22248.142": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/CefNet.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/CefNet.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "CefNet.Avalonia/105.3.22248.142": {
+        "type": "package",
+        "dependencies": {
+          "Avalonia": "0.10.17",
+          "CefNet": "105.3.22248.142"
+        },
+        "compile": {
+          "lib/net6.0/CefNet.Avalonia.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/CefNet.Avalonia.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "CommunityToolkit.Mvvm/8.4.0": {
         "type": "package",
         "compile": {
@@ -1061,6 +1091,46 @@
         "lib/netstandard2.0/Avalonia.X11.xml"
       ]
     },
+    "CefNet/105.3.22248.142": {
+      "sha512": "wC1nLsJ94bIHGSBYPUzPdo7hUknCcdFUD0hg/y9MKmuJ7Ht7XeegADfhlzHcc/JP++p+K39rSDC69oj0VjwqkA==",
+      "type": "package",
+      "path": "cefnet/105.3.22248.142",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "cefnet.105.3.22248.142.nupkg.sha512",
+        "cefnet.nuspec",
+        "lib/net45/CefNet.dll",
+        "lib/net45/CefNet.xml",
+        "lib/net48/CefNet.dll",
+        "lib/net48/CefNet.xml",
+        "lib/net6.0/CefNet.dll",
+        "lib/net6.0/CefNet.xml",
+        "lib/netstandard2.0/CefNet.dll",
+        "lib/netstandard2.0/CefNet.xml",
+        "lib/netstandard2.1/CefNet.dll",
+        "lib/netstandard2.1/CefNet.xml"
+      ]
+    },
+    "CefNet.Avalonia/105.3.22248.142": {
+      "sha512": "7mSwj9CECvDtxZG5lhw1FAeFd+nyQlnAmJNnNTrfd2RgC8ZlOSz71Iqz95SNvwTwYk9Y7OVhVUqcaA+OsLKRAw==",
+      "type": "package",
+      "path": "cefnet.avalonia/105.3.22248.142",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "cefnet.avalonia.105.3.22248.142.nupkg.sha512",
+        "cefnet.avalonia.nuspec",
+        "lib/net461/CefNet.Avalonia.dll",
+        "lib/net461/CefNet.Avalonia.xml",
+        "lib/net6.0/CefNet.Avalonia.dll",
+        "lib/net6.0/CefNet.Avalonia.xml",
+        "lib/netstandard2.0/CefNet.Avalonia.dll",
+        "lib/netstandard2.0/CefNet.Avalonia.xml",
+        "lib/netstandard2.1/CefNet.Avalonia.dll",
+        "lib/netstandard2.1/CefNet.Avalonia.xml"
+      ]
+    },
     "CommunityToolkit.Mvvm/8.4.0": {
       "sha512": "tqVU8yc/ADO9oiTRyTnwhFN68hCwvkliMierptWOudIAvWY1mWCh5VFh+guwHJmpMwfg0J0rY+yyd5Oy7ty9Uw==",
       "type": "package",
@@ -1576,6 +1646,7 @@
       "Avalonia.Diagnostics >= 11.2.1",
       "Avalonia.Fonts.Inter >= 11.2.1",
       "Avalonia.Themes.Fluent >= 11.2.1",
+      "CefNet.Avalonia >= 105.3.22248.142",
       "CommunityToolkit.Mvvm >= 8.4.0",
       "Microsoft.Extensions.DependencyInjection >= 9.0.2"
     ]
@@ -1642,6 +1713,10 @@
           "Avalonia.Themes.Fluent": {
             "target": "Package",
             "version": "[11.2.1, )"
+          },
+          "CefNet.Avalonia": {
+            "target": "Package",
+            "version": "[105.3.22248.142, )"
           },
           "CommunityToolkit.Mvvm": {
             "target": "Package",

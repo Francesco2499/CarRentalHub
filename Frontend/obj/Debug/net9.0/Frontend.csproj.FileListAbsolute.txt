@@ -68,3 +68,5 @@
 /Users/ciccio/CarRental/app_car_rental_project/Frontend/obj/Debug/net9.0/ref/Frontend.dll
 /Users/ciccio/CarRental/app_car_rental_project/Frontend/bin/Debug/net9.0/Microsoft.Extensions.DependencyInjection.dll
 /Users/ciccio/CarRental/app_car_rental_project/Frontend/bin/Debug/net9.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+/Users/ciccio/CarRental/app_car_rental_project/Frontend/bin/Debug/net9.0/CefNet.dll
+/Users/ciccio/CarRental/app_car_rental_project/Frontend/bin/Debug/net9.0/CefNet.Avalonia.dll

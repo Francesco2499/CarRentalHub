@@ -2,9 +2,9 @@
 
 namespace Frontend.Views;
 
-public partial class MainView : UserControl
+public partial class UserMainView : UserControl
 {
-    public MainView()
+    public UserMainView()
     {
         InitializeComponent();
     }

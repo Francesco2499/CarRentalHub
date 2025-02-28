@@ -8,6 +8,8 @@ public record VehicleModel(
     string Category,
     decimal Price,
     bool Available,
-    string Location
+    string Location,
+    double Lat,  // Aggiunto campo per latitudine
+    double Lon 
 );
 

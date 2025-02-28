@@ -34,7 +34,12 @@ namespace Frontend.Services
             };
 
  
-            return await _httpService.PostAsync<BookingModel?>($"http://localhost:8085/api/v1/booking/new", requestBody);
+            return await _httpService.PostAsync<BookingModel?>("http://localhost:8085/api/v1/booking/new", requestBody);
+        }
+
+        public async Task<List<BookingModel>?> GetMyBookings()
+        {
+            return await _httpService.GetAsync<List<BookingModel>>("http://localhost:8085/api/v1/booking/getAll");
         }
     }
 }
