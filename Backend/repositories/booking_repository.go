@@ -10,41 +10,6 @@ import (
 	"time"
 )
 
-/*func GetAllBookings(userID int, isAdmin bool) ([]models.Booking, error) {
-	db := config.GetDB()
-	var query string
-	var rows *sql.Rows
-	var err error
-
-	if isAdmin {
-		query = `SELECT id, user_id, vehicle_id, start_date, end_date, created_at, updated_at FROM bookings`
-		log.Printf("Executing query: %s", query)
-		rows, err = db.Query(query)
-	} else {
-		query = `SELECT id, user_id, vehicle_id, start_date, end_date, created_at, updated_at FROM bookings WHERE user_id = $1`
-		log.Printf("Executing query: %s with userID: %d", query, userID)
-		rows, err = db.Query(query, userID)
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("query error: %w", err)
-	}
-	defer rows.Close()
-
-	var bookings []models.Booking
-	for rows.Next() {
-		var booking models.Booking
-		if err := rows.Scan(&booking.ID, &booking.UserID, &booking.VehicleID, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("data scan error: %w", err)
-		}
-		bookings = append(bookings, booking)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error after iteration: %w", err)
-	}
-	return bookings, nil
-}*/
-
 func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, error) {
 	db := config.GetDB()
 	var query string
@@ -89,42 +54,46 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, e
 	return bookings, nil
 }
 
-func GetBookingsByUser(userID int) ([]models.Booking, error) {
+/*func GetBookingsByUser(userID int) ([]models.BookingWithVehicleDTO, error) {
 	db := config.GetDB()
-	query := `SELECT id, user_id, vehicle_id, start_date, end_date, created_at, updated_at FROM bookings WHERE user_id = $1`
+	//query := `SELECT id, user_id, vehicle_id, start_date, end_date, created_at, updated_at FROM bookings WHERE user_id = $1`
+	query := `SELECT b.id, b.user_id, v.model, b.start_date, b.end_date, b.created_at, b.updated_at
+			FROM bookings b JOIN vehicles v ON b.vehicle_id = v.id WHERE b.user_id = $1`
 	rows, err := db.Query(query, userID)
 	if err != nil {
 		return nil, fmt.Errorf("query error: %w", err)
 	}
 	defer rows.Close()
 
-	var bookings []models.Booking
+	var bookings []models.BookingWithVehicleDTO
 	for rows.Next() {
-		var booking models.Booking
-		if err := rows.Scan(&booking.ID, &booking.UserID, &booking.VehicleID, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
+		var booking models.BookingWithVehicleDTO
+		if err := rows.Scan(&booking.ID, &booking.UserID, &booking.VehicleModel, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("data scan error: %w", err)
 		}
 		bookings = append(bookings, booking)
 	}
 	return bookings, nil
-}
+}*/
 
-func GetBookingById(id int, userID int, isAdmin bool) (*models.Booking, error) {
+/*func GetBookingById(id int, userID int, isAdmin bool) (*models.BookingWithVehicleDTO, error) {
 	db := config.GetDB()
 	var query string
-	var booking models.Booking
+	var booking models.BookingWithVehicleDTO
 	var err error
 
 	if isAdmin {
-		query = `SELECT id, user_id, vehicle_id, start_date, end_date, created_at, updated_at FROM bookings WHERE id = $1`
+		query = `SELECT b.id, b.user_id, v.model, b.start_date, b.end_date, b.created_at, b.updated_at
+			FROM bookings b JOIN vehicles v ON b.vehicle_id = v.id WHERE b.id = $1`
 		err = db.QueryRow(query, id).Scan(
-			&booking.ID, &booking.UserID, &booking.VehicleID, &booking.StartDate,
+			&booking.ID, &booking.UserID, &booking.VehicleModel, &booking.StartDate,
 			&booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt,
 		)
 	} else {
-		query = `SELECT id, user_id, vehicle_id, start_date, end_date, created_at, updated_at FROM bookings WHERE id = $1 AND user_id = $2`
+		query = `SELECT b.id, b.user_id, v.model, b.start_date, b.end_date, b.created_at, b.updated_at
+			FROM bookings b JOIN vehicles v ON b.vehicle_id = v.id WHERE b.id = $1 AND b.user_id = $2`
 		err = db.QueryRow(query, id, userID).Scan(
-			&booking.ID, &booking.UserID, &booking.VehicleID, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt)
+			&booking.ID, &booking.UserID, &booking.VehicleModel, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt)
 	}
 
 	if err != nil {
@@ -134,7 +103,7 @@ func GetBookingById(id int, userID int, isAdmin bool) (*models.Booking, error) {
 		return nil, fmt.Errorf("database query error: %w", err)
 	}
 	return &booking, nil
-}
+}*/
 
 func IsVehicleAvailable(vehicleID int, bookingID int, startDate, endDate time.Time) (bool, error) {
 	db := config.GetDB()
@@ -186,18 +155,3 @@ func DeleteBooking(id int) error {
 	}
 	return nil
 }
-
-/*func GetVehicleIdFromBooking(bookingID int) (int, error) {
-	db := config.GetDB()
-	query := `SELECT vehicle_id FROM bookings WHERE id = $1`
-
-	var vehicleID int
-	err := db.QueryRow(query, bookingID).Scan(&vehicleID)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return 0, fmt.Errorf("booking with ID %d not found", bookingID)
-		}
-		return 0, fmt.Errorf("database query error: %w", err)
-	}
-	return vehicleID, nil
-}*/
