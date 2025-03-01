@@ -102,12 +102,7 @@ func CreateBooking(c *gin.Context) {
 	}
 
 	booking.UserID = userID
-	/* senza l'uso della goroutine
-	if err := services.CreateBooking(&booking); err != nil {
-		log.Printf("Error saving booking: %v", err)
-		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
-		return
-	}*/
+	//senza l'uso della goroutine chiamare services.CreateBooking(&booking)
 	if err := services.RequestBooking(booking); err != nil {
 		log.Printf("Error saving booking: %v", err)
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})

@@ -57,34 +57,72 @@ func GetVehicleById(id int) (*models.Vehicle, error) {
 
 func CreateVehicle(vehicle *models.Vehicle) error {
 	db := config.GetDB()
-	query := `INSERT INTO vehicles (model, category, price, available, location) VALUES ($1, $2, $3, $4, $5)`
-	_, err := db.Exec(query, vehicle.Model, vehicle.Category, vehicle.Price, vehicle.Available, vehicle.Location)
+
+	tx, err := db.Begin()
 	if err != nil {
+		return fmt.Errorf("failed to start start transaction: %w", err)
+	}
+
+	query := `INSERT INTO vehicles (model, category, price, available, location) VALUES ($1, $2, $3, $4, $5)`
+	_, err = tx.Exec(query, vehicle.Model, vehicle.Category, vehicle.Price, vehicle.Available, vehicle.Location)
+	if err != nil {
+		tx.Rollback()
 		return fmt.Errorf("vehicle entry error: %w", err)
+	}
+
+	// Conferma la transazione
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 	return nil
 }
 
 func UpdateVehicle(vehicle *models.Vehicle) error {
 	db := config.GetDB()
-	query := `UPDATE vehicles SET model = $1, category = $2, price = $3, available = $4, location = $5 WHERE id = $6`
-	_, err := db.Exec(query, vehicle.Model, vehicle.Category, vehicle.Price, vehicle.Available, vehicle.Location, vehicle.ID)
+	tx, err := db.Begin()
 	if err != nil {
+		return fmt.Errorf("failed to start start transaction: %w", err)
+	}
+
+	query := `UPDATE vehicles SET model = $1, category = $2, price = $3, available = $4, location = $5 WHERE id = $6`
+	_, err = tx.Exec(query, vehicle.Model, vehicle.Category, vehicle.Price, vehicle.Available, vehicle.Location, vehicle.ID)
+	if err != nil {
+		tx.Rollback()
 		return fmt.Errorf("vehicle update error: %w", err)
+	}
+
+	// Conferma la transazione
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 	return nil
 }
 
 func DeleteVehicle(id int) error {
 	db := config.GetDB()
-	query := `DELETE FROM vehicles WHERE id = $1`
-	result, err := db.Exec(query, id)
+	tx, err := db.Begin()
 	if err != nil {
+		return fmt.Errorf("failed to start start transaction: %w", err)
+	}
+
+	query := `DELETE FROM vehicles WHERE id = $1`
+	result, err := tx.Exec(query, id)
+	if err != nil {
+		tx.Rollback()
 		return fmt.Errorf("vehicle delete error: %w", err)
 	}
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
+		tx.Rollback()
 		return errors.New("vehicle not found")
+	}
+
+	// Conferma la transazione
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 	return nil
 }
