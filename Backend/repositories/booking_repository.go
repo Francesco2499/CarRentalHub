@@ -22,7 +22,7 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, e
 				b.id, b.user_id, v.model, b.start_date, b.end_date, b.created_at, b.updated_at
 			FROM bookings b
 			JOIN vehicles v ON b.vehicle_id = v.id`
-		log.Printf("Executing query: %s", query)
+		//log.Printf("Executing query: %s", query)
 		rows, err = db.Query(query)
 	} else {
 		query = `
@@ -31,7 +31,7 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, e
 			FROM bookings b
 			JOIN vehicles v ON b.vehicle_id = v.id
 			WHERE b.user_id = $1`
-		log.Printf("Executing query: %s with userID: %d", query, userID)
+		//log.Printf("Executing query: %s with userID: %d", query, userID)
 		rows, err = db.Query(query, userID)
 	}
 
@@ -122,36 +122,104 @@ func IsVehicleAvailable(vehicleID int, bookingID int, startDate, endDate time.Ti
 	return count == 0, nil
 }
 
-func CreateBooking(booking *models.Booking) error {
+func CreateBooking(booking *models.Booking) (*models.BookingWithVehicleDTO, error) {
 	db := config.GetDB()
-	query := `INSERT INTO bookings (user_id, vehicle_id, start_date, end_date) VALUES ($1, $2, $3, $4)`
-	_, err := db.Exec(query, booking.UserID, booking.VehicleID, booking.StartDate, booking.EndDate)
+
+	tx, err := db.Begin()
 	if err != nil {
-		return fmt.Errorf("booking entry error: %w", err)
+		return nil, fmt.Errorf("failed to start transaction: %w", err)
 	}
-	return nil
+
+	// Query per inserire la prenotazione SOLO se il veicolo è disponibile e restituire i dettagli base
+	query := `
+		INSERT INTO bookings (user_id, vehicle_id, start_date, end_date) 
+		SELECT $1, $2, $3, $4
+		WHERE NOT EXISTS (
+			SELECT 1 FROM bookings 
+			WHERE vehicle_id = $2 AND (start_date, end_date) OVERLAPS ($3, $4)
+		)
+		RETURNING id, user_id, vehicle_id, start_date, end_date, created_at, updated_at`
+
+	var vehicleID int
+	//newBooking := models.BookingWithVehicleDTO{}
+	var newBooking models.BookingWithVehicleDTO
+	err = tx.QueryRow(query, booking.UserID, booking.VehicleID, booking.StartDate, booking.EndDate).
+		Scan(&newBooking.ID, &newBooking.UserID, &vehicleID, &newBooking.StartDate, &newBooking.EndDate, &newBooking.CreatedAt, &newBooking.UpdatedAt)
+
+	if err != nil {
+		tx.Rollback()
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("vehicle is no longer available, booking rejected")
+		}
+		return nil, fmt.Errorf("booking entry error: %w", err)
+	}
+
+	// Recupera il modello del veicolo usando l'ID appena estratto
+	err = db.QueryRow(`SELECT model FROM vehicles WHERE id = $1`, vehicleID).Scan(&newBooking.VehicleModel)
+	if err != nil {
+		tx.Rollback()
+		return nil, fmt.Errorf("failed to fetch vehicle model: %w", err)
+	}
+
+	// Conferma la transazione
+	err = tx.Commit()
+	if err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	log.Printf("Booking transaction completed successfully")
+	return &newBooking, nil
 }
 
 func UpdateBooking(booking *models.Booking) error {
 	db := config.GetDB()
-	query := `UPDATE bookings SET vehicle_id = $1, start_date = $2, end_date = $3 WHERE id = $4`
-	_, err := db.Exec(query, booking.VehicleID, booking.StartDate, booking.EndDate, booking.ID)
+
+	tx, err := db.Begin()
 	if err != nil {
+		return fmt.Errorf("failed to start start transaction: %w", err)
+	}
+
+	query := `UPDATE bookings SET vehicle_id = $1, start_date = $2, end_date = $3 WHERE id = $4`
+	_, err = tx.Exec(query, booking.VehicleID, booking.StartDate, booking.EndDate, booking.ID)
+	if err != nil {
+		tx.Rollback()
 		return fmt.Errorf("booking update error: %w", err)
 	}
+
+	// Conferma la transazione
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
 	return nil
 }
 
 func DeleteBooking(id int) error {
 	db := config.GetDB()
-	query := `DELETE FROM bookings WHERE id = $1`
-	result, err := db.Exec(query, id)
+
+	tx, err := db.Begin()
 	if err != nil {
+		return fmt.Errorf("failed to start start transaction: %w", err)
+	}
+
+	query := `DELETE FROM bookings WHERE id = $1`
+	result, err := tx.Exec(query, id)
+	if err != nil {
+		tx.Rollback()
 		return fmt.Errorf("booking delete error: %w", err)
 	}
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
+		tx.Rollback()
 		return errors.New("booking not found")
 	}
+
+	// Conferma la transazione
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
 	return nil
 }
