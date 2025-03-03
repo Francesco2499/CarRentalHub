@@ -40,16 +40,22 @@
 
       <Button Content="Cerca auto" Margin="0 20 0 0" HorizontalAlignment="Center" Command="{Binding CercaVeicoliCommand}" />
     
-      <!-- Lista dei veicoli -->
-      <ListBox Margin="0 20 0 0" Padding="0"
-              ItemsSource="{Binding VeicoliDisponibili}">
+      <Grid ColumnDefinitions="2*, 2*, 2*, 2*" Background="#1e1e1e" Margin="10" Width="600">
+          <TextBlock Text="ID" Grid.Column="0" TextAlignment="Center" FontWeight="Bold" Margin="5"/>
+          <TextBlock Text="Modello" Grid.Column="1"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
+          <TextBlock Text="Categoria" Grid.Column="2"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
+          <TextBlock Text="Prezzo" Grid.Column="3"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
+      </Grid>      
+      <ListBox Padding="0"
+              ItemsSource="{Binding VeicoliDisponibili}"
+              SelectedItem="{Binding SelectedVehicle, Mode=TwoWay}">
           <ListBox.Styles>
               <Style Selector="ListBoxItem">
                   <Setter Property="Padding" Value="12 8" />
               </Style>
           </ListBox.Styles>
           <ListBox.ItemTemplate>
-              <DataTemplate DataType="{x:Type models:VehicleModel}">
+              <DataTemplate>
                   <Grid ColumnDefinitions="2*, 2*, 2*, 2*">
                       <TextBlock Text="{Binding Id}" Grid.Column="0" Margin="5"/>
                       <TextBlock Text="{Binding Model}" Grid.Column="1" Margin="5"/>
@@ -65,36 +71,30 @@
           <Button.Opacity>
               <Binding Path="PreviousPageOpacity" />
           </Button.Opacity>
-          <PathIcon Data="{Binding Source=chevron_left_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Width="14"/>
+          <PathIcon Data="{Binding Source=chevron_left_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Width="10"/>
         </Button>
 
         <Button Command="{Binding GoToNextPageCommand}" Margin="5" IsEnabled="{Binding IsNextPageEnabled}">
           <Button.Opacity>
               <Binding Path="NextPageOpacity" />
           </Button.Opacity>
-          <PathIcon Data="{Binding Source=chevron_right_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Width="14"/>
+          <PathIcon Data="{Binding Source=chevron_right_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Width="10"/>
         </Button>
       </StackPanel>
 
       <StackPanel Margin="20" HorizontalAlignment="Center">
-        <TextBlock Text="Inserisci l'ID dell'auto da prenotare:" HorizontalAlignment="Center" Margin="0, 10"/>
-        
-        <!-- TextBox per l'ID dell'auto -->
-        <TextBox Width="250" HorizontalAlignment="Center" Text="{Binding CarId}" Watermark="ID dell'auto" />
-        <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" Margin="0,10,0,0"/>
-
-
         <!-- Bottone per prenotare l'auto -->
-        <Button Content="Prenota auto" HorizontalAlignment="Center" Command="{Binding AddBookingCommand}" CommandParameter="{Binding CarId}" Margin="10, 20"/>
-      </StackPanel>
+        <Button Content="Prenota auto" HorizontalAlignment="Center" Command="{Binding AddBookingCommand}" Margin="10, 20"/>
+        <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" Margin="10"/>
 
-      <StackPanel IsVisible="{Binding IsBookingSummaryVisible}" Margin="20">
-        <TextBlock Text="Resoconto Prenotazione" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-        <TextBlock Text="{Binding Booking.vehicle_model, StringFormat='Veicolo: {0}'}" />
-        <TextBlock Text="{Binding Booking.start_date, StringFormat='Data inizio: {0:yyyy-MM-dd}'}" />
-        <TextBlock Text="{Binding Booking.end_date, StringFormat='Data fine: {0:yyyy-MM-dd}'}" />
+
+        <StackPanel IsVisible="{Binding IsBookingSummaryVisible}" Margin="20">
+          <TextBlock Text="Resoconto Prenotazione" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+          <TextBlock Text="{Binding Booking.vehicle_model, StringFormat='Veicolo: {0}'}" />
+          <TextBlock Text="{Binding Booking.start_date, StringFormat='Data inizio: {0:yyyy-MM-dd}'}" />
+          <TextBlock Text="{Binding Booking.end_date, StringFormat='Data fine: {0:yyyy-MM-dd}'}" />
+        </StackPanel>
       </StackPanel>
     </StackPanel>
   </StackPanel>
-
 </UserControl>

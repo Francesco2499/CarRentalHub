@@ -62,6 +62,9 @@ namespace Frontend.ViewModels
         [ObservableProperty]
         private bool _isVisibleSearchDate = true;
 
+        [ObservableProperty]
+        private VehicleModel? _selectedVehicle;
+
 // Proprietà per verificare se la paginazione è necessaria (cioè se ci sono più di 6 veicoli)
         [ObservableProperty]
         private bool _isPaginationVisible = false;
@@ -204,37 +207,25 @@ namespace Frontend.ViewModels
 
 
         [RelayCommand]
-         private async Task AddBooking(string carId)
+         private async Task AddBooking()
         {
-            if (string.IsNullOrEmpty(carId))
+            if (SelectedVehicle == null)
             {
-                Console.WriteLine("ID veicolo non valido.");
+                ErrorMessage = "Seleziona un veicolo!";
                 return;
-            }
+            }  
 
-            // Trova il veicolo con l'ID fornito (in un'app reale, questo sarebbe un servizio API, database, ecc.)
-            var veicolo = VeicoliDisponibili.FirstOrDefault(v => v.Id == int.Parse(carId));
+            var booking = await _bookingService.AddBooking(SelectedVehicle.Id, StartDate, EndDate);
             
-            if (veicolo != null)
+            if (booking != null)
             {
-                               
-
-                var booking = await _bookingService.AddBooking(int.Parse(carId), StartDate, EndDate);
-                
-                if (booking != null)
-                {
-                    Booking = booking;
-                    ErrorMessage = string.Empty;
-                    IsBookingSummaryVisible = true;
-                } else
-                {
-                    ErrorMessage = "Errore nella prenotazione. Riprova.";
-                }           
-            }
-            else
+                Booking = booking;
+                ErrorMessage = string.Empty;
+                IsBookingSummaryVisible = true;
+            } else
             {
-                ErrorMessage = $"Nessun veicolo trovato con l'ID: {carId}";
-            }
+                ErrorMessage = "Errore nella prenotazione. Riprova.";
+            }           
         }
     }
 }

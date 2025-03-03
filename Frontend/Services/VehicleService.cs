@@ -35,5 +35,19 @@ namespace Frontend.Services
         {
             return await _httpService.GetAsync<List<VehicleModel>>("http://localhost:8085/api/v1/vehicle/getAll");
         }
+
+        public async Task<VehicleModel> AddVehicle(VehicleModel vehicle)
+        {
+            var requestBody = new
+            {
+                model = vehicle.Model,
+                category = vehicle.Category,
+                price = vehicle.Price,
+                available = true,
+                location = "Napoli"
+            };
+
+            return await _httpService.PostAsync<VehicleModel>("http://localhost:8085/api/v1/vehicle/new", requestBody);
+        }
     }
 }
