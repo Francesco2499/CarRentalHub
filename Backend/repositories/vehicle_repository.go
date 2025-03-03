@@ -13,7 +13,7 @@ import (
 
 func GetAllVehicles() ([]models.Vehicle, error) {
 	db := config.GetDB()
-	query := `SELECT id, model, category, price, available, location FROM vehicles`
+	query := `SELECT id, model, category, price, location FROM vehicles`
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("query error: %w", err)
@@ -23,7 +23,7 @@ func GetAllVehicles() ([]models.Vehicle, error) {
 	var vehicles []models.Vehicle
 	for rows.Next() {
 		var vehicle models.Vehicle
-		if err := rows.Scan(&vehicle.ID, &vehicle.Model, &vehicle.Category, &vehicle.Price, &vehicle.Available, &vehicle.Location); err != nil {
+		if err := rows.Scan(&vehicle.ID, &vehicle.Model, &vehicle.Category, &vehicle.Price, &vehicle.Location); err != nil {
 			return nil, fmt.Errorf("data scan error: %w", err)
 		}
 		vehicles = append(vehicles, vehicle)
@@ -36,14 +36,13 @@ func GetAllVehicles() ([]models.Vehicle, error) {
 
 func GetVehicleById(id int) (*models.Vehicle, error) {
 	db := config.GetDB()
-	query := `SELECT id, model, category, price, available, location FROM vehicles WHERE id = $1`
+	query := `SELECT id, model, category, price, location FROM vehicles WHERE id = $1`
 	var vehicle models.Vehicle
 	err := db.QueryRow(query, id).Scan(
 		&vehicle.ID,
 		&vehicle.Model,
 		&vehicle.Category,
 		&vehicle.Price,
-		&vehicle.Available,
 		&vehicle.Location,
 	)
 	if err != nil {
@@ -63,8 +62,8 @@ func CreateVehicle(vehicle *models.Vehicle) error {
 		return fmt.Errorf("failed to start start transaction: %w", err)
 	}
 
-	query := `INSERT INTO vehicles (model, category, price, available, location) VALUES ($1, $2, $3, $4, $5)`
-	_, err = tx.Exec(query, vehicle.Model, vehicle.Category, vehicle.Price, vehicle.Available, vehicle.Location)
+	query := `INSERT INTO vehicles (model, category, price, location) VALUES ($1, $2, $3, $4)`
+	_, err = tx.Exec(query, vehicle.Model, vehicle.Category, vehicle.Price, vehicle.Location)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("vehicle entry error: %w", err)
@@ -85,8 +84,8 @@ func UpdateVehicle(vehicle *models.Vehicle) error {
 		return fmt.Errorf("failed to start start transaction: %w", err)
 	}
 
-	query := `UPDATE vehicles SET model = $1, category = $2, price = $3, available = $4, location = $5 WHERE id = $6`
-	_, err = tx.Exec(query, vehicle.Model, vehicle.Category, vehicle.Price, vehicle.Available, vehicle.Location, vehicle.ID)
+	query := `UPDATE vehicles SET model = $1, category = $2, price = $3, location = $4 WHERE id = $5`
+	_, err = tx.Exec(query, vehicle.Model, vehicle.Category, vehicle.Price, vehicle.Location, vehicle.ID)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("vehicle update error: %w", err)
@@ -129,7 +128,7 @@ func DeleteVehicle(id int) error {
 
 func GetAvailableVehicles(startDate, endDate time.Time) ([]models.Vehicle, error) {
 	db := config.GetDB()
-	query := `SELECT id, model, category, price, available, location 
+	query := `SELECT id, model, category, price, location 
 		FROM vehicles 
 		WHERE id NOT IN (
 			SELECT vehicle_id FROM bookings 
@@ -145,7 +144,7 @@ func GetAvailableVehicles(startDate, endDate time.Time) ([]models.Vehicle, error
 	var vehicles []models.Vehicle
 	for rows.Next() {
 		var vehicle models.Vehicle
-		if err := rows.Scan(&vehicle.ID, &vehicle.Model, &vehicle.Category, &vehicle.Price, &vehicle.Available, &vehicle.Location); err != nil {
+		if err := rows.Scan(&vehicle.ID, &vehicle.Model, &vehicle.Category, &vehicle.Price, &vehicle.Location); err != nil {
 			return nil, fmt.Errorf("error scanning vehicle data: %w", err)
 		}
 		vehicles = append(vehicles, vehicle)

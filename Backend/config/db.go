@@ -85,7 +85,6 @@ func CreateTables() error {
 			model VARCHAR(255) NOT NULL,
 			category VARCHAR(255) NOT NULL,
 			price DECIMAL(10,2) NOT NULL,
-			available BOOLEAN DEFAULT TRUE,
 			location VARCHAR(255) NOT NULL
 		);`,
 
@@ -187,10 +186,10 @@ func SeedData() error {
 
 	if count == 0 { // Inserisce i dati solo se la tabella è vuota
 		_, err := db.Exec(`
-			INSERT INTO vehicles (model, category, price, available, location) VALUES 
-			('Toyota Corolla', 'Sedan', 50.00, TRUE, 'Milan'),
-			('Ford Fiesta', 'Hatchback', 40.00, TRUE, 'Rome'),
-			('BMW X5', 'SUV', 90.00, FALSE, 'Naples');
+			INSERT INTO vehicles (model, category, price, location) VALUES 
+			('Toyota Corolla', 'Sedan', 50.00, 'Milan'),
+			('Ford Fiesta', 'Hatchback', 40.00, 'Rome'),
+			('BMW X5', 'SUV', 90.00, 'Naples');
 		`)
 		if err != nil {
 			return err
