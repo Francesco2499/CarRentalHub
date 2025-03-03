@@ -122,14 +122,15 @@ func IsVehicleAvailable(vehicleID int, bookingID int, startDate, endDate time.Ti
 	return count == 0, nil
 }
 
-func CreateBooking(booking *models.Booking) error {
+func CreateBooking(booking *models.Booking) (*models.BookingWithVehicleDTO, error) {
 	db := config.GetDB()
 
 	tx, err := db.Begin()
 	if err != nil {
-		return fmt.Errorf("failed to start start transaction: %w", err)
+		return nil, fmt.Errorf("failed to start transaction: %w", err)
 	}
-	// Query per inserire una nuova prenotazione SOLO se il veicolo è disponibile
+
+	// Query per inserire la prenotazione SOLO se il veicolo è disponibile e restituire i dettagli base
 	query := `
 		INSERT INTO bookings (user_id, vehicle_id, start_date, end_date) 
 		SELECT $1, $2, $3, $4
@@ -137,27 +138,37 @@ func CreateBooking(booking *models.Booking) error {
 			SELECT 1 FROM bookings 
 			WHERE vehicle_id = $2 AND (start_date, end_date) OVERLAPS ($3, $4)
 		)
-		RETURNING id`
+		RETURNING id, user_id, vehicle_id, start_date, end_date, created_at, updated_at`
 
-	var bookingID int
-	err = tx.QueryRow(query, booking.UserID, booking.VehicleID, booking.StartDate, booking.EndDate).Scan(&bookingID)
+	var vehicleID int
+	//newBooking := models.BookingWithVehicleDTO{}
+	var newBooking models.BookingWithVehicleDTO
+	err = tx.QueryRow(query, booking.UserID, booking.VehicleID, booking.StartDate, booking.EndDate).
+		Scan(&newBooking.ID, &newBooking.UserID, &vehicleID, &newBooking.StartDate, &newBooking.EndDate, &newBooking.CreatedAt, &newBooking.UpdatedAt)
+
 	if err != nil {
 		tx.Rollback()
 		if errors.Is(err, sql.ErrNoRows) {
-			return fmt.Errorf("Vehicle is no longer available, booking rejected")
+			return nil, fmt.Errorf("vehicle is no longer available, booking rejected")
 		}
-		return fmt.Errorf("booking entry error: %w", err)
+		return nil, fmt.Errorf("booking entry error: %w", err)
+	}
+
+	// Recupera il modello del veicolo usando l'ID appena estratto
+	err = db.QueryRow(`SELECT model FROM vehicles WHERE id = $1`, vehicleID).Scan(&newBooking.VehicleModel)
+	if err != nil {
+		tx.Rollback()
+		return nil, fmt.Errorf("failed to fetch vehicle model: %w", err)
 	}
 
 	// Conferma la transazione
 	err = tx.Commit()
 	if err != nil {
-		return fmt.Errorf("failed to commit transaction: %w", err)
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-	log.Printf("transaction completed successfully")
-
-	return nil
+	log.Printf("Booking transaction completed successfully")
+	return &newBooking, nil
 }
 
 func UpdateBooking(booking *models.Booking) error {

@@ -85,6 +85,7 @@ func GetAllBookings(c *gin.Context) {
 	c.JSON(http.StatusOK, bookingDTO)
 }*/
 
+
 func CreateBooking(c *gin.Context) {
 	log.Println("Received request to create a new booking")
 	userID, _ := extractUserFromContext(c)
@@ -103,14 +104,17 @@ func CreateBooking(c *gin.Context) {
 
 	booking.UserID = userID
 	//senza l'uso della goroutine chiamare services.CreateBooking(&booking)
-	if err := services.RequestBooking(booking); err != nil {
+	createdBooking, err := services.RequestBooking(booking)
+	if err != nil {
 		log.Printf("Error saving booking: %v", err)
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		return
 	}
+
 	log.Println("Booking created successfully")
-	c.JSON(http.StatusCreated, booking)
+	c.JSON(http.StatusCreated, createdBooking)
 }
+
 
 func UpdateBooking(c *gin.Context) {
 	log.Println("Received request to update a booking")

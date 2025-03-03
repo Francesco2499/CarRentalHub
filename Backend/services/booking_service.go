@@ -13,7 +13,8 @@ import (
 // Struttura per la richiesta di prenotazione
 type BookingRequest struct {
 	Booking  models.Booking
-	Response chan error // Canale per la risposta
+	Response chan *models.BookingWithVehicleDTO
+	Error    chan error
 }
 
 // Cache per le prenotazioni (TTL di 30 secondi)
@@ -32,30 +33,43 @@ func processBookingRequests() {
 	log.Println("Goroutine processBookingRequests avviata!")
 	for req := range bookingChannel {
 		log.Println("Ricevuta richiesta di prenotazione, elaborazione in corso...")
-		err := CreateBooking(&req.Booking)
-		req.Response <- err // Invia la risposta sul canale
+		createdBooking, err := CreateBooking(&req.Booking)
+		if err != nil {
+			req.Error <- err
+		} else {
+			req.Response <- createdBooking
+		}
 		log.Println("Prenotazione elaborata e risposta inviata")
 	}
 }
 
-func CreateBooking(booking *models.Booking) error {
-	err := repositories.CreateBooking(booking)
+func CreateBooking(booking *models.Booking) (*models.BookingWithVehicleDTO, error) {
+	createdBooking, err := repositories.CreateBooking(booking)
 	if err != nil {
-		return err
+		return nil, err
 	}
+
 	// Invalida la cache quando viene creata una nuova prenotazione
 	bookingCache.Invalidate()
 
-	return nil
+	return createdBooking, nil
 }
 
 // Funzione chiamata dal controller per gestire la prenotazione
-func RequestBooking(booking models.Booking) error {
+func RequestBooking(booking models.Booking) (*models.BookingWithVehicleDTO, error) {
 	log.Println("Inviando richiesta di prenotazione al canale...")
-	response := make(chan error)
-	bookingChannel <- BookingRequest{Booking: booking, Response: response}
+	response := make(chan *models.BookingWithVehicleDTO)
+	errorChan := make(chan error)
+
+	bookingChannel <- BookingRequest{Booking: booking, Response: response, Error: errorChan}
 	log.Println("Richiesta inserita nel canale, in attesa di risposta...")
-	return <-response // Attende la risposta dalla Goroutine
+
+	select {
+	case res := <-response:
+		return res, nil
+	case err := <-errorChan:
+		return nil, err
+	}
 }
 
 func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, error) {
