@@ -182,38 +182,16 @@ namespace Frontend.ViewModels
         }
 
         [RelayCommand]
-        private async Task AddVehicle()
-        {
-            //var newVehicle = new VehicleModel
-           //
-            //UpdatePaginatedCars();
-        }
-
-        [RelayCommand]
-        private async Task EditVehicle()
-        {
-            // if (SelectedCar == null)
-            // {
-            //     ErrorMessage = "Seleziona un'auto da modificare.";
-            //     return;
-            // }
-
-            // SelectedCar.Model = "Modificato";
-            // UpdatePaginatedCars();
-        }
-
-        [RelayCommand]
         private async Task DeleteVehicle()
         {
-            // if (SelectedCar == null)
-            // {
-            //     ErrorMessage = "Seleziona un'auto da eliminare.";
-            //     return;
-            // }
+            if (SelectedVehicle == null)
+            {
+                ErrorMessage = "Seleziona un'auto da eliminare.";
+                return;
+            }
 
-            // allCars.Remove(SelectedCar);
-            // SelectedCar = null;
-            // UpdatePaginatedCars();
+            _vehicleService.DeleteVehicle(SelectedVehicle.Id);
+            LoadVehicles();
         }
     }
 }

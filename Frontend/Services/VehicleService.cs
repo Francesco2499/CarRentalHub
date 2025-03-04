@@ -49,5 +49,10 @@ namespace Frontend.Services
 
             return await _httpService.PostAsync<VehicleModel>("http://localhost:8085/api/v1/vehicle/new", requestBody);
         }
+
+        public async Task<VehicleModel> DeleteVehicle(int vehicleId)
+        {
+            return await _httpService.DeleteAsync<VehicleModel>($"http://localhost:8085/api/v1/vehicle/delete/{vehicleId}");
+        }
     }
 }

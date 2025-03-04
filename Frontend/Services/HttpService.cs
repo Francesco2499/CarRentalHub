@@ -36,9 +36,9 @@ namespace Frontend.Services
         }
 
         // Metodo generico per fare richieste DELETE
-        public async Task<TResponse?> DeleteAsync<TResponse>(string url, object requestBody)
+        public async Task<TResponse?> DeleteAsync<TResponse>(string url)
         {
-            return await SendRequestAsync<TResponse>(HttpMethod.Delete, url, requestBody);
+            return await SendRequestAsync<TResponse>(HttpMethod.Delete, url, null);
         }
 
         // Metodo generico per fare richieste GET

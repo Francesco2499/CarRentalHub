@@ -33,7 +33,7 @@ namespace Frontend.ViewModels
         private int _currentPage = 1;
 
         // Proprietà per la dimensione della pagina (6 veicoli per pagina)
-        private const int PageSize = 2;
+        private const int PageSize = 5;
 
         // Proprietà per la lista di veicoli visibili (che verrà aggiornata a seconda della pagina)
         private List<VehicleModel> vehicles = new();
@@ -225,6 +225,7 @@ namespace Frontend.ViewModels
             } else
             {
                 ErrorMessage = "Errore nella prenotazione. Riprova.";
+                return;
             }           
         }
     }

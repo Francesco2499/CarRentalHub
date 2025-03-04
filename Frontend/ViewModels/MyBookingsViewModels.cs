@@ -17,7 +17,7 @@ namespace Frontend.ViewModels
         [ObservableProperty]
         private int _currentPage = 1;
 
-        private const int PageSize = 2;
+        private const int PageSize = 5;
 
         [ObservableProperty]
         private ObservableCollection<BookingModel> _paginatedBookings = new();
