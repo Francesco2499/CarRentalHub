@@ -85,6 +85,7 @@ func GetAllBookings(c *gin.Context) {
 	c.JSON(http.StatusOK, bookingDTO)
 }*/
 
+
 func CreateBooking(c *gin.Context) {
 	log.Println("Received request to create a new booking")
 	userID, _ := extractUserFromContext(c)
@@ -102,14 +103,18 @@ func CreateBooking(c *gin.Context) {
 	}
 
 	booking.UserID = userID
-	if err := services.CreateBooking(&booking); err != nil {
+	//senza l'uso della goroutine chiamare services.CreateBooking(&booking)
+	createdBooking, err := services.RequestBooking(booking)
+	if err != nil {
 		log.Printf("Error saving booking: %v", err)
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		return
 	}
+
 	log.Println("Booking created successfully")
-	c.JSON(http.StatusCreated, booking)
+	c.JSON(http.StatusCreated, createdBooking)
 }
+
 
 func UpdateBooking(c *gin.Context) {
 	log.Println("Received request to update a booking")
@@ -149,14 +154,15 @@ func DeleteBooking(c *gin.Context) {
 		return
 	}
 	log.Printf("Booking ID %d deleted successfully", id)
-	c.Status(http.StatusNoContent)
+	//c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, gin.H{"message": "Booking deleted successfully"})
 }
 
 func extractUserFromContext(c *gin.Context) (int, bool) {
 
-	for key, value := range c.Keys {
+	/*for key, value := range c.Keys {
 		log.Printf("Key: %s, Value: %v", key, value)
-	}
+	}*/
 
 	// Recupera userID dal contesto della richiesta
 	userID, exists := c.Get("userID")

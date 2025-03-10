@@ -12,5 +12,5 @@ public record BookingModel(
     DateTime start_date,
     DateTime end_date,
     DateTime created_at,
-    DateTime updated_at
+    DateTime? updated_at
 );

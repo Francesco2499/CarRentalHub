@@ -52,7 +52,7 @@ namespace Frontend.ViewModels
 
         private async Task LoadBookings()
         {
-            var bookings = await _bookingService.GetMyBookings();
+            var bookings = await _bookingService.GetAllBookings();
             AllBookings.Clear();
 
             if (bookings is { Count: > 0 })

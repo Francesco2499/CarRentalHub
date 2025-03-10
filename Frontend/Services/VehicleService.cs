@@ -17,12 +17,6 @@ namespace Frontend.Services
         {
             _httpService = new HttpService();
         }
-        
-        private static readonly JsonSerializerOptions JsonOptions = new()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        };
 
         public async Task<List<VehicleModel>?> GetVehiclesByDate(DateTime? startDate, DateTime? endDate)
         {
@@ -43,11 +37,23 @@ namespace Frontend.Services
                 model = vehicle.Model,
                 category = vehicle.Category,
                 price = vehicle.Price,
-                available = true,
                 location = "Napoli"
             };
 
             return await _httpService.PostAsync<VehicleModel>("http://localhost:8085/api/v1/vehicle/new", requestBody);
+        }
+
+        public async Task<VehicleModel> EditVehicle(VehicleModel vehicle)
+        {
+            var requestBody = new
+            {
+                model = vehicle.Model,
+                category = vehicle.Category,
+                price = vehicle.Price,
+                location = "Napoli"
+            };
+
+            return await _httpService.PutAsync<VehicleModel>($"http://localhost:8085/api/v1/vehicle/update/{vehicle.Id}", requestBody);
         }
 
         public async Task<VehicleModel> DeleteVehicle(int vehicleId)

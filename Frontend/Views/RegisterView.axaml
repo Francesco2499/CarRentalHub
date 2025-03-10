@@ -9,7 +9,7 @@
 
     <StackPanel Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center">
         
-        <TextBlock Text="Registrazione" FontSize="24" FontWeight="Bold" TextAlignment="Center" Margin="10"/>
+        <TextBlock Text="{Binding RegisterTitle}" FontSize="24" FontWeight="Bold" TextAlignment="Center" Margin="10"/>
 
         <TextBox Watermark="Email" Width="250" Height="40"
                  Text="{Binding Email}" />
@@ -23,15 +23,17 @@
         <TextBox Watermark="Conferma Password" Width="250" Height="40" PasswordChar="*"
                  Text="{Binding ConfirmPassword}" />
 
-        <TextBlock Text="{Binding RegisterMessage}" Foreground="Red" TextAlignment="Center"/>
+        <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" TextAlignment="Center"/>
 
         <Button Content="Vai al Login!" IsVisible="{Binding ShowGoToLogin}" Width="250" Height="40"
                 Command="{Binding GoToLoginCommand}" Background="#28A745" Foreground="White"/>
 
         <Button Content="Registrati" IsVisible="{Binding ShowSubmitForm}" Width="250" Height="40"
-                Command="{Binding SubmitRegistrationCommand}" Background="#28A745" Foreground="White"/>
+                Command="{Binding SubmitRegistrationCommand}"  HorizontalAlignment="Center" Background="#28A745" Foreground="White"/>
+        
+        <TextBlock Text="{Binding RegisterMessage}" Foreground="Green" TextAlignment="Center"/>
 
-        <Button Content="Torna Indietro" IsVisible="{Binding ShowSubmitForm}" Width="250" Height="40"
+        <Button Content="Torna Indietro" IsVisible="{Binding ShowBack}" Width="250" Height="40"
                 Command="{Binding BackCommand}" Background="Gray" Foreground="White"/>
     </StackPanel>
 </UserControl>

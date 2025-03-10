@@ -32,6 +32,9 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 [/Users/ciccio/CarRental/app_car_rental_project/Frontend/Assets/Icons.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[/Users/ciccio/CarRental/app_car_rental_project/Frontend/Views/AdminBookingView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [/Users/ciccio/CarRental/app_car_rental_project/Frontend/Views/AdminVehicleView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
@@ -47,11 +50,11 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 [/Users/ciccio/CarRental/app_car_rental_project/Frontend/Views/MyBookingsView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[/Users/ciccio/CarRental/app_car_rental_project/Frontend/Views/NewBookingView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [/Users/ciccio/CarRental/app_car_rental_project/Frontend/Views/RegisterView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
 [/Users/ciccio/CarRental/app_car_rental_project/Frontend/Views/UserMainView.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[/Users/ciccio/CarRental/app_car_rental_project/Frontend/Views/VeicoliView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

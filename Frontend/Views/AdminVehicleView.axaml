@@ -11,7 +11,7 @@
              
    <StackPanel Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center">
 
-        <StackPanel Margin="10" Orientation="Horizontal">
+        <StackPanel Margin="10" HorizontalAlignment="Center" Orientation="Horizontal">
             <Button Content="Aggiungi Veicolo" Command="{Binding ShowAddVehicleFormCommand}" Margin="5"/>
             <Button Content="Modifica Veicolo" Command="{Binding ShowEditVehicleFormCommand}" Margin="5"/>
             <Button Content="Elimina Veicolo" Command="{Binding DeleteVehicleCommand}" Margin="5"/>
@@ -19,7 +19,7 @@
 
         <TextBox Text="{Binding SearchQuery}" 
                  Watermark="Cerca per modello o marca..." Width="300" Margin="10"/>
-        <Button Content="Cerca" Command="{Binding SearchVehiclesCommand}" Margin="10"/>
+        <Button HorizontalAlignment="Center" Content="Cerca" Command="{Binding SearchItemsCommand}" Margin="10"/>
 
         <StackPanel IsVisible="{Binding IsGridVisible}">
 
@@ -31,7 +31,7 @@
           </Grid>
 
           <!-- Lista delle prenotazioni -->
-          <ListBox ItemsSource="{Binding Vehicles}" SelectedItem="{Binding SelectedVehicle, Mode=TwoWay}"  Width="600">
+          <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedVehicle, Mode=TwoWay}"  Width="600">
               <ListBox.Styles>
                   <Style Selector="ListBoxItem">
                       <Setter Property="Padding" Value="8" />
@@ -68,8 +68,7 @@
         </StackPanel>
 
         <!-- Form per Aggiunta/Modifica -->
-        <!-- Form per Aggiunta/Modifica -->
-        <StackPanel IsVisible="{Binding IsFormVisible}" Background="#1e1e1e" Width="400">
+        <StackPanel Margin="5" IsVisible="{Binding IsFormVisible}" Background="#1e1e1e" Width="400">
             <TextBlock Text="Modello" />
             <TextBox Text="{Binding EditingVehicle.Model}" />
 

@@ -16,10 +16,6 @@ namespace Frontend.ViewModels
             _mainViewModel = mainViewModel;
         }
 
-        public HomeViewModel()
-        {
-        }
-
         [RelayCommand]
         private void Login()
         {

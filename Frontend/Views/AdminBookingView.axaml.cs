@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace Frontend.Views;
 
-public partial class VeicoliView : UserControl
+public partial class AdminBookingView : UserControl
 {
-    public VeicoliView()
+    public AdminBookingView()
     {
         InitializeComponent();
     }

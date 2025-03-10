@@ -42,14 +42,15 @@ public class UserService
         return loginResponse;
     }
 
-    public async Task<RegistrationResponse?> Register(string email, string username, string password)
+    public async Task<RegistrationResponse?> Register(string email, string username, string password, bool isAdmin)
     {
             // Crea il corpo della richiesta JSON con i dati di registrazione
             var requestBody = new
             {
                 email,
                 username,
-                password
+                password,
+                role = isAdmin ? "admin" : ""
             };
 
             return await _httpService.PostAsync<RegistrationResponse>("http://localhost:8085/api/v1/auth/register", requestBody);        

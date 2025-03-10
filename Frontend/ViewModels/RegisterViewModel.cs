@@ -8,11 +8,16 @@ namespace Frontend.ViewModels;
 
 public partial class RegisterViewModel : ViewModelBase
 {
-    private readonly MainWindowViewModel _mainViewModel;
+    private readonly MainWindowViewModel? _mainViewModel;
     private readonly UserService _userService;
 
     [ObservableProperty]
     private bool _showSubmitForm = true;
+
+
+    [ObservableProperty]
+    private bool _showBack= true;
+
 
     [ObservableProperty]
     private bool _showGoToLogin = false;
@@ -32,9 +37,26 @@ public partial class RegisterViewModel : ViewModelBase
     [ObservableProperty]
     private string registerMessage = string.Empty;
 
+    [ObservableProperty]
+    private string errorMessage = string.Empty;
+
+    [ObservableProperty]
+    private string registerTitle = "Registrazioe";
+
+    [ObservableProperty]
+    private bool _isAdmin = false;
+
     public RegisterViewModel(MainWindowViewModel mainViewModel)
     {
         _mainViewModel = mainViewModel;
+        _userService = new UserService();
+    }
+
+    public RegisterViewModel(bool isAdmin)
+    {
+        IsAdmin = isAdmin;
+        ShowBack = !isAdmin;
+        RegisterTitle = "Registrazione nuovi admin";
         _userService = new UserService();
     }
 
@@ -43,32 +65,42 @@ public partial class RegisterViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(ConfirmPassword) || string.IsNullOrWhiteSpace(Password))
         {
-            RegisterMessage = "Compila tutti i campi!";
+            ErrorMessage = "Compila tutti i campi!";
             return;
         }        
-        var response = await _userService.Register(Email, Username, Password);
+        var response = await _userService.Register(Email, Username, Password, IsAdmin);
 
+        
         if (response != null) 
         {
-            RegisterMessage = response.Message;
+            if (IsAdmin) {
+                if (response.User != null) {
+                    ErrorMessage = response.Message;
+                } else {
+                    RegisterMessage = "Aggiunto nuovo amministratore!";
+                }
+            } else {
+                ErrorMessage = response.Message;
 
-            if (response.User != null)
-            {
-                ShowSubmitForm = false;
-                ShowGoToLogin = true;
+                if (response.User != null)
+                {
+                    ShowSubmitForm = false;
+                    ShowGoToLogin = true;
+                }  
             }
+            
         }
     }
     
     [RelayCommand]
     private void GoToLogin()
     {
-        _mainViewModel.ChangeViewModel(new LoginViewModel(_mainViewModel));
+        _mainViewModel?.ChangeViewModel(new LoginViewModel(_mainViewModel));
     }
 
     [RelayCommand]
     private void Back()
     {
-        _mainViewModel.ChangeViewModel(new HomeViewModel(_mainViewModel));
+        _mainViewModel?.ChangeViewModel(new HomeViewModel(_mainViewModel));
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
+using Frontend.ViewModels;
 
 namespace Frontend.Models;
 
-public record ListItemTemplate(Type ModelType, string IconKey, string Label);
+public record ListItemTemplate(Func<ViewModelBase> CreateInstance, string IconKey, string Label);

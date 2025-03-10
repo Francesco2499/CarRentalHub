@@ -15,7 +15,7 @@ public partial class UserMainViewModel : ViewModelBase
     private bool _isPaneOpen;
 
     [ObservableProperty]
-    private ViewModelBase _currentPage = new HomeViewModel();
+    private ViewModelBase? _currentPage;
 
     [ObservableProperty]
     private ListItemTemplate? _selectedListItem;
@@ -27,15 +27,17 @@ public partial class UserMainViewModel : ViewModelBase
         var templates = !isAdmin
             ? new List<ListItemTemplate>
             {
-                new(typeof(VeicoliViewModel), "add_regular", "Add booking"),
-                new(typeof(MyBookingsViewModel), "book_search_regular", "My bookings")
+                new(() => new NewBookingViewModel(), "add_regular", "Add booking"),
+                new(() => new MyBookingsViewModel(), "book_search_regular", "My bookings")
             }
-            : new List<ListItemTemplate>
-            {
-                new(typeof(AdminVehicleViewModel), "admin_panel_settings", "Manage Vehicles")
-            };
+            :
+            [
+                new(() => new AdminVehicleViewModel(), "vehicle_car_regular", "Manage Vehicles"),
+                new(() => new AdminBookingViewModel(), "book_search_regular", "Manage Bookings"),
+                new(() => new RegisterViewModel(true), "personal_regular", "Add new admin")
+            ];
 
-        Items = new ObservableCollection<ListItemTemplate>(templates);
+        Items = [.. templates];
         SelectedListItem = Items.First();
     }
 
@@ -43,7 +45,7 @@ public partial class UserMainViewModel : ViewModelBase
     {
         if (value != null)
         {
-            CurrentPage = Activator.CreateInstance(value.ModelType) as ViewModelBase;
+            CurrentPage = value.CreateInstance();
         }
     }
 

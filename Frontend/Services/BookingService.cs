@@ -37,9 +37,26 @@ namespace Frontend.Services
             return await _httpService.PostAsync<BookingModel?>("http://localhost:8085/api/v1/booking/new", requestBody);
         }
 
-        public async Task<List<BookingModel>?> GetMyBookings()
+        public async Task<List<BookingModel>?> GetAllBookings()
         {
             return await _httpService.GetAsync<List<BookingModel>>("http://localhost:8085/api/v1/booking/getAll");
         }
+
+        public async Task<List<BookingModel>?> DeleteBooking(int bookingId)
+        {
+            return await _httpService.DeleteAsync<List<BookingModel>>($"http://localhost:8085/api/v1/booking/delete/{bookingId}");
+        }
+
+        public async Task<List<BookingModel>?> EditBooking(BookingModel booking)
+        {
+            var requestBody = new
+            {
+                booking.user_id,
+                booking.vehicle_id,
+                start_date = booking.start_date.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                end_date = booking.end_date.ToString("yyyy-MM-ddTHH:mm:ssZ")
+            };
+
+            return await _httpService.PutAsync<List<BookingModel>>($"http://localhost:8085/api/v1/booking/update/{booking.Id}", requestBody);        }
     }
 }

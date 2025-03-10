@@ -26,10 +26,6 @@ public partial class LoginViewModel : ViewModelBase
         _userService = new UserService();
     }
 
-     public LoginViewModel()
-    {
-    }
-
     [RelayCommand]
     public async Task SubmitLogin()
     {
@@ -40,12 +36,14 @@ public partial class LoginViewModel : ViewModelBase
         }        
         var response = await _userService.Authenticate(EmailOrUsername, Password);
 
-        if (response != null && !string.IsNullOrEmpty(response.Token)) 
-        {
-            _mainViewModel.ChangeViewModel(new UserMainViewModel(response.IsAdmin));
-        } else {
-            LoginMessage = response.Message;
-            return;
+        if (response != null) {
+            if (!string.IsNullOrEmpty(response.Token)) 
+            {
+                _mainViewModel.ChangeViewModel(new UserMainViewModel(response.IsAdmin));
+            } else {
+                LoginMessage = response.Message;
+                return;
+            }
         }
     }
 

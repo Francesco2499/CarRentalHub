@@ -24,31 +24,31 @@ namespace Frontend.Services
         };
 
         // Metodo generico per fare richieste POST
-        public async Task<TResponse?> PostAsync<TResponse>(string url, object requestBody)
+        public async Task<TResponse> PostAsync<TResponse>(string url, object requestBody)
         {
             return await SendRequestAsync<TResponse>(HttpMethod.Post, url, requestBody);
         }
 
         // Metodo generico per fare richieste PUT
-        public async Task<TResponse?> PutAsync<TResponse>(string url, object requestBody)
+        public async Task<TResponse> PutAsync<TResponse>(string url, object requestBody)
         {
             return await SendRequestAsync<TResponse>(HttpMethod.Put, url, requestBody);
         }
 
         // Metodo generico per fare richieste DELETE
-        public async Task<TResponse?> DeleteAsync<TResponse>(string url)
+        public async Task<TResponse> DeleteAsync<TResponse>(string url)
         {
             return await SendRequestAsync<TResponse>(HttpMethod.Delete, url, null);
         }
 
         // Metodo generico per fare richieste GET
-        public async Task<TResponse?> GetAsync<TResponse>(string url)
+        public async Task<TResponse> GetAsync<TResponse>(string url)
         {
             return await SendRequestAsync<TResponse>(HttpMethod.Get, url, null);
         }
 
         // Metodo che gestisce le richieste in base al tipo di metodo HTTP (GET, POST, PUT, DELETE)
-        private async Task<TResponse?> SendRequestAsync<TResponse>(HttpMethod method, string url, object? requestBody)
+        private static async Task<TResponse> SendRequestAsync<TResponse>(HttpMethod method, string url, object? requestBody)
         {
             try
             {
@@ -77,20 +77,13 @@ namespace Frontend.Services
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 // Se la richiesta ha avuto successo, deserializza il corpo JSON nella risposta desiderata
-                if (response.IsSuccessStatusCode)
-                {
-                    return JsonSerializer.Deserialize<TResponse>(responseBody, JsonOptions);
-                }
-                else
-                {
-                    // In caso di errore, restituisci un oggetto di tipo TResponse (potrebbe essere un errore)
-                    return JsonSerializer.Deserialize<TResponse>(responseBody, JsonOptions);
-                }
+                
+                return JsonSerializer.Deserialize<TResponse>(responseBody, JsonOptions) ?? throw new InvalidOperationException("Deserializzazione fallita.");          
             }
             catch (Exception ex)
             {
                 // Gestisci gli errori di connessione
-                return JsonSerializer.Deserialize<TResponse>($"{{\"Message\": \"Errore di connessione: {ex.Message}\", \"Token\": null}}", JsonOptions);
+                return JsonSerializer.Deserialize<TResponse>($"{{\"Message\": \"Errore di connessione: {ex.Message}\", \"Token\": null}}", JsonOptions) ?? throw new InvalidOperationException("Deserializzazione fallita.");
             }
         }
     }
