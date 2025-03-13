@@ -14,14 +14,6 @@ namespace Frontend.ViewModels
     {
         private readonly BookingService _bookingService;
 
-        [ObservableProperty]
-        private ObservableCollection<BookingModel> _paginatedBookings = new();
-
-        private int _totalBookingsCount = 0;
-
-        [ObservableProperty]
-        private ObservableCollection<BookingModel> _allBookings = new();
-
         public MyBookingsViewModel()
         {
             _bookingService = new BookingService();
@@ -37,7 +29,7 @@ namespace Frontend.ViewModels
         {
             return [.. items.Where(b => b.vehicle_model.Contains(query, StringComparison.OrdinalIgnoreCase))];
         }
-        
+
         protected override List<BookingModel> ApplySearchByBookingId(List<BookingModel> items, int query)
         {
             return [.. items.Where(b => b.Id == query)];
