@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:15.2
+    container_name: carrentalhub-db
+    restart: always
+    env_file:
+      - ../Backend/.env
+    #environment:
+      #POSTGRES_USER: ${POSTGRES_USER}
+      #POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      #POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  backend:
+    build:
+       context: ../Backend
+       dockerfile: docker/Dockerfile
+    container_name: carrentalhub-backend
+    restart: always
+    env_file:
+      - ../Backend/.env
+    depends_on:
+      db:
+        condition: service_healthy
+    #environment:
+      #DB_HOST: ${DB_HOST}
+      #DB_USER: ${DB_USER}
+      #DB_PASSWORD: ${DB_PASSWORD}
+      #DB_NAME: ${DB_NAME}
+    ports:
+      - "8085:8085"
+
+  stats:
+    build:
+      context: ../Stats  # La directory in cui si trova il Dockerfile per il modulo Python
+      dockerfile: Dockerfile
+    container_name: carrentalhub-stats
+    restart: always
+    env_file:
+      - ../Backend/.env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5005:5005"
+    environment:
+      FLASK_APP: app.py
+      FLASK_ENV: development 
+
+volumes:
+  pgdata:
