@@ -42,9 +42,9 @@ namespace Frontend.Services
             return await _httpService.GetAsync<List<BookingModel>>("http://localhost:8085/api/v1/booking/getAll");
         }
 
-        public async Task<List<BookingModel>?> DeleteBooking(int bookingId)
+        public async Task DeleteBooking(int bookingId)
         {
-            return await _httpService.DeleteAsync<List<BookingModel>>($"http://localhost:8085/api/v1/booking/delete/{bookingId}");
+            await _httpService.DeleteAsync<dynamic>($"http://localhost:8085/api/v1/booking/delete/{bookingId}");
         }
 
         public async Task<List<BookingModel>?> EditBooking(BookingModel booking)

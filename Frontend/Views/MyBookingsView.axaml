@@ -23,7 +23,7 @@
         </Grid>
 
         <!-- Lista delle prenotazioni -->
-        <ListBox ItemsSource="{Binding PaginatedBookings}" Width="600">
+        <ListBox ItemsSource="{Binding Items}" Width="600">
             <ListBox.Styles>
                 <Style Selector="ListBoxItem">
                     <Setter Property="Padding" Value="8" />
