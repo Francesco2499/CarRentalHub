@@ -5,10 +5,6 @@ services:
     restart: always
     env_file:
       - ../Backend/.env
-    #environment:
-      #POSTGRES_USER: ${POSTGRES_USER}
-      #POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      #POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -27,16 +23,15 @@ services:
     restart: always
     env_file:
       - ../Backend/.env
+    environment:
+      APP_ENV: prod
     depends_on:
       db:
         condition: service_healthy
-    #environment:
-      #DB_HOST: ${DB_HOST}
-      #DB_USER: ${DB_USER}
-      #DB_PASSWORD: ${DB_PASSWORD}
-      #DB_NAME: ${DB_NAME}
     ports:
       - "8085:8085"
+    volumes:
+      - ../Backend/logs:/app/logs
 
   stats:
     build:
