@@ -37,12 +37,13 @@
             <Style Selector="ListBoxItem">
               <Setter Property="Padding" Value="12 8"></Setter>
             </Style>
+            
           </ListBox.Styles>
           <ListBox.ItemTemplate>
             <DataTemplate DataType="{x:Type models:ListItemTemplate}">
               <StackPanel Spacing="17" Orientation="Horizontal">
                 <PathIcon Data="{Binding IconKey, Converter={x:Static converters:TypeConverters.IconConverter}}"
-                          Width="14" />
+                          Width="16" />
                 <TextBlock Text="{Binding Label}" />
               </StackPanel>
             </DataTemplate>

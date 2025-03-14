@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Frontend.Services;
+using System.Collections.ObjectModel;
 
 namespace Frontend.ViewModels;
 
@@ -46,10 +47,23 @@ public partial class RegisterViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isAdmin = false;
 
+    [ObservableProperty]
+    private ObservableCollection<string>? _regions;
+
+    [ObservableProperty]
+    private string? _selectedRegion;
+
     public RegisterViewModel(MainWindowViewModel mainViewModel)
     {
         _mainViewModel = mainViewModel;
         _userService = new UserService();
+        Regions =
+        [
+            "Abruzzo", "Basilicata", "Calabria", "Campania", "Emilia-Romagna",
+            "Friuli-Venezia Giulia", "Lazio", "Liguria", "Lombardia", "Marche",
+            "Molise", "Piemonte", "Puglia", "Sardegna", "Sicilia",
+            "Toscana", "Trentino-Alto Adige", "Umbria", "Valle d'Aosta", "Veneto"
+        ];
     }
 
     public RegisterViewModel(bool isAdmin)
