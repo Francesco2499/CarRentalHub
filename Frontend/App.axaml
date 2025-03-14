@@ -18,7 +18,7 @@
         <Style Selector="TextBox">
             <Setter Property="Foreground" Value="White"/>
         </Style>
-        <Style Selector="TextBox:pointerover">
+        <Style Selector="TextBox:focus">
             <Setter Property="BorderBrush" Value="#007ACC"/>
         </Style>
         <Style Selector="Button:hover">
