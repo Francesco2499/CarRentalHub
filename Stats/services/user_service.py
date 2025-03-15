@@ -32,7 +32,7 @@ def generate_users_by_region_plot():
 def get_user_info(user_id):
     df = get_user_statistics(user_id)
     if df.empty:
-        return jsonify({"message": "User not found"}), 404
+        return jsonify({"message": "User not found or not a customer"}), 404
 
     row = df.iloc[0]
     return jsonify({

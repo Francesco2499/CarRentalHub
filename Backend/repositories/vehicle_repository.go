@@ -134,6 +134,7 @@ func GetAvailableVehicles(startDate, endDate time.Time) ([]models.Vehicle, error
 			SELECT vehicle_id FROM bookings 
 			WHERE (start_date, end_date) OVERLAPS ($1, $2)
 		)`
+	// overlaps = start_date <= param_end AND end_date >= param_start
 
 	rows, err := db.Query(query, startDate, endDate)
 	if err != nil {
