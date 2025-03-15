@@ -36,7 +36,7 @@ services:
   stats:
     build:
       context: ../Stats  # La directory in cui si trova il Dockerfile per il modulo Python
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     container_name: carrentalhub-stats
     restart: always
     env_file:
@@ -48,7 +48,9 @@ services:
       - "5005:5005"
     environment:
       FLASK_APP: app.py
-      FLASK_ENV: development 
+      FLASK_ENV: development
+    volumes:
+      - ../Stats/static/images:/app/static/images
 
 volumes:
   pgdata:

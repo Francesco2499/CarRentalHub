@@ -3,3 +3,4 @@ Werkzeug
 pandas
 psycopg2
 matplotlib
+python-dotenv
