@@ -5,8 +5,13 @@ from config import DB_CONFIG
 def get_db_connection():
     return psycopg2.connect(**DB_CONFIG)
 
-def execute_query(query: str):
+def execute_query(query, params=None):
     conn = get_db_connection()
-    df = pd.read_sql(query, conn)
-    conn.close()
-    return df
+    try:
+        if params:
+            df = pd.read_sql(query, conn, params=params)
+        else:
+            df = pd.read_sql(query, conn)
+        return df
+    finally:
+        conn.close()
