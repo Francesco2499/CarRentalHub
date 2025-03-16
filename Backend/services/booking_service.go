@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"time"
 )
 
 // Struttura per la richiesta di prenotazione
@@ -18,7 +17,7 @@ type BookingRequest struct {
 }
 
 // Cache per le prenotazioni (TTL di 30 secondi)
-var bookingCache = cache.NewCache(30 * time.Second)
+//var bookingCache = cache.NewCache(30 * time.Second)
 
 // Canale globale per la gestione concorrente delle prenotazioni
 var bookingChannel = make(chan BookingRequest, 100)
@@ -50,7 +49,8 @@ func CreateBooking(booking *models.Booking) (*models.BookingWithVehicleDTO, erro
 	}
 
 	// Invalida la cache quando viene creata una nuova prenotazione
-	bookingCache.Invalidate()
+	cache.BookingCache.Invalidate()
+	cache.VehicleCache.Invalidate()
 
 	return createdBooking, nil
 }
@@ -75,7 +75,7 @@ func RequestBooking(booking models.Booking) (*models.BookingWithVehicleDTO, erro
 func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, error) {
 	cacheKey := fmt.Sprintf("bookings_user_%d_admin_%t", userID, isAdmin)
 	// Controllo se il dato è in cache
-	if cachedData, found := bookingCache.Get(cacheKey); found {
+	if cachedData, found := cache.BookingCache.Get(cacheKey); found {
 		log.Println("all bookings found in cache")
 		return cachedData.([]models.BookingWithVehicleDTO), nil
 	}
@@ -86,7 +86,7 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, e
 	}
 
 	// Salvo in cache
-	bookingCache.Set(cacheKey, bookings)
+	cache.BookingCache.Set(cacheKey, bookings)
 
 	return bookings, nil
 }
@@ -149,7 +149,8 @@ func UpdateBooking(booking *models.Booking) error {
 	}
 
 	// Invalida la cache dopo l'aggiornamento
-	bookingCache.Invalidate()
+	cache.BookingCache.Invalidate()
+	cache.VehicleCache.Invalidate()
 
 	return nil
 }
@@ -161,6 +162,8 @@ func DeleteBooking(id int) error {
 	}
 
 	// Invalida la cache dopo la cancellazione
-	bookingCache.Invalidate()
+	cache.BookingCache.Invalidate()
+	cache.VehicleCache.Invalidate()
+
 	return nil
 }
