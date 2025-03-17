@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Frontend.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="Frontend.Views.StatsView"
+             x:DataType="vm:StatsViewModel">
+  <StackPanel HorizontalAlignment="Center" Width="800">
+          <TextBlock Text="Statistiche" FontSize="24" TextAlignment="Center"/>
+          <TextBlock Text="Qui è possibile rivedere tutte le statistiche in merito a CarRentalHub." TextAlignment="Center" Margin="10"/>
+        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+          <Button Content="Veicoli" Command="{Binding ShowButtonCommand}" CommandParameter="Veicoli" Margin="5" HorizontalAlignment="Center"
+                IsVisible="{Binding IsVeicoliButtonVisible}"/>
+
+        <!-- Bottone "Utenti" -->
+        <Button Content="Utenti" Command="{Binding ShowButtonCommand}" CommandParameter="Utenti" Margin="5" HorizontalAlignment="Center"
+                IsVisible="{Binding IsUtentiButtonVisible}"/>
+
+        <!-- Bottone "Prenotazioni" -->
+        <Button Content="Prenotazioni" Command="{Binding ShowButtonCommand}" CommandParameter="Prenotazioni" Margin="5" HorizontalAlignment="Center"
+                IsVisible="{Binding IsPrenotazioniButtonVisible}"/>
+
+        <!-- Bottone "Torna indietro" -->
+        <Button Content="Torna indietro" Command="{Binding GoBackCommand}" Margin="5" HorizontalAlignment="Center"
+                IsVisible="{Binding IsBackButtonVisible}"/>
+        </StackPanel>
+        
+        <StackPanel IsVisible="{Binding IsVisibleVehicleStats}">
+            <Button Content="Vedi auto più prenotate" Command="{Binding ShowTopRentedCommand}" Margin="5"/>
+            <Button Content="Controlla la disponibilità delle auto" Command="{Binding ShowAvailabilityCommand}" Margin="5"/>
+        </StackPanel>
+          <!-- Top 5 veicoli più noleggiati -->
+        <StackPanel IsVisible="{Binding IsVisibleTop5}">
+          <TextBlock TextAlignment="Center" Text="Di seguito un grafico rappresentante la top 5 dei veicoli più utilizzati dal tuo parco auto!"/>
+          <Image Source="{Binding Top5Image}" Width="600" Height="400" Margin="10"/>
+        </StackPanel>
+        <StackPanel IsVisible="{Binding IsVisibleAvailability}">
+          <TextBlock Text="Disponibilità dei Veicoli" Margin="10"/>
+          <TextBlock Text="{Binding AvailabilityMessage}" VerticalAlignment="Center"/>
+        </StackPanel>
+
+
+        <!-- Grafico Disponibilità dei Veicoli 
+        
+
+         Grafico Ricavi per Veicolo
+        <TextBlock Text="Ricavi per Veicolo" Margin="10"/>
+        <ListBox ItemsSource="{Binding VehicleStats.Revenue}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Key}"/>
+                        <TextBlock Text="{Binding Value, StringFormat={}{0:C}}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>-->
+
+      </StackPanel>
+    </UserControl>

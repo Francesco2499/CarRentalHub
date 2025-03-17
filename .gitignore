@@ -1,0 +1,9 @@
+Backend/.env
+Backend/logs/
+Frontend/obj/
+Frontend/bin/
+__pycache__/
+*.log
+*.pyc
+*.sln
+*.png

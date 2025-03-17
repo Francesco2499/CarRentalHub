@@ -34,7 +34,8 @@ public partial class UserMainViewModel : ViewModelBase
             [
                 new(() => new AdminVehicleViewModel(), "vehicle_car_regular", "Manage Vehicles"),
                 new(() => new AdminBookingViewModel(), "book_search_regular", "Manage Bookings"),
-                new(() => new RegisterViewModel(true), "personal_regular", "Add new admin")
+                new(() => new RegisterViewModel(true), "personal_regular", "Add new admin"),
+                new(() => new StatsViewModel(), "personal_regular", "Add new admin")
             ];
 
         Items = [.. templates];
