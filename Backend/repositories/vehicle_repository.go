@@ -142,7 +142,8 @@ func GetAvailableVehicles(startDate, endDate time.Time, location string) ([]mode
 	}
 	defer rows.Close()
 
-	var vehicles []models.Vehicle
+	//var vehicles []models.Vehicle
+	vehicles := make([]models.Vehicle, 0)
 	for rows.Next() {
 		var vehicle models.Vehicle
 		if err := rows.Scan(&vehicle.ID, &vehicle.Model, &vehicle.Category, &vehicle.Price, &vehicle.Location); err != nil {
