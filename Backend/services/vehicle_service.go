@@ -85,15 +85,15 @@ func GetVehicleById(id int) (*models.Vehicle, error) {
 	return vehicle, nil
 }
 
-func GetAvailableVehicles(startDate, endDate time.Time) ([]models.Vehicle, error) {
-	cacheKey := fmt.Sprintf("available_vehicles_%s_%s", startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
+func GetAvailableVehicles(startDate, endDate time.Time, location string) ([]models.Vehicle, error) {
+	cacheKey := fmt.Sprintf("available_vehicles_%s_%s_%s", location, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
 
 	if cachedData, found := cache.VehicleCache.Get(cacheKey); found {
 		log.Println("Available vehicles found in cache")
 		return cachedData.([]models.Vehicle), nil
 	}
 
-	vehicles, err := repositories.GetAvailableVehicles(startDate, endDate)
+	vehicles, err := repositories.GetAvailableVehicles(startDate, endDate, location)
 	if err != nil {
 		return nil, err
 	}

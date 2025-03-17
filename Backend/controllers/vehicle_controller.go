@@ -104,6 +104,7 @@ func GetAvailableVehicles(c *gin.Context) {
 
 	startDateStr := c.Query("start_date")
 	endDateStr := c.Query("end_date")
+	location := c.Query("location")
 
 	if startDateStr == "" || endDateStr == "" {
 		log.Println("Error: Missing start_date or end_date query parameters")
@@ -125,13 +126,13 @@ func GetAvailableVehicles(c *gin.Context) {
 		return
 	}
 
-	vehicles, err := services.GetAvailableVehicles(startDate, endDate)
+	vehicles, err := services.GetAvailableVehicles(startDate, endDate, location)
 	if err != nil {
 		log.Printf("Error retrieving available vehicles: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	log.Printf("Successfully retrieved %d available vehicles", len(vehicles))
+	log.Printf("Successfully retrieved %d available vehicles in '%s' between %s and %s", len(vehicles), location, startDateStr, endDateStr)
 	c.JSON(http.StatusOK, vehicles)
 }

@@ -126,17 +126,17 @@ func DeleteVehicle(id int) error {
 	return nil
 }
 
-func GetAvailableVehicles(startDate, endDate time.Time) ([]models.Vehicle, error) {
+func GetAvailableVehicles(startDate, endDate time.Time, location string) ([]models.Vehicle, error) {
 	db := config.GetDB()
 	query := `SELECT id, model, category, price, location 
 		FROM vehicles 
 		WHERE id NOT IN (
 			SELECT vehicle_id FROM bookings 
 			WHERE (start_date, end_date) OVERLAPS ($1, $2)
-		)`
+		) AND LOWER(location) = LOWER($3)`
 	// overlaps = start_date <= param_end AND end_date >= param_start
 
-	rows, err := db.Query(query, startDate, endDate)
+	rows, err := db.Query(query, startDate, endDate, location)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving available vehicles: %w", err)
 	}
