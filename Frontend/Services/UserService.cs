@@ -9,20 +9,13 @@ namespace Frontend.Services;
 
 public class UserService
 {
-    private readonly HttpService _httpService;
-
-    public UserService()
-    {
-        _httpService = new HttpService();
-    }
-
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
     };
 
-    public async Task<LoginResponse?> Authenticate(string username, string password)
+    public static LoginResponse? Authenticate(string username, string password)
     {
         var requestBody = new
         {
@@ -31,7 +24,7 @@ public class UserService
         };
 
         // Usa il metodo generico PostAsync per inviare la richiesta di login
-        var loginResponse = await _httpService.PostAsync<LoginResponse>("http://localhost:8085/api/v1/auth/login", requestBody);
+        var loginResponse = HttpService.Post<LoginResponse>("http://localhost:8085/api/v1/auth/login", requestBody);
 
         if (loginResponse != null && !string.IsNullOrEmpty(loginResponse.Token))
         {
@@ -42,7 +35,7 @@ public class UserService
         return loginResponse;
     }
 
-    public async Task<RegistrationResponse?> Register(string email, string username, string password, bool isAdmin)
+    public static RegistrationResponse? Register(string email, string username, string password, bool isAdmin)
     {
             // Crea il corpo della richiesta JSON con i dati di registrazione
             var requestBody = new
@@ -53,13 +46,13 @@ public class UserService
                 role = isAdmin ? "admin" : ""
             };
 
-            return await _httpService.PostAsync<RegistrationResponse>("http://localhost:8085/api/v1/auth/register", requestBody);        
+            return HttpService.Post<RegistrationResponse>("http://localhost:8085/api/v1/auth/register", requestBody);        
     }
 }
 
 public record RegistrationResponse(string Message, UserResponse? User);
 
-public record UserResponse(string username, string email, string password, string role);
+public record UserResponse(string Username, string Email, string Password, string Role);
 
 public record LoginResponse(string Message, string? Token, bool IsAdmin);
 

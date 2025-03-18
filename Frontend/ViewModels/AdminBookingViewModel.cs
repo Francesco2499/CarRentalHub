@@ -13,7 +13,6 @@ namespace Frontend.ViewModels
     public partial class AdminBookingViewModel : SearchableViewModel<BookingModel>
     {
         [ObservableProperty] private BookingModel? _selectedBooking;
-        [ObservableProperty] private string _errorMessage = string.Empty;
         [ObservableProperty] private bool _isFormVisible = false;
         [ObservableProperty] private bool _isGridVisible = true;
         [ObservableProperty] private BookingModel _editingBooking = new(0, 0, 0, "", DateTime.Now, DateTime.Now, DateTime.Now, DateTime.Now);
@@ -24,9 +23,9 @@ namespace Frontend.ViewModels
             LoadItems();
         }
 
-        protected override async Task<List<BookingModel>?> LoadAllItemsAsync()
+        protected override List<BookingModel>? LoadAllItemsAsync()
         {
-            return await _bookingService.GetAllBookings();
+            return BookingService.GetAllBookings();
         }
        
         protected override List<BookingModel> ApplySearch(List<BookingModel> items, string query)
@@ -60,7 +59,7 @@ namespace Frontend.ViewModels
         }
 
         [RelayCommand]
-        private async Task SaveBooking()
+        private void SaveBooking()
         {
             if (SelectedBooking == null)
             {
@@ -70,8 +69,8 @@ namespace Frontend.ViewModels
 
             try
             {
-                await _bookingService.EditBooking(EditingBooking);
-                await LoadItems();
+                BookingService.EditBooking(EditingBooking);
+                LoadItems();
                 IsFormVisible = false;
                 IsGridVisible = true;
             }
@@ -82,7 +81,7 @@ namespace Frontend.ViewModels
         }
 
         [RelayCommand]
-        private async Task DeleteBooking()
+        private void DeleteBooking()
         {
             if (SelectedBooking == null)
             {
@@ -90,8 +89,8 @@ namespace Frontend.ViewModels
                 return;
             }
 
-            await _bookingService.DeleteBooking(SelectedBooking.Id);
-            await LoadItems();
+            _bookingService.DeleteBooking(SelectedBooking.Id);
+            LoadItems();
         }
 
     }

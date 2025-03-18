@@ -11,9 +11,12 @@ namespace Frontend.ViewModels
     public abstract partial class PaginatedViewModel<TModel> : ViewModelBase
     {
         protected const int PageSize = 5;
+
+        [ObservableProperty]
+        private bool _isVisibleList = false;
         
         [ObservableProperty]
-        protected ObservableCollection<TModel> _items = new();
+        protected ObservableCollection<TModel> _items = [];
         
         [ObservableProperty]
         protected int _currentPage = 1;
@@ -29,20 +32,25 @@ namespace Frontend.ViewModels
         
         [ObservableProperty]
         protected double _nextPageOpacity = 1.0;
+
+        [ObservableProperty]
+        private string? _errorMessage;
         
         [ObservableProperty]
         protected bool _isPaginationVisible = false;
         
-        protected List<TModel>? _allItems = new();
+        protected List<TModel>? _allItems = [];
         
-        protected abstract Task<List<TModel>?> LoadAllItemsAsync(); // Metodo che deve essere implementato nelle viewmodel concrete
+        protected abstract List<TModel>? LoadAllItemsAsync(); // Metodo che deve essere implementato nelle viewmodel concrete
         
         protected void UpdatePaginatedItems(List<TModel>? listItems)
         {
             var skip = (CurrentPage - 1) * PageSize;
             var results = listItems ?? _allItems;
+            ErrorMessage = string.Empty;
+            
             if (results != null) {
-              Items.Clear();
+                Items.Clear();
                 foreach (var item in results.Skip(skip).Take(PageSize))
                 {
                     Items.Add(item);
@@ -50,9 +58,12 @@ namespace Frontend.ViewModels
 
                 IsPreviousPageEnabled = CurrentPage > 1;
                 IsNextPageEnabled = CurrentPage * PageSize < results.Count;
-                IsPaginationVisible = _allItems != null ? _allItems.Count > PageSize : false;
+                IsPaginationVisible = _allItems != null && _allItems.Count > PageSize;
                 PreviousPageOpacity = IsPreviousPageEnabled ? 1.0 : 0.5;
-                NextPageOpacity = IsNextPageEnabled ? 1.0 : 0.5;  
+                NextPageOpacity = IsNextPageEnabled ? 1.0 : 0.5;   
+                if (results.Count == 0) {
+                    ErrorMessage = "No results found. Please try a different search term.";
+                }
             }
         }
 
@@ -76,9 +87,9 @@ namespace Frontend.ViewModels
             }
         }
         
-        public async Task LoadItems()
+        public void LoadItems()
         {
-            _allItems = await LoadAllItemsAsync();
+            _allItems = LoadAllItemsAsync();
             UpdatePaginatedItems(null);
         }
     }

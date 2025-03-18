@@ -24,7 +24,7 @@
         <TextBox Watermark="Conferma Password" Width="250" Height="40" PasswordChar="*"
                  Text="{Binding ConfirmPassword}" />
 
-        <ComboBox ItemsSource="{Binding Regions}" PlaceholderText="Seleziona una regione..."
+        <ComboBox ItemsSource="{Binding Regions}" IsVisible="{Binding ShowBack}"  PlaceholderText="Seleziona una regione..."
                 SelectedItem="{Binding SelectedRegion, Mode=TwoWay}" 
                 Width="250" 
                 Height="40"

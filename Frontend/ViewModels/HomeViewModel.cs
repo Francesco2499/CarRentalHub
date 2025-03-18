@@ -7,14 +7,9 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Frontend.ViewModels
 {
-    public partial class HomeViewModel : ViewModelBase
+    public partial class HomeViewModel(MainWindowViewModel mainViewModel) : ViewModelBase
     {
-        private readonly MainWindowViewModel _mainViewModel;
-
-        public HomeViewModel(MainWindowViewModel mainViewModel)
-        {
-            _mainViewModel = mainViewModel;
-        }
+        private readonly MainWindowViewModel _mainViewModel = mainViewModel;
 
         [RelayCommand]
         private void Login()

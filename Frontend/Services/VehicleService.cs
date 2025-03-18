@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Frontend.Models;
@@ -11,39 +8,27 @@ namespace Frontend.Services
 {
     public class VehicleService
     {
-        private readonly HttpService _httpService;
 
-        public VehicleService()
-        {
-            _httpService = new HttpService();
-        }
-
-        public async Task<List<VehicleModel>?> GetVehiclesByDate(DateTime? startDate, DateTime? endDate)
+        // Recupera i veicoli disponibili in una data specifica (restituisce una lista vuota in caso di errore)
+        public static List<VehicleModel> GetVehiclesByDate(DateTime? startDate, DateTime? endDate)
         {
             string url = $"http://localhost:8085/api/v1/vehicle/getAllAvailable?start_date={startDate:yyyy-MM-dd}&end_date={endDate:yyyy-MM-dd}";
+            
+            var vehicles = HttpService.Get<List<VehicleModel>>(url);
 
-            return await _httpService.GetAsync<List<VehicleModel>>(url);
+            return vehicles ?? [];
         }
 
-        public async Task<List<VehicleModel>?> GetAllVehicles()
+        // Recupera tutti i veicoli (restituisce una lista vuota in caso di errore)
+        public static List<VehicleModel> GetAllVehicles()
         {
-            return await _httpService.GetAsync<List<VehicleModel>>("http://localhost:8085/api/v1/vehicle/getAll");
+            var vehicles = HttpService.Get<List<VehicleModel>>("http://localhost:8085/api/v1/vehicle/getAll");
+
+            return vehicles ?? [];
         }
 
-        public async Task<VehicleModel> AddVehicle(VehicleModel vehicle)
-        {
-            var requestBody = new
-            {
-                model = vehicle.Model,
-                category = vehicle.Category,
-                price = vehicle.Price,
-                location = "Napoli"
-            };
-
-            return await _httpService.PostAsync<VehicleModel>("http://localhost:8085/api/v1/vehicle/new", requestBody);
-        }
-
-        public async Task<VehicleModel> EditVehicle(VehicleModel vehicle)
+        // Aggiunge un veicolo e restituisce l'oggetto creato oppure null in caso di errore
+        public static VehicleModel? AddVehicle(VehicleModel vehicle)
         {
             var requestBody = new
             {
@@ -53,12 +38,38 @@ namespace Frontend.Services
                 location = "Napoli"
             };
 
-            return await _httpService.PutAsync<VehicleModel>($"http://localhost:8085/api/v1/vehicle/update/{vehicle.Id}", requestBody);
+            var result = HttpService.Post<VehicleModel>("http://localhost:8085/api/v1/vehicle/new", requestBody);
+           
+            return result;
         }
 
-        public async Task<VehicleModel> DeleteVehicle(int vehicleId)
+        // Modifica un veicolo esistente e restituisce il veicolo aggiornato oppure null in caso di errore
+        public static VehicleModel? EditVehicle(VehicleModel vehicle)
         {
-            return await _httpService.DeleteAsync<VehicleModel>($"http://localhost:8085/api/v1/vehicle/delete/{vehicleId}");
+            var requestBody = new
+            {
+                model = vehicle.Model,
+                category = vehicle.Category,
+                price = vehicle.Price,
+                location = "Napoli"
+            };
+
+            var updatedVehicle = HttpService.Put<VehicleModel>($"http://localhost:8085/api/v1/vehicle/update/{vehicle.Id}", requestBody);
+
+            return updatedVehicle;
+        }
+
+        // Elimina un veicolo e gestisce eventuali errori
+        public static void DeleteVehicle(int vehicleId)
+        {
+            try
+            {
+                HttpService.Delete<dynamic>($"http://localhost:8085/api/v1/vehicle/delete/{vehicleId}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting vehicle {vehicleId}: {ex.Message}");
+            }
         }
     }
 }

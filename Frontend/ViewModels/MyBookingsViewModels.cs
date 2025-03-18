@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Frontend.Models;
 using Frontend.Services;
+using Avalonia.Automation.Peers;
 
 namespace Frontend.ViewModels
 {
@@ -14,15 +15,27 @@ namespace Frontend.ViewModels
     {
         private readonly BookingService _bookingService;
 
+        [ObservableProperty] private string? _bookingMessage;
+
+        [ObservableProperty] private bool _isVisibleList = true;
+
         public MyBookingsViewModel()
         {
             _bookingService = new BookingService();
             LoadItems();
         }
 
-        protected override async Task<List<BookingModel>?> LoadAllItemsAsync()
+        protected override List<BookingModel>? LoadAllItemsAsync()
         {
-            return await _bookingService.GetAllBookings();
+            var bookings = BookingService.GetAllBookings();
+            if (bookings == null || bookings.Count == 0)
+            {
+                BookingMessage = "Non hai ancora effettuata nessuna prenotazione";
+                IsVisibleList = false;
+                return []; // Restituisce una lista vuota invece di null
+            }
+            IsVisibleList = true;
+            return bookings;
         }
 
         protected override List<BookingModel> ApplySearch(List<BookingModel> items, string query)

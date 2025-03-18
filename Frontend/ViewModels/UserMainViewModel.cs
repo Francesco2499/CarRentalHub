@@ -27,6 +27,7 @@ public partial class UserMainViewModel : ViewModelBase
         var templates = !isAdmin
             ? new List<ListItemTemplate>
             {
+                new(() => new UserHomePageViewModel(this), "HomeRegular", "Home"),
                 new(() => new NewBookingViewModel(), "add_regular", "Add booking"),
                 new(() => new MyBookingsViewModel(), "book_search_regular", "My bookings")
             }

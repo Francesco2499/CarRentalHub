@@ -11,20 +11,8 @@ namespace Frontend.Services
 {
     public class BookingService
     {
-        private readonly HttpService _httpService;
 
-        public BookingService()
-        {
-            _httpService = new HttpService();
-        }
-        
-        private static readonly JsonSerializerOptions JsonOptions = new()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        };
-
-        public async Task<BookingModel?> AddBooking(int vehicle_id, DateTime? start_date, DateTime? end_date)
+        public static BookingModel? AddBooking(int vehicle_id, DateTime? start_date, DateTime? end_date)
         {
             var requestBody = new
             {
@@ -33,21 +21,32 @@ namespace Frontend.Services
                 end_date = end_date?.ToString("yyyy-MM-ddTHH:mm:ssZ")
             };
 
- 
-            return await _httpService.PostAsync<BookingModel?>("http://localhost:8085/api/v1/booking/new", requestBody);
+            var result = HttpService.Post<BookingModel?>("http://localhost:8085/api/v1/booking/new", requestBody);
+           
+            return result;
         }
 
-        public async Task<List<BookingModel>?> GetAllBookings()
+        public static List<BookingModel> GetAllBookings()
         {
-            return await _httpService.GetAsync<List<BookingModel>>("http://localhost:8085/api/v1/booking/getAll");
+            // Esegui la richiesta GET
+            var bookings = HttpService.Get<List<BookingModel>>("http://localhost:8085/api/v1/booking/getAll");
+
+            return bookings ?? []; // Restituisci una lista vuota se bookings è null
         }
 
-        public async Task DeleteBooking(int bookingId)
+           public void DeleteBooking(int bookingId)
         {
-            await _httpService.DeleteAsync<List<BookingModel>>($"http://localhost:8085/api/v1/booking/delete/{bookingId}");
+            try
+            {
+                HttpService.Delete<dynamic>($"http://localhost:8085/api/v1/booking/delete/{bookingId}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting booking with ID {bookingId}: {ex.Message}");
+            }
         }
 
-        public async Task<List<BookingModel>?> EditBooking(BookingModel booking)
+        public static List<BookingModel> EditBooking(BookingModel booking)
         {
             var requestBody = new
             {
@@ -57,6 +56,14 @@ namespace Frontend.Services
                 end_date = booking.end_date.ToString("yyyy-MM-ddTHH:mm:ssZ")
             };
 
-            return await _httpService.PutAsync<List<BookingModel>>($"http://localhost:8085/api/v1/booking/update/{booking.Id}", requestBody);        }
+            var updatedBookings = HttpService.Put<List<BookingModel>>($"http://localhost:8085/api/v1/booking/update/{booking.Id}", requestBody);
+
+            if (updatedBookings == null)
+            {
+                return []; 
+            }
+
+            return updatedBookings;
+        }
     }
 }

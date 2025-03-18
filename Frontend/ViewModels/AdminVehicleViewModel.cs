@@ -18,9 +18,6 @@ namespace Frontend.ViewModels
         private VehicleModel? _selectedVehicle;
 
         [ObservableProperty]
-        private string _errorMessage = string.Empty;
-
-        [ObservableProperty]
         private bool _isFormVisible = false;
 
         [ObservableProperty]
@@ -52,7 +49,7 @@ namespace Frontend.ViewModels
         }
 
         [RelayCommand]
-        private async Task SaveVehicle()
+        private void SaveVehicle()
         {
             if (string.IsNullOrWhiteSpace(EditingVehicle.Model) || string.IsNullOrWhiteSpace(EditingVehicle.Category))
             {
@@ -63,14 +60,14 @@ namespace Frontend.ViewModels
             try {
                 if (EditingVehicle.Id == 0) // Aggiunta di un nuovo veicolo
                 {
-                    await _vehicleService.AddVehicle(EditingVehicle);
+                    VehicleService.AddVehicle(EditingVehicle);
                 }
                 else
                 {
-                    await _vehicleService.EditVehicle(EditingVehicle);
+                    VehicleService.EditVehicle(EditingVehicle);
                 }
                 ErrorMessage = "";
-                await LoadItems();
+                LoadItems();
                 IsFormVisible = false;  
                 IsGridVisible = true;
             } catch (Exception ex)
@@ -85,21 +82,21 @@ namespace Frontend.ViewModels
             LoadItems();
         }
 
-        protected override async Task<List<VehicleModel>?> LoadAllItemsAsync()
+        protected override List<VehicleModel>? LoadAllItemsAsync()
         {
-            return await _vehicleService.GetAllVehicles();
+            return VehicleService.GetAllVehicles();
         }
 
         protected override List<VehicleModel> ApplySearch(List<VehicleModel> items, string query)
         {
             return [.. items.Where(v =>
-                    (v.Model.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-                    v.Category.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)) 
+                    v.Model.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    v.Category.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)
                 )];
         }
 
         [RelayCommand]
-        private async Task DeleteVehicle()
+        private void DeleteVehicle()
         {
             ErrorMessage = "";
             if (SelectedVehicle == null)
@@ -108,8 +105,8 @@ namespace Frontend.ViewModels
                 return;
             }
 
-            await _vehicleService.DeleteVehicle(SelectedVehicle.Id);
-            await LoadItems();
+            VehicleService.DeleteVehicle(SelectedVehicle.Id);
+            LoadItems();
         }
     }
 }

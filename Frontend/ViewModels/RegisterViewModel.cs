@@ -75,14 +75,14 @@ public partial class RegisterViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public async Task SubmitRegistration()
+    public void SubmitRegistration()
     {
         if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(ConfirmPassword) || string.IsNullOrWhiteSpace(Password))
         {
             ErrorMessage = "Compila tutti i campi!";
             return;
         }        
-        var response = await _userService.Register(Email, Username, Password, IsAdmin);
+        var response = UserService.Register(Email, Username, Password, IsAdmin);
 
         
         if (response != null) 
