@@ -10,7 +10,7 @@ import (
 )
 
 // Cache per le prenotazioni (TTL di 30 secondi)
-var vehicleCache = cache.NewCache(30 * time.Second)
+//var vehicleCache = cache.NewCache(30 * time.Second)
 
 func CreateVehicle(vehicle *models.Vehicle) error {
 	err := repositories.CreateVehicle(vehicle)
@@ -19,7 +19,7 @@ func CreateVehicle(vehicle *models.Vehicle) error {
 	}
 
 	//invalida la cache
-	vehicleCache.Invalidate()
+	cache.VehicleCache.Invalidate()
 
 	return nil
 }
@@ -31,7 +31,7 @@ func UpdateVehicle(vehicle *models.Vehicle) error {
 	}
 
 	//invalida la cache
-	vehicleCache.Invalidate()
+	cache.VehicleCache.Invalidate()
 
 	return nil
 }
@@ -43,7 +43,7 @@ func DeleteVehicle(id int) error {
 	}
 
 	//invalida la cache
-	vehicleCache.Invalidate()
+	cache.VehicleCache.Invalidate()
 
 	return nil
 }
@@ -51,7 +51,7 @@ func DeleteVehicle(id int) error {
 func GetAllVehicles() ([]models.Vehicle, error) {
 	cacheKey := "all_vehicles"
 
-	if cachedData, found := vehicleCache.Get(cacheKey); found {
+	if cachedData, found := cache.VehicleCache.Get(cacheKey); found {
 		log.Println("All vehicles found in cache")
 		return cachedData.([]models.Vehicle), nil
 	}
@@ -61,7 +61,7 @@ func GetAllVehicles() ([]models.Vehicle, error) {
 		return nil, err
 	}
 
-	vehicleCache.Set(cacheKey, vehicles)
+	cache.VehicleCache.Set(cacheKey, vehicles)
 	return vehicles, nil
 
 }
@@ -70,7 +70,7 @@ func GetVehicleById(id int) (*models.Vehicle, error) {
 
 	cacheKey := fmt.Sprintf("vehicle_id_%d", id)
 
-	if cachedData, found := vehicleCache.Get(cacheKey); found {
+	if cachedData, found := cache.VehicleCache.Get(cacheKey); found {
 		log.Printf("Vehicle with id: %d found in cache", id)
 		return cachedData.(*models.Vehicle), nil
 	}
@@ -81,24 +81,24 @@ func GetVehicleById(id int) (*models.Vehicle, error) {
 	}
 
 	// Salva in cache
-	vehicleCache.Set(cacheKey, vehicle)
+	cache.VehicleCache.Set(cacheKey, vehicle)
 	return vehicle, nil
 }
 
-func GetAvailableVehicles(startDate, endDate time.Time) ([]models.Vehicle, error) {
-	cacheKey := fmt.Sprintf("available_vehicles_%s_%s", startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
+func GetAvailableVehicles(startDate, endDate time.Time, location string) ([]models.Vehicle, error) {
+	cacheKey := fmt.Sprintf("available_vehicles_%s_%s_%s", location, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
 
-	if cachedData, found := vehicleCache.Get(cacheKey); found {
+	if cachedData, found := cache.VehicleCache.Get(cacheKey); found {
 		log.Println("Available vehicles found in cache")
 		return cachedData.([]models.Vehicle), nil
 	}
 
-	vehicles, err := repositories.GetAvailableVehicles(startDate, endDate)
+	vehicles, err := repositories.GetAvailableVehicles(startDate, endDate, location)
 	if err != nil {
 		return nil, err
 	}
 
 	// Salva in cache
-	vehicleCache.Set(cacheKey, vehicles)
+	cache.VehicleCache.Set(cacheKey, vehicles)
 	return vehicles, nil
 }

@@ -15,8 +15,14 @@ var db *sql.DB
 func InitDB() (*sql.DB, error) {
 
 	// Carica il file .env (se esiste)
-	if err := godotenv.Load(); err != nil {
+	/*if err := godotenv.Load(); err != nil {
 		log.Println("Warning: No .env file found, using system environment variables")
+	}*/
+
+	if os.Getenv("APP_ENV") != "prod" {
+		if err := godotenv.Load(); err != nil {
+			log.Println("Warning: No .env file found, using system environment variables")
+		}
 	}
 
 	host, err := getEnv("DB_HOST")
@@ -93,6 +99,7 @@ func CreateTables() error {
 			username VARCHAR(50) UNIQUE NOT NULL,
 			email VARCHAR(100) UNIQUE NOT NULL,
 			password TEXT NOT NULL,
+			region VARCHAR(50) NOT NULL,
 			role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'customer'))
 		);`,
 
@@ -165,10 +172,10 @@ func SeedData() error {
 
 	if count == 0 { // Inserisce i dati solo se la tabella è vuota
 		_, err := db.Exec(`
-			INSERT INTO users (username, email, password, role) 
-			VALUES ('testadmin', 'admin@example.com', '$2a$10$9XLtbksVUlDcoPQ0uz4Pe.kiyrfr3QOEJ1e9FqcuHMgb5HBI7Fi7O', 'admin'),
-       		('testcustomer', 'testcustomer@example.com', '$2a$10$bHUA0bk60fLdfD5du8lFGeF1PpqT42mvqE6Wn4uQRSfvvD39Scqva', 'customer'),
-			('testuser', 'testuser@example.com', '$2a$10$BgqOX8eoqerj8lm0Lo96yuq7JtRfjQiPxyT0jYTIIzypjsxfebob.', 'customer');
+			INSERT INTO users (username, email, password, region, role) 
+			VALUES ('testadmin', 'admin@example.com', '$2a$10$9XLtbksVUlDcoPQ0uz4Pe.kiyrfr3QOEJ1e9FqcuHMgb5HBI7Fi7O', 'Sicilia', 'admin'),
+       		('testcustomer', 'testcustomer@example.com', '$2a$10$bHUA0bk60fLdfD5du8lFGeF1PpqT42mvqE6Wn4uQRSfvvD39Scqva', 'Piemonte', 'customer'),
+			('testuser', 'testuser@example.com', '$2a$10$BgqOX8eoqerj8lm0Lo96yuq7JtRfjQiPxyT0jYTIIzypjsxfebob.', 'Lombardia', 'customer');
 		`)
 
 		if err != nil {

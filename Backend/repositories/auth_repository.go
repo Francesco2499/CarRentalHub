@@ -11,8 +11,8 @@ import (
 func FindByEmail(email string) (*models.User, error) {
 	db := config.GetDB()
 	var user models.User
-	err := db.QueryRow(`SELECT id, username, email, password, role FROM users WHERE email = $1`, email).
-		Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Role)
+	err := db.QueryRow(`SELECT id, username, email, password, region, role FROM users WHERE email = $1`, email).
+		Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Region, &user.Role)
 	if err != nil {
 		return nil, err
 	}
@@ -23,8 +23,8 @@ func FindByEmail(email string) (*models.User, error) {
 func FindByUsername(username string) (*models.User, error) {
 	db := config.GetDB()
 	var user models.User
-	err := db.QueryRow(`SELECT id, username, email, password, role FROM users WHERE username = $1`, username).
-		Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Role)
+	err := db.QueryRow(`SELECT id, username, email, password, region, role FROM users WHERE username = $1`, username).
+		Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Region, &user.Role)
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +52,8 @@ func SaveUser(user *models.User) error {
 	}
 	user.Password = string(hashedPassword)
 
-	query := `INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id`
-	err = db.QueryRow(query, user.Username, user.Email, user.Password, user.Role).Scan(&user.ID)
+	query := `INSERT INTO users (username, email, password, region, role) VALUES ($1, $2, $3, $4, $5) RETURNING id`
+	err = db.QueryRow(query, user.Username, user.Email, user.Password, user.Region, user.Role).Scan(&user.ID)
 	if err != nil {
 		return err
 	}
