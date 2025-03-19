@@ -8,21 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-/*func AuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		tokenString := c.GetHeader("Authorization")
-
-		_, err := helpers.ValidateJWT(tokenString)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-			c.Abort()
-			return
-		}
-
-		c.Next()
-	}
-}*/
-
 // AuthMiddleware verifica il token JWT e il ruolo dell'utente
 func AuthMiddleware(requiredRole string) gin.HandlerFunc {
 	return func(c *gin.Context) {
