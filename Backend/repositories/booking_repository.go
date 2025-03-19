@@ -141,7 +141,6 @@ func CreateBooking(booking *models.Booking) (*models.BookingWithVehicleDTO, erro
 		RETURNING id, user_id, vehicle_id, start_date, end_date, created_at, updated_at`
 
 	var vehicleID int
-	//newBooking := models.BookingWithVehicleDTO{}
 	var newBooking models.BookingWithVehicleDTO
 	err = tx.QueryRow(query, booking.UserID, booking.VehicleID, booking.StartDate, booking.EndDate).
 		Scan(&newBooking.ID, &newBooking.UserID, &vehicleID, &newBooking.StartDate, &newBooking.EndDate, &newBooking.CreatedAt, &newBooking.UpdatedAt)
@@ -154,12 +153,20 @@ func CreateBooking(booking *models.Booking) (*models.BookingWithVehicleDTO, erro
 		return nil, fmt.Errorf("booking entry error: %w", err)
 	}
 
-	// Recupera il modello del veicolo usando l'ID appena estratto
-	err = db.QueryRow(`SELECT model FROM vehicles WHERE id = $1`, vehicleID).Scan(&newBooking.VehicleModel)
+	// Recupera il modello e il prezzo del veicolo usando l'ID appena estratto
+	var priceForDay float64
+	err = db.QueryRow(`SELECT model, price FROM vehicles WHERE id = $1`, vehicleID).Scan(&newBooking.VehicleModel, &priceForDay)
 	if err != nil {
 		tx.Rollback()
-		return nil, fmt.Errorf("failed to fetch vehicle model: %w", err)
+		return nil, fmt.Errorf("failed to fetch vehicle details: %w", err)
 	}
+
+	//days := int(newBooking.EndDate.Sub(newBooking.StartDate).Hours()/24) + 1
+	days := int(newBooking.EndDate.Truncate(24*time.Hour).Sub(newBooking.StartDate.Truncate(24*time.Hour)).Hours()/24) + 1
+	if days < 1 {
+		days = 1 // fallback di sicurezza
+	}
+	newBooking.TotalPrice = priceForDay * float64(days)
 
 	// Conferma la transazione
 	err = tx.Commit()
