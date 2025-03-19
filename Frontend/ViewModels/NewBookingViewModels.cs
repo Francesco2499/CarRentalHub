@@ -19,15 +19,16 @@ namespace Frontend.ViewModels
 
         [ObservableProperty] private bool _isVisibleSubTitle = true;
 
-        [ObservableProperty] private string _dateSearchMessage = string.Empty;
+        [ObservableProperty] private string _firstErrorMessage = string.Empty;
 
         [ObservableProperty] private string _bookingMessage = string.Empty;
 
         [ObservableProperty] private bool _isVisibleSearchDate = true;
 
+        [ObservableProperty] private string _location = string.Empty;
+
         [ObservableProperty] private VehicleModel? _selectedVehicle;
 
-        // Proprietà per la data di inizio (simulata)
         private DateTime? _startDate;
         public DateTime? StartDate
         {
@@ -48,33 +49,39 @@ namespace Frontend.ViewModels
         private DateTime? _endDate;
         protected override List<VehicleModel>? LoadAllItemsAsync()
         {
-            return VehicleService.GetVehiclesByDate(StartDate, EndDate);
+            return VehicleService.GetVehiclesByDate(StartDate, EndDate, Location);
         }
 
         [RelayCommand]
         private void SearchVehicles()
         {
             // Resetta il messaggio di errore all'inizio
-            DateSearchMessage = string.Empty;
+            FirstErrorMessage = string.Empty;
 
             // Verifica che entrambe le date siano selezionate
             if (StartDate == null || EndDate == null)
             {
-                DateSearchMessage = "Seleziona entrambe le date (inizio e fine).";
+                FirstErrorMessage = "Seleziona entrambe le date (inizio e fine).";
                 return;
             }
 
             // Verifica che la data di inizio non sia nel passato
             if (StartDate.Value.Date < DateTime.Today)
             {
-                DateSearchMessage = "La data di inizio non può essere nel passato.";
+                FirstErrorMessage = "La data di inizio non può essere nel passato.";
                 return;
             }
 
             // Verifica che la data di fine non sia prima della data di inizio
             if (EndDate.Value.Date < StartDate.Value.Date)
             {
-                DateSearchMessage = "La data di fine non può essere prima della data di inizio.";
+                FirstErrorMessage = "La data di fine non può essere prima della data di inizio.";
+                return;
+            }
+
+            if (Location == string.Empty)
+            {
+                FirstErrorMessage = "Inserisci un comune per la tua ricerca!";
                 return;
             }
 

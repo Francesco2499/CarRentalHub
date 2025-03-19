@@ -62,7 +62,7 @@ namespace Frontend.ViewModels
                 PreviousPageOpacity = IsPreviousPageEnabled ? 1.0 : 0.5;
                 NextPageOpacity = IsNextPageEnabled ? 1.0 : 0.5;   
                 if (results.Count == 0) {
-                    ErrorMessage = "No results found. Please try a different search term.";
+                    ErrorMessage = "Nessun risultato trovato. Cambia i parametri di ricerca.";
                 }
             }
         }

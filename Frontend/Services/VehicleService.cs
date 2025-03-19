@@ -10,9 +10,9 @@ namespace Frontend.Services
     {
 
         // Recupera i veicoli disponibili in una data specifica (restituisce una lista vuota in caso di errore)
-        public static List<VehicleModel> GetVehiclesByDate(DateTime? startDate, DateTime? endDate)
+        public static List<VehicleModel> GetVehiclesByDate(DateTime? startDate, DateTime? endDate, String location)
         {
-            string url = $"http://localhost:8085/api/v1/vehicle/getAllAvailable?start_date={startDate:yyyy-MM-dd}&end_date={endDate:yyyy-MM-dd}";
+            string url = $"http://localhost:8085/api/v1/vehicle/getAllAvailable?location={location}&start_date={startDate:yyyy-MM-dd}&end_date={endDate:yyyy-MM-dd}";
             
             var vehicles = HttpService.Get<List<VehicleModel>>(url);
 
@@ -35,7 +35,7 @@ namespace Frontend.Services
                 model = vehicle.Model,
                 category = vehicle.Category,
                 price = vehicle.Price,
-                location = "Napoli"
+                location = vehicle.Location
             };
 
             var result = HttpService.Post<VehicleModel>("http://localhost:8085/api/v1/vehicle/new", requestBody);
@@ -51,7 +51,7 @@ namespace Frontend.Services
                 model = vehicle.Model,
                 category = vehicle.Category,
                 price = vehicle.Price,
-                location = "Napoli"
+                location = vehicle.Location
             };
 
             var updatedVehicle = HttpService.Put<VehicleModel>($"http://localhost:8085/api/v1/vehicle/update/{vehicle.Id}", requestBody);

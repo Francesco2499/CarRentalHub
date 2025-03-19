@@ -10,28 +10,43 @@
              x:DataType="vm:NewBookingViewModel">
   
   <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-    <TextBlock Text="Nuova Prenotazione" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-    <TextBlock IsVisible="{Binding IsVisibleSubTitle}" Text="Qui potrai effettuare una nuova prenotazione, scegliendo prima il periodo di tuo interesse e successivamente selezionando l'auto che preferisci!" 
-           Width="500" 
+    <TextBlock Text="Nuova Prenotazione" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+
+    <TextBlock IsVisible="{Binding IsVisibleSubTitle}" Text="Per effettuare una prenotazione, inizia selezionando le date in cui desideri noleggiare un'auto e il comune di ritiro. Una volta scelto il periodo e la località, ti mostreremo le auto disponibili. Potrai confrontare le opzioni, selezionare il veicolo più adatto alle tue esigenze e completare la prenotazione in pochi passaggi!" 
+           Width="800" 
+           FontSize="16"
            TextWrapping="Wrap"
            HorizontalAlignment="Center" 
-           VerticalAlignment="Center" 
+           VerticalAlignment="Center"
+           TextAlignment="Justify" 
            Margin="0,0,0,20"/>
 
-
     <StackPanel IsVisible="{Binding IsVisibleSearchDate}">
-      <TextBlock Text="Scegli la data per la tua prenotazione" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,20"/>
+
+      <TextBlock Text="Scegli la data e il comune per la tua prenotazione:" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,20"/>
+      
       <StackPanel Spacing="20" Margin="20" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <CalendarDatePicker SelectedDateFormat="Short" SelectedDate="{Binding StartDate}" Margin="0,0,80,0"/>
-        <CalendarDatePicker SelectedDateFormat="Short" SelectedDate="{Binding EndDate}" />
+        <CalendarDatePicker SelectedDateFormat="Short" SelectedDate="{Binding StartDate}" Margin="40,0,80,0"/>
+        <StackPanel Orientation="Horizontal">
+                <CalendarDatePicker SelectedDateFormat="Short" SelectedDate="{Binding EndDate}" />
+                
+                <!-- Icona info con tooltip -->
+                <PathIcon Data="{Binding Source=info_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" 
+                          Width="20" Height="20" Margin="15,0,0,0">
+                    <ToolTip.Tip>
+                        <TextBlock Text="La prenotazione durerà fino alle 23:59 dell'ultimo giorno selezionato." Width="200" TextWrapping="Wrap"/>
+                    </ToolTip.Tip>
+                </PathIcon>
+            </StackPanel>
       </StackPanel>
+
+      <TextBox Watermark="Inserisci il comune"  Width="350" Margin="20" HorizontalAlignment="Center" Text="{Binding Location}" />
 
       <Button Content="See available vehicles"  Command="{Binding SearchVehiclesCommand}" HorizontalAlignment="Center" Margin="10"/>
 
-      <TextBlock Text="{Binding DateSearchMessage}" Foreground="Red"/>
+      <TextBlock Text="{Binding FirstErrorMessage}" HorizontalAlignment="Center" Foreground="Red"/>
 
-      <TextBlock Text="{Binding BookingMessage}" FontSize="18" TextAlignment="Center"/>
-
+      <TextBlock Text="{Binding BookingMessage}" FontSize="20" TextAlignment="Center"/>
 
     </StackPanel>
     
@@ -54,6 +69,7 @@
           <TextBlock Text="Price" Grid.Column="3"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
       </Grid>      
       <ListBox Padding="0"
+              Width="650"
               ItemsSource="{Binding Items}"
               SelectedItem="{Binding SelectedVehicle, Mode=TwoWay}">
           <ListBox.ItemTemplate>
@@ -97,13 +113,11 @@
     </StackPanel>
     <StackPanel IsVisible="{Binding IsBookingSummaryVisible}" HorizontalAlignment="Center" Margin="20">
     
-    <Border Background="#1e1e1e" CornerRadius="10" Padding="30" Width="400" HorizontalAlignment="Center">
+    <Border Background="#4e4e4e" CornerRadius="10" Padding="30" Width="400" HorizontalAlignment="Center">
         <StackPanel>
             <TextBlock Text="Booking Summary" FontSize="20" FontWeight="Bold" Foreground="White" TextAlignment="Center" Margin="0,0,0,20"/>
             
             <Separator Background="Gray" Height="1" Margin="0,10"/>
-            
-                  
 
                 <TextBlock Text="{Binding Booking.vehicle_model, StringFormat='🚗 Vehicle: {0}'}" Margin="0,10"/>
 

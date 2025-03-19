@@ -35,7 +35,7 @@ public class UserService
         return loginResponse;
     }
 
-    public static RegistrationResponse? Register(string email, string username, string password, bool isAdmin)
+    public static RegistrationResponse? Register(string email, string username, string password, bool isAdmin, string region)
     {
             // Crea il corpo della richiesta JSON con i dati di registrazione
             var requestBody = new
@@ -43,6 +43,7 @@ public class UserService
                 email,
                 username,
                 password,
+                region,
                 role = isAdmin ? "admin" : ""
             };
 

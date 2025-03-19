@@ -7,18 +7,33 @@
 
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="700">
         <TextBlock Text="Le Mie Prenotazioni" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+        <TextBlock Text="Utilizza la funzione di ricerca per trovare facilmente le tue prenotazioni. Puoi filtrare per modello di auto per individuare rapidamente un veicolo specifico, oppure selezionare un intervallo di date per visualizzare tutte le prenotazioni effettuate nel periodo selezionato per verificarne il resoconto." 
+                Width="750" 
+                FontSize="16"
+                TextWrapping="Wrap"
+                HorizontalAlignment="Center" 
+                VerticalAlignment="Center"
+                TextAlignment="Justify" 
+                Margin="0,0,0,10"/>
 
-        <TextBlock Text="{Binding BookingMessage}" FontSize="18" TextAlignment="Center"/>
+        <TextBlock Text="{Binding BookingMessage}" FontSize="20" TextAlignment="Center"/>
 
         <StackPanel IsVisible="{Binding IsVisibleList}">
 
-            <TextBox Watermark="Search bookings..."  Width="350" Margin="20" HorizontalAlignment="Center" Text="{Binding SearchQuery}" />
-
-            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                <Button Content="Cerca per modello" Command="{Binding SearchItemsCommand}" CommandParameter="text" Margin="10"/>
-                <Button Content="Cerca per prenotazione" Command="{Binding SearchItemsCommand}" CommandParameter="booking" Margin="10"/>
-                <Button Content="Mostra tutte" IsEnabled="{Binding EnableShowAll}" Command="{Binding SearchItemsCommand}" CommandParameter="all" Margin="10"/>
+            <StackPanel HorizontalAlignment="Center" Margin="20, 0, 20, 10" Orientation="Horizontal">
+                <TextBox Watermark="Search bookings..."  Height="10" Width="350" Margin="20" HorizontalAlignment="Center" Text="{Binding SearchQuery}" />
+                <Button Content="Cerca per modello" Command="{Binding SearchItemsCommand}" CommandParameter="text" Margin="5"/>
             </StackPanel>
+            
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10, 0, 10, 10">
+                <CalendarDatePicker SelectedDate="{Binding StartDate}" Width="150" Margin="5"/>
+                <CalendarDatePicker SelectedDate="{Binding EndDate}" Width="150" Margin="5"/>
+                <Button Content="Cerca per date" Command="{Binding SearchByDateCommand}" Margin="20"/>
+            </StackPanel>
+
+            <Button Content="Mostra tutte" IsEnabled="{Binding EnableShowAll}" Command="{Binding SearchItemsCommand}" HorizontalAlignment="Center" CommandParameter="all" Margin="5"/>
+
 
             <!-- Intestazione delle colonne -->
             <Grid ColumnDefinitions="2*, 2*, 2*, 2*" Background="#1e1e1e" Margin="10" Width="600">
@@ -63,6 +78,8 @@
                     <PathIcon Data="{Binding Source=chevron_right_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Width="14"/>
                 </Button>
             </StackPanel>
+
+            <TextBlock Text="{Binding ErrorMessage}" HorizontalAlignment="Center" Foreground="Red" Margin="10"/>       
         </StackPanel>
     </StackPanel>
 </UserControl>

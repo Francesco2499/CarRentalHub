@@ -12,25 +12,23 @@ namespace Frontend.ViewModels
 {
     public partial class AdminVehicleViewModel : SearchableViewModel<VehicleModel>
     {
-        private readonly VehicleService _vehicleService;
+        [ObservableProperty] private VehicleModel? _selectedVehicle;
 
-        [ObservableProperty]
-        private VehicleModel? _selectedVehicle;
+        [ObservableProperty] private bool _isFormVisible = false;
 
-        [ObservableProperty]
-        private bool _isFormVisible = false;
-
-        [ObservableProperty]
-        private bool _isGridVisible = true;
-
-        [ObservableProperty]
-        private VehicleModel _editingVehicle = new(0, "", "", 0, "", 0, 0); 
+        [ObservableProperty] private VehicleModel _editingVehicle = new(0, "", "", 0, ""); 
+        
+        public AdminVehicleViewModel()
+        {
+            IsVisibleList = true;
+            LoadItems();
+        }
 
         [RelayCommand]
         private void ShowAddVehicleForm()
         {
-            EditingVehicle = new VehicleModel(0, "", "", 0, "", 0, 0);
-            IsGridVisible = false;
+            EditingVehicle = new VehicleModel(0, "", "", 0, "");
+            IsVisibleList = false;
             IsFormVisible = true;
         }
 
@@ -44,7 +42,7 @@ namespace Frontend.ViewModels
             }
 
             EditingVehicle = SelectedVehicle with { };
-            IsGridVisible = false;
+            IsVisibleList = false;
             IsFormVisible = true;
         }
 
@@ -69,17 +67,11 @@ namespace Frontend.ViewModels
                 ErrorMessage = "";
                 LoadItems();
                 IsFormVisible = false;  
-                IsGridVisible = true;
+                IsVisibleList = true;
             } catch (Exception ex)
             {
                 ErrorMessage = $"Si è verificato un errore imprevisto: {ex.Message}";
             } 
-        }
-
-        public AdminVehicleViewModel()
-        {
-            _vehicleService = new VehicleService();
-            LoadItems();
         }
 
         protected override List<VehicleModel>? LoadAllItemsAsync()
@@ -107,6 +99,14 @@ namespace Frontend.ViewModels
 
             VehicleService.DeleteVehicle(SelectedVehicle.Id);
             LoadItems();
+        }
+
+        [RelayCommand]
+        private void GoBack()
+        {
+            SearchQuery = string.Empty;
+            IsVisibleList = true;
+            IsFormVisible = false;
         }
     }
 }

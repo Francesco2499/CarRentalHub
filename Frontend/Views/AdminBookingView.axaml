@@ -10,7 +10,7 @@
              
    <StackPanel Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center">
 
-        <TextBlock Text="Gestione Prenotazioni" FontSize="20" FontWeight="Bold" TextAlignment="Center"/>
+        <TextBlock Text="Gestione Prenotazioni" FontSize="24" FontWeight="Bold" TextAlignment="Center"/>
         <TextBlock Text="Qui puoi cercare, modificare o eliminare le prenotazioni esistenti." TextAlignment="Center" Margin="0,0,0,10"/>
 
         <TextBox Text="{Binding SearchQuery}" Watermark="Cerca per cliente o veicolo..." Width="300" Margin="10"/>
