@@ -6,8 +6,6 @@ import (
 	"Backend/repositories"
 	"fmt"
 	"regexp"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 func isEmail(s string) bool {
@@ -15,12 +13,8 @@ func isEmail(s string) bool {
 	return re.MatchString(s)
 }
 
-func VerifyPassword(hashedPassword, password string) error {
-	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
-}
-
 // RegisterUser registra un nuovo utente utilizzando il repository
-func RegisterUser(user models.User) (*models.User, string, error) {
+func RegisterUser(user models.User) (*models.UserLoginResponseDTO, string, error) {
 	// Verifica se l'email è già in uso
 	if _, err := repositories.FindByEmail(user.Email); err == nil {
 		return nil, "Email already in use", fmt.Errorf("email already in use")
@@ -41,16 +35,16 @@ func RegisterUser(user models.User) (*models.User, string, error) {
 		return nil, "Error", err
 	}
 
-	return &user, "Registration done!", nil
+	userDTO := models.ToUserLoginResponseDTO(&user)
+	//return &user, "Registration done!", nil
+	return userDTO, "Registration done!", nil
 }
 
 // AuthenticateUser esegue l'autenticazione dell'utente e restituisce un token JWT.
-func AuthenticateUser(username, password string) (string, string, bool, error) {
+func AuthenticateUser(username, password string) (string, string, *models.UserLoginResponseDTO, error) {
 	var user *models.User
 	var err error
-	var isAdmin bool
 
-	// Verifica se il valore passato è un'email o uno username
 	if isEmail(username) {
 		user, err = repositories.FindByEmail(username)
 	} else {
@@ -58,23 +52,20 @@ func AuthenticateUser(username, password string) (string, string, bool, error) {
 	}
 
 	if err != nil {
-		return "User not found", "", false, fmt.Errorf("error: %v", err)
+		return "User not found", "", nil, fmt.Errorf("error: %v", err)
 	}
 
-	// Verifica la password
-	if err := VerifyPassword(user.Password, password); err != nil {
-		return "Invalid password", "", false, fmt.Errorf("password error")
+	if user.Password != password {
+		return "Invalid password", "", nil, fmt.Errorf("password error")
 	}
 
-	// Genera il token JWT
 	token, err := helpers.GenerateJWT(user.ID, user.Role)
 	if err != nil {
-		return "Error genereating token", "", false, fmt.Errorf("error genereating token: %v", err)
+		return "Error generating token", "", nil, fmt.Errorf("error generating token: %v", err)
 	}
 
-	isAdmin = user.Role == "admin"
-
-	return "Login done", token, isAdmin, nil
+	userDTO := models.ToUserLoginResponseDTO(user)
+	return "Login done", token, userDTO, nil
 }
 
 func GetUserIdByUsername(username string) (int, error) {

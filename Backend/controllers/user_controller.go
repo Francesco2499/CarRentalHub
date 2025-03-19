@@ -11,19 +11,19 @@ import (
 func UpdateCurrentUser(c *gin.Context) {
 	userID := c.GetInt("userID")
 
-	var updatedUser models.User
-	if err := c.ShouldBindJSON(&updatedUser); err != nil {
+	var req models.UserUpdateRequestDTO
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
 
-	err := services.UpdateUser(userID, &updatedUser)
+	userDTO, err := services.UpdateUser(userID, &req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully", "user": userDTO})
 }
 
 func DeleteCurrentUser(c *gin.Context) {
