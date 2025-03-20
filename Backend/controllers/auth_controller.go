@@ -4,7 +4,7 @@ import (
 	"Backend/models"
 	"Backend/services"
 	"net/http"
-
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +23,7 @@ func Register(c *gin.Context) {
 	newUser, message, err := services.RegisterUser(user)
 	if err != nil {
 		// Gestisce eventuali errori durante la registrazione
-		c.JSON(http.StatusInternalServerError, gin.H{"message": message})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": message, "error": fmt.Errorf("")})
 		return
 	}
 
@@ -35,21 +35,20 @@ func Register(c *gin.Context) {
 func Login(c *gin.Context) {
 	var user models.User
 
-	// Legge i dati del corpo della richiesta
 	if err := c.ShouldBindJSON(&user); err != nil {
-		// Se i dati non sono corretti, restituisce errore
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid data"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
 		return
 	}
 
-	// Chiamata al servizio di autenticazione
-	message, token, isAdmin, err := services.AuthenticateUser(user.Username, user.Password)
+	message, token, userResp, err := services.AuthenticateUser(user.Username, user.Password)
 	if err != nil {
-		// Se l'autenticazione fallisce, restituisce errore
-		c.JSON(http.StatusOK, gin.H{"message": message})
+		c.JSON(http.StatusOK, gin.H{"message": message, "error": fmt.Errorf("")})
 		return
 	}
 
-	// Restituisce il token JWT se l'autenticazione ha avuto successo
-	c.JSON(http.StatusOK, gin.H{"message": message, "token": token, "isAdmin": isAdmin})
+	c.JSON(http.StatusOK, gin.H{
+		"message": message,
+		"token":   token,
+		"user":    userResp,
+	})
 }

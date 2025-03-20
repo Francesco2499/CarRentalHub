@@ -11,15 +11,18 @@ import (
 func SetupRoutes() *gin.Engine {
 	// Gruppo di rotte per l'autenticazione
 	router := gin.Default()
-	/*err := router.SetTrustedProxies([]string{"127.0.0.1"}) // Imposta solo proxy locali fidati
-	if err != nil {
-		log.Fatalf("Errore nella configurazione dei proxy: %v", err)
-	}*/
 
 	auth := router.Group("/api/v1/auth")
 	{
 		auth.POST("/register", controllers.Register) // Registrazione utente
 		auth.POST("/login", controllers.Login)       // Login utente
+	}
+
+	user := router.Group("/api/v1/user")
+	user.Use(middleware.AuthMiddleware("")) // Tutti gli utenti autenticati
+	{
+		user.PUT("/update/me", controllers.UpdateCurrentUser)
+		user.DELETE("/delete/me", controllers.DeleteCurrentUser)
 	}
 
 	vehicle := router.Group("/api/v1/vehicle")

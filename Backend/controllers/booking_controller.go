@@ -107,12 +107,12 @@ func CreateBooking(c *gin.Context) {
 	createdBooking, err := services.RequestBooking(booking)
 	if err != nil {
 		log.Printf("Error saving booking: %v", err)
-		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		c.JSON(http.StatusConflict, gin.H{"message": "Errore nella creazione della prenotazione", "error": err.Error()})
 		return
 	}
 
 	log.Println("Booking created successfully")
-	c.JSON(http.StatusCreated, createdBooking)
+	c.JSON(http.StatusCreated, gin.H{"createdBooking": createdBooking, "message": "Prenotazione effettuata!"});
 }
 
 
@@ -121,7 +121,7 @@ func UpdateBooking(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Println("Error: Invalid booking ID")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid booking ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Id prenotazione non valido", "error": err})
 		return
 	}
 	var booking models.Booking
@@ -131,13 +131,14 @@ func UpdateBooking(c *gin.Context) {
 		return
 	}
 	booking.ID = id
-	if err := services.UpdateBooking(&booking); err != nil {
+	msg, err := services.UpdateBooking(&booking)
+	if err != nil {
 		log.Printf("Error while updating booking ID %d: %v", id, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": msg, "error": err.Error()})
 		return
 	}
 	log.Printf("Booking with ID %d updated successfully", id)
-	c.JSON(http.StatusOK, booking)
+	c.JSON(http.StatusOK, gin.H{"booking": booking, "message": msg})
 }
 
 func DeleteBooking(c *gin.Context) {
@@ -145,17 +146,17 @@ func DeleteBooking(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Println("Error: Invalid booking ID")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid booking ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Id prenotazione non valido", "error": err})
 		return
 	}
 	if err := services.DeleteBooking(id); err != nil {
 		log.Printf("Error while deleting booking ID %d: %v", id, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Errore nella cancellazione della prenotazione!", "error": err.Error()})
 		return
 	}
 	log.Printf("Booking ID %d deleted successfully", id)
 	//c.Status(http.StatusNoContent)
-	c.JSON(http.StatusOK, gin.H{"message": "Booking deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Prenotazione cancellata correttamente!"})
 }
 
 func extractUserFromContext(c *gin.Context) (int, bool) {

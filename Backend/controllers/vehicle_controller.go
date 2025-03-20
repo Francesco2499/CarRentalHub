@@ -3,6 +3,7 @@ package controllers
 import (
 	"Backend/models"
 	"Backend/services"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -51,11 +52,11 @@ func CreateVehicle(c *gin.Context) {
 	}
 	if err := services.CreateVehicle(&vehicle); err != nil {
 		log.Printf("Error saving vehicle to the database: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message":"Errore nella creazione del veicolo", "error": err.Error()})
 		return
 	}
 	log.Printf("New vehicle created successfully: %+v", vehicle)
-	c.JSON(http.StatusCreated, vehicle)
+	c.JSON(http.StatusCreated, gin.H{"message": "Veicolo aggiunto correttamente!", "vehicle":vehicle})
 }
 
 func UpdateVehicle(c *gin.Context) {
@@ -75,11 +76,11 @@ func UpdateVehicle(c *gin.Context) {
 	vehicle.ID = id
 	if err := services.UpdateVehicle(&vehicle); err != nil {
 		log.Printf("Error while updating vehicle ID %d: %v", id, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message":"Errore nella modifica del veicolo", "error": err.Error()})
 		return
 	}
 	log.Printf("Vehicle with ID %d updated successfully: %+v", id, vehicle)
-	c.JSON(http.StatusOK, vehicle)
+	c.JSON(http.StatusOK, gin.H{"message": "Veicolo modificato correttamente!", "vehicle": vehicle})
 }
 
 func DeleteVehicle(c *gin.Context) {
@@ -106,23 +107,18 @@ func GetAvailableVehicles(c *gin.Context) {
 	endDateStr := c.Query("end_date")
 	location := c.Query("location")
 
-	if startDateStr == "" || endDateStr == "" {
-		log.Println("Error: Missing start_date or end_date query parameters")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing start_date or end_date query parameters"})
-		return
-	}
-
 	startDate, err := time.Parse("2006-01-02", startDateStr)
+
 	if err != nil {
 		log.Println("Error: Invalid start_date format")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid start_date format. Use YYYY-MM-DD."})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Formato non valido. Usa YYYY-MM-DD.", "error": fmt.Errorf("")})
 		return
 	}
 
 	endDate, err := time.Parse("2006-01-02", endDateStr)
 	if err != nil {
 		log.Println("Error: Invalid end_date format")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid end_date format. Use YYYY-MM-DD."})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Formato non valido. Usa YYYY-MM-DD.", "error": fmt.Errorf("")})
 		return
 	}
 

@@ -10,4 +10,5 @@ type BookingWithVehicleDTO struct {
 	EndDate      time.Time `json:"end_date"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
+	TotalPrice   float64   `json:"total_price"`
 }
