@@ -17,13 +17,13 @@ func UpdateCurrentUser(c *gin.Context) {
 		return
 	}
 
-	userDTO, err := services.UpdateUser(userID, &req)
+	userDTO, msg, err := services.UpdateUser(userID, &req)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": msg, "error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully", "user": userDTO})
+	c.JSON(http.StatusOK, gin.H{"message": msg, "user": userDTO})
 }
 
 func DeleteCurrentUser(c *gin.Context) {
@@ -31,9 +31,9 @@ func DeleteCurrentUser(c *gin.Context) {
 
 	err := services.DeleteUser(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message":"Errore nella cancellazione dell'utente", "error": "Failed to delete user"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Utente cancellato correttamente"})
 }

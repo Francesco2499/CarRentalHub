@@ -133,26 +133,26 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, e
 	return booking, nil
 }*/
 
-func UpdateBooking(booking *models.Booking) error {
+func UpdateBooking(booking *models.Booking) (string, error) {
 
 	available, err := repositories.IsVehicleAvailable(booking.VehicleID, booking.ID, booking.StartDate, booking.EndDate)
 	if err != nil {
-		return fmt.Errorf("Error checking vehicle availability: %w", err)
+		return "Errore nella ricerca di veicoli disponibili!", fmt.Errorf("error checking vehicle availability: %w", err)
 	}
 	if !available {
-		return errors.New("Vehicle is not available for the selected dates")
+		return "Il veicolo non è disponibile", errors.New("vehicle is not available for the selected dates")
 	}
 
 	err = repositories.UpdateBooking(booking)
 	if err != nil {
-		return err
+		return "Errore nell'aggiornamento della prenotazione", err
 	}
 
 	// Invalida la cache dopo l'aggiornamento
 	cache.BookingCache.Invalidate()
 	cache.VehicleCache.Invalidate()
 
-	return nil
+	return "Aggiornamento effettuato", nil
 }
 
 func DeleteBooking(id int) error {

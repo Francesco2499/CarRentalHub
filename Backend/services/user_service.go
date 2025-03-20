@@ -6,16 +6,16 @@ import (
 	"fmt"
 )
 
-func UpdateUser(userID int, req *models.UserUpdateRequestDTO) (*models.UserLoginResponseDTO, error) {
+func UpdateUser(userID int, req *models.UserUpdateRequestDTO) (*models.UserLoginResponseDTO, string, error) {
 	user, err := repositories.FindUserByID(userID)
 	if err != nil {
-		return nil, fmt.Errorf("user not found")
+		return nil, "Utente non trovato!", fmt.Errorf("")
 	}
 
 	// Verifica password attuale
 	if req.Password != "" && req.NuovaPassword != "" {
 		if user.Password != req.Password {
-			return nil, fmt.Errorf("invalid current password")
+			return nil, "Password errata!", fmt.Errorf("")
 		}
 		// Password corretta, aggiorna con nuova hashata
 		user.Password = req.NuovaPassword
@@ -29,10 +29,10 @@ func UpdateUser(userID int, req *models.UserUpdateRequestDTO) (*models.UserLogin
 	// Salva nel DB
 	err = repositories.UpdateFullUser(user)
 	if err != nil {
-		return nil, fmt.Errorf("failed to update user")
+		return nil, "Errore nella modifica dell'utente", fmt.Errorf("")
 	}
 
-	return models.ToUserLoginResponseDTO(user), nil
+	return models.ToUserLoginResponseDTO(user), "Modifica effettuata correttamente!", nil
 }
 
 func DeleteUser(userID int) error {
