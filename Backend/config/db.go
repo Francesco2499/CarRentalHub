@@ -165,18 +165,28 @@ func CreateTables() error {
 func SeedData() error {
 	var count int
 
+	// Seeding per utenti
 	err := db.QueryRow("SELECT COUNT(*) FROM users").Scan(&count)
 	if err != nil {
 		return err
 	}
 
-	if count == 0 { // Inserisce i dati solo se la tabella è vuota
+	if count == 0 {
 		_, err := db.Exec(`
 			INSERT INTO users (username, email, password, region, role) 
-			VALUES ('testadmin', 'admin@example.com', '$2a$10$9XLtbksVUlDcoPQ0uz4Pe.kiyrfr3QOEJ1e9FqcuHMgb5HBI7Fi7O', 'Sicilia', 'admin'),
-       		('testcustomer', 'testcustomer@example.com', '$2a$10$bHUA0bk60fLdfD5du8lFGeF1PpqT42mvqE6Wn4uQRSfvvD39Scqva', 'Piemonte', 'customer'),
-			('testuser', 'testuser@example.com', '$2a$10$BgqOX8eoqerj8lm0Lo96yuq7JtRfjQiPxyT0jYTIIzypjsxfebob.', 'Lombardia', 'customer');
-		`)
+			VALUES 
+				('testadmin', 'admin@example.com', 'e0e6097a6f8af07daf5fc7244336ba37133713a8fc7345c36d667dfa513fabaa', 'Sicilia', 'admin'),
+       			('testcustomer', 'testcustomer@example.com', '6cb75f652a9b52798eb6cf2201057c73d1e2277bb2b10b89a90203b9f60c68c0', 'Piemonte', 'customer'),
+				('testuser', 'testuser@example.com', '6cb75f652a9b52798eb6cf2201057c73d1e2277bb2b10b89a90203b9f60c68c0', 'Lombardia', 'customer'),
+				('mariorossi', 'mario.rossi@example.com', '6cb75f652a9b52798eb6cf2201057c73d1e2277bb2b10b89a90203b9f60c68c0', 'Lazio', 'customer'),
+				('giovannibianchi', 'giovanni.bianchi@example.com', '6cb75f652a9b52798eb6cf2201057c73d1e2277bb2b10b89a90203b9f60c68c0', 'Sicilia', 'customer'),
+				('francescaneri', 'francesca.neri@example.com', '6cb75f652a9b52798eb6cf2201057c73d1e2277bb2b10b89a90203b9f60c68c0', 'Emilia-Romagna', 'customer'),
+				('lucalongo', 'luca.longo@example.com', '6cb75f652a9b52798eb6cf2201057c73d1e2277bb2b10b89a90203b9f60c68c0', 'Toscana', 'customer'),
+				('martinamartini', 'martina.martini@example.com', '6cb75f652a9b52798eb6cf2201057c73d1e2277bb2b10b89a90203b9f60c68c0', 'Sicilia', 'customer'),
+				`)
+
+		//Password per test -> ADMIN: securepassword Customer:password123
+		
 
 		if err != nil {
 			return err
@@ -186,6 +196,7 @@ func SeedData() error {
 		fmt.Println("User data already present, no new entries inserted.")
 	}
 
+	// Seeding per veicoli
 	err = db.QueryRow("SELECT COUNT(*) FROM vehicles").Scan(&count)
 	if err != nil {
 		return err
@@ -194,29 +205,43 @@ func SeedData() error {
 	if count == 0 { // Inserisce i dati solo se la tabella è vuota
 		_, err := db.Exec(`
 			INSERT INTO vehicles (model, category, price, location) VALUES 
-			('Toyota Corolla', 'Sedan', 50.00, 'Milan'),
-			('Ford Fiesta', 'Hatchback', 40.00, 'Rome'),
-			('BMW X5', 'SUV', 90.00, 'Naples');
+				('Toyota Corolla', 'Berlina', 50.00, 'Catania'),
+				('Ford Fiesta', 'Hatchback', 40.00, 'Roma'),
+				('BMW X5', 'SUV', 90.00, 'Napoli'),
+				('Audi A4', 'Berlina', 75.00, 'Catania'),
+				('Fiat Panda', 'City Car', 30.00, 'Bologna'),
+				('Mercedes-Benz GLC', 'SUV', 120.00, 'Firenze'),
+				('Tesla Model 3', 'Berlina Elettrica', 150.00, 'Catania'),
+				('Jeep Wrangler', 'SUV', 100.00, 'Palermo'),
+				('Peugeot 208', 'Hatchback', 35.00, 'Genova'),
+				('Alfa Romeo Giulietta', 'Compact', 55.00, 'Catania');
 		`)
 		if err != nil {
 			return err
 		}
-		fmt.Println("Initial data entered successfully!")
+		fmt.Println("Initial vehicle data entered successfully!")
 	} else {
-		fmt.Println("Data vehicle already present, no new entries inserted.")
+		fmt.Println("Vehicle data already present, no new entries inserted.")
 	}
 
-	// Seeding for bookings
+	// Seeding per prenotazioni
 	err = db.QueryRow("SELECT COUNT(*) FROM bookings").Scan(&count)
 	if err != nil {
 		return err
 	}
 
-	if count == 0 { // Insert data only if the bookings table is empty
+	if count == 0 { // Inserisce i dati solo se la tabella è vuota
 		_, err := db.Exec(`
 			INSERT INTO bookings (user_id, vehicle_id, start_date, end_date) VALUES 
-			(2, 2, '2025-03-01 10:00:00', '2025-03-10 10:00:00'),
-			(3, 3, '2025-04-05 08:00:00', '2025-04-13 08:00:00');
+				(2, 2, '2025-03-01 10:00:00', '2025-03-10 10:00:00'),
+				(3, 3, '2025-04-05 08:00:00', '2025-04-13 08:00:00'),
+				(4, 4, '2025-05-15 09:00:00', '2025-05-22 09:00:00'),
+				(5, 2, '2025-06-10 10:30:00', '2025-06-20 10:30:00'),
+				(6, 6, '2025-07-01 11:00:00', '2025-07-10 11:00:00'),
+				(4, 7, '2025-08-01 12:00:00', '2025-08-07 12:00:00'),
+				(5, 7, '2025-09-10 14:00:00', '2025-09-15 14:00:00'),
+				(5, 7, '2025-10-05 13:00:00', '2025-10-12 13:00:00'),
+				(3, 5, '2025-11-20 15:00:00', '2025-11-27 15:00:00');
 		`)
 		if err != nil {
 			return err
@@ -228,6 +253,7 @@ func SeedData() error {
 
 	return nil
 }
+
 
 func GetDB() *sql.DB {
 	if db == nil {
