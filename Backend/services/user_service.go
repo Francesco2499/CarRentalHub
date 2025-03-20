@@ -13,12 +13,12 @@ func UpdateUser(userID int, req *models.UserUpdateRequestDTO) (*models.UserLogin
 	}
 
 	// Verifica password attuale
-	if req.Password != "" && req.NuovaPassword != "" {
+	if req.Password != "" && req.NewPassword != "" {
 		if user.Password != req.Password {
 			return nil, "Password errata!", fmt.Errorf("")
 		}
 		// Password corretta, aggiorna con nuova hashata
-		user.Password = req.NuovaPassword
+		user.Password = req.NewPassword
 	}
 
 	// Aggiorna i campi modificabili

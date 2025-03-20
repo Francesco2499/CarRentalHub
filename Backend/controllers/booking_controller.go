@@ -112,7 +112,7 @@ func CreateBooking(c *gin.Context) {
 	}
 
 	log.Println("Booking created successfully")
-	c.JSON(http.StatusCreated, gin.H{"createdBooking": createdBooking, "message": "Prenotazione effettuata!"});
+	c.JSON(http.StatusCreated, gin.H{"booking": createdBooking, "message": "Prenotazione effettuata!"});
 }
 
 
