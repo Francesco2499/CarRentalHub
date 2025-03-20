@@ -1,34 +1,27 @@
+using System.Collections.Generic;
+using Frontend.Models;
+using Frontend.Helpers;
 using System;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Frontend.Services;
 
 public class UserService
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-    };
 
     public static LoginResponse? Authenticate(string username, string password)
     {
-        var requestBody = new
+        var requestBody = new Dictionary<string, object>
         {
-            username,
-            password
+            { "username", username },
+            { "password", PasswordHasher.HashPassword(password) }
         };
 
-        // Usa il metodo generico PostAsync per inviare la richiesta di login
+        Console.WriteLine(PasswordHasher.HashPassword(password));
+
         var loginResponse = HttpService.Post<LoginResponse>("http://localhost:8085/api/v1/auth/login", requestBody);
 
         if (loginResponse != null && !string.IsNullOrEmpty(loginResponse.Token))
         {
-            // Memorizza il token nella classe AuthService
             TokenService.SetToken(loginResponse.Token);
         }
 
@@ -37,23 +30,37 @@ public class UserService
 
     public static RegistrationResponse? Register(string email, string username, string password, bool isAdmin, string region)
     {
-            // Crea il corpo della richiesta JSON con i dati di registrazione
-            var requestBody = new
-            {
-                email,
-                username,
-                password,
-                region,
-                role = isAdmin ? "admin" : ""
-            };
+        var requestBody = new Dictionary<string, object>
+        {
+            { "email", email },
+            { "username", username },
+            { "password", password },
+            { "region", region },
+            { "role", isAdmin ? "admin" : "" }
+        };
 
-            return HttpService.Post<RegistrationResponse>("http://localhost:8085/api/v1/auth/register", requestBody);        
+        return HttpService.Post<RegistrationResponse>("http://localhost:8085/api/v1/auth/register", requestBody);
+    }
+
+    public static RegistrationResponse? EditProfile(UserModel user, string newPassword)
+    {
+        var requestBody = new Dictionary<string, object>
+        {
+            { "email", user.Email },
+            { "username", user.Username },
+            { "region", user.Region }
+        };
+
+        if (!string.IsNullOrEmpty(newPassword))
+        {
+            requestBody["password"] = user.Password;
+            requestBody["new_password"] = newPassword;
+        }
+
+        return HttpService.Put<RegistrationResponse>("http://localhost:8085/api/v1/user/update/me", requestBody);
     }
 }
 
-public record RegistrationResponse(string Message, UserResponse? User);
+public record RegistrationResponse(string? Message, UserModel? User, string? Error);
 
-public record UserResponse(string Username, string Email, string Password, string Role);
-
-public record LoginResponse(string Message, string? Token, bool IsAdmin);
-
+public record LoginResponse(string? Message, string? Token, UserModel? User, string Error);

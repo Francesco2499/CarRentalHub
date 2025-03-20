@@ -56,18 +56,30 @@ namespace Frontend.ViewModels
             }
 
             try {
+                VehicleResponse? vehicleResponse;
+                string? msg;
+
                 if (EditingVehicle.Id == 0) // Aggiunta di un nuovo veicolo
                 {
-                    VehicleService.AddVehicle(EditingVehicle);
+                    vehicleResponse = VehicleService.AddVehicle(EditingVehicle);
+                    msg = "Errore nell'aggiunta del veicolo!";
                 }
                 else
                 {
-                    VehicleService.EditVehicle(EditingVehicle);
+                    vehicleResponse = VehicleService.EditVehicle(EditingVehicle);
+                    msg = "Errore nella modifica del veicolo!";
                 }
+
                 ErrorMessage = "";
-                LoadItems();
-                IsFormVisible = false;  
-                IsVisibleList = true;
+
+                if (vehicleResponse?.Vehicle != null) {
+                    LoadItems();
+                    IsFormVisible = false;  
+                    IsVisibleList = true; 
+                } else {
+                    ErrorMessage = vehicleResponse?.Message ?? msg;
+                }
+               
             } catch (Exception ex)
             {
                 ErrorMessage = $"Si è verificato un errore imprevisto: {ex.Message}";

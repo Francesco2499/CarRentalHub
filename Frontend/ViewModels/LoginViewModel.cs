@@ -9,7 +9,6 @@ namespace Frontend.ViewModels;
 public partial class LoginViewModel(MainWindowViewModel mainViewModel) : ViewModelBase
 {
     private readonly MainWindowViewModel _mainViewModel = mainViewModel;
-    private readonly UserService _userService = new UserService();
 
     [ObservableProperty]
     private string emailOrUsername = string.Empty;
@@ -31,11 +30,11 @@ public partial class LoginViewModel(MainWindowViewModel mainViewModel) : ViewMod
         var response = UserService.Authenticate(EmailOrUsername, Password);
 
         if (response != null) {
-            if (!string.IsNullOrEmpty(response.Token)) 
+            if (!string.IsNullOrEmpty(response.Error) && response.User != null) 
             {
-                _mainViewModel.ChangeViewModel(new UserMainViewModel(response.IsAdmin));
+                _mainViewModel.ChangeViewModel(new UserMainViewModel(response.User.Role == "admin", response.User));
             } else {
-                LoginMessage = response.Message;
+                LoginMessage = response.Message ?? "Errore login!";
                 return;
             }
         }

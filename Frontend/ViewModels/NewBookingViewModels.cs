@@ -115,18 +115,18 @@ namespace Frontend.ViewModels
                 return;
             }  
 
-            var booking = BookingService.AddBooking(SelectedVehicle.Id, StartDate, EndDate);
+            var bookingResponse = BookingService.AddBooking(SelectedVehicle.Id, StartDate, EndDate);
             
-            if (booking != null)
+            if (bookingResponse?.Booking != null)
             {
-                Booking = booking;
+                Booking = bookingResponse?.Booking;
                 ErrorMessage = string.Empty;
                 IsBookingSummaryVisible = true;
                 IsVisibleSubTitle = false;
                 IsVisibleList = false;
             } else
             {
-                ErrorMessage = "Errore nella prenotazione. Riprova.";
+                ErrorMessage = bookingResponse?.Message ?? "Errore nella prenotazione!";
                 return;
             }           
         }

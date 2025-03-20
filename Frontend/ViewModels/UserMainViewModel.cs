@@ -22,21 +22,22 @@ public partial class UserMainViewModel : ViewModelBase
 
     public ObservableCollection<ListItemTemplate> Items { get; }
 
-    public UserMainViewModel(bool isAdmin)
+    public UserMainViewModel(bool isAdmin, UserModel user)
     {
         var templates = !isAdmin
             ? new List<ListItemTemplate>
             {
                 new(() => new UserHomePageViewModel(this), "HomeRegular", "Home"),
-                new(() => new NewBookingViewModel(), "add_regular", "Add booking"),
-                new(() => new MyBookingsViewModel(), "book_search_regular", "My bookings")
+                new(() => new NewBookingViewModel(), "add_regular", "Nuova prenotazione"),
+                new(() => new MyBookingsViewModel(), "book_search_regular", "Le mie prenotazioni"),
+                new(() => new MyAreaViewModel(user), "book_search_regular", "My Area")
             }
             :
             [
-                new(() => new AdminVehicleViewModel(), "vehicle_car_regular", "Manage Vehicles"),
-                new(() => new AdminBookingViewModel(), "book_search_regular", "Manage Bookings"),
-                new(() => new RegisterViewModel(true), "personal_regular", "Add new admin"),
-                new(() => new StatsViewModel(), "personal_regular", "Add new admin")
+                new(() => new AdminVehicleViewModel(), "vehicle_car_regular", "Gestisci veicoli"),
+                new(() => new AdminBookingViewModel(), "book_search_regular", "Gestisci prenotazioni"),
+                new(() => new RegisterViewModel(true), "personal_regular", "Aggiungi admin"),
+                new(() => new StatsViewModel(), "personal_regular", "Visualizza stats")
             ];
 
         Items = [.. templates];

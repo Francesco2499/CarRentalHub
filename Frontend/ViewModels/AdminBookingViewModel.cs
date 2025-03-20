@@ -69,10 +69,14 @@ namespace Frontend.ViewModels
 
             try
             {
-                BookingService.EditBooking(EditingBooking);
-                LoadItems();
-                IsFormVisible = false;
-                IsGridVisible = true;
+                var bookingResponse = BookingService.EditBooking(EditingBooking);
+                if (bookingResponse?.Booking != null) {
+                    LoadItems();
+                    IsFormVisible = false;
+                    IsGridVisible = true;  
+                } else {
+                    ErrorMessage = bookingResponse?.Message ?? "Errore nella modifica della prenotazione!";
+                }
             }
             catch (Exception ex)
             {
@@ -89,7 +93,7 @@ namespace Frontend.ViewModels
                 return;
             }
 
-            _bookingService.DeleteBooking(SelectedBooking.Id);
+            BookingService.DeleteBooking(SelectedBooking.Id);
             LoadItems();
         }
 

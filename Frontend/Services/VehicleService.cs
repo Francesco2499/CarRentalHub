@@ -1,22 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Frontend.Models;
 
 namespace Frontend.Services
 {
     public class VehicleService
     {
-
         // Recupera i veicoli disponibili in una data specifica (restituisce una lista vuota in caso di errore)
-        public static List<VehicleModel> GetVehiclesByDate(DateTime? startDate, DateTime? endDate, String location)
+        public static List<VehicleModel> GetVehiclesByDate(DateTime? startDate, DateTime? endDate, string location)
         {
             string url = $"http://localhost:8085/api/v1/vehicle/getAllAvailable?location={location}&start_date={startDate:yyyy-MM-dd}&end_date={endDate:yyyy-MM-dd}";
             
             var vehicles = HttpService.Get<List<VehicleModel>>(url);
 
-            return vehicles ?? [];
+            return vehicles ?? [];  // Se la risposta è nulla, ritorna una lista vuota
         }
 
         // Recupera tutti i veicoli (restituisce una lista vuota in caso di errore)
@@ -24,37 +21,41 @@ namespace Frontend.Services
         {
             var vehicles = HttpService.Get<List<VehicleModel>>("http://localhost:8085/api/v1/vehicle/getAll");
 
-            return vehicles ?? [];
+            return vehicles ?? [];  // Se la risposta è nulla, ritorna una lista vuota
         }
 
         // Aggiunge un veicolo e restituisce l'oggetto creato oppure null in caso di errore
-        public static VehicleModel? AddVehicle(VehicleModel vehicle)
+        public static VehicleResponse? AddVehicle(VehicleModel vehicle)
         {
-            var requestBody = new
+            // Creazione del dizionario per i parametri della richiesta
+            var requestBody = new Dictionary<string, object>
             {
-                model = vehicle.Model,
-                category = vehicle.Category,
-                price = vehicle.Price,
-                location = vehicle.Location
+                { "model", vehicle.Model },
+                { "category", vehicle.Category },
+                { "price", vehicle.Price },
+                { "location", vehicle.Location }
             };
 
-            var result = HttpService.Post<VehicleModel>("http://localhost:8085/api/v1/vehicle/new", requestBody);
-           
+            // Invia la richiesta POST per aggiungere un nuovo veicolo
+            var result = HttpService.Post<VehicleResponse>("http://localhost:8085/api/v1/vehicle/new", requestBody);
+
             return result;
         }
 
         // Modifica un veicolo esistente e restituisce il veicolo aggiornato oppure null in caso di errore
-        public static VehicleModel? EditVehicle(VehicleModel vehicle)
+        public static VehicleResponse? EditVehicle(VehicleModel vehicle)
         {
-            var requestBody = new
+            // Creazione del dizionario per i parametri della richiesta
+            var requestBody = new Dictionary<string, object>
             {
-                model = vehicle.Model,
-                category = vehicle.Category,
-                price = vehicle.Price,
-                location = vehicle.Location
+                { "model", vehicle.Model },
+                { "category", vehicle.Category },
+                { "price", vehicle.Price },
+                { "location", vehicle.Location }
             };
 
-            var updatedVehicle = HttpService.Put<VehicleModel>($"http://localhost:8085/api/v1/vehicle/update/{vehicle.Id}", requestBody);
+            // Invia la richiesta PUT per aggiornare un veicolo
+            var updatedVehicle = HttpService.Put<VehicleResponse>($"http://localhost:8085/api/v1/vehicle/update/{vehicle.Id}", requestBody);
 
             return updatedVehicle;
         }
@@ -72,4 +73,7 @@ namespace Frontend.Services
             }
         }
     }
+
+    public record VehicleResponse(VehicleModel? Vehicle, string? Message, string? Error);
+
 }

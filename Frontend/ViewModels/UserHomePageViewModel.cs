@@ -10,8 +10,8 @@ namespace Frontend.ViewModels
         public UserHomePageViewModel(UserMainViewModel mainViewModel)
         {
             _mainViewModel = mainViewModel;
-            SelectBookingCommand = new RelayCommand(() => SelectItem("My bookings"));
-            SelectCarCommand = new RelayCommand(() => SelectItem("Add booking"));
+            SelectBookingCommand = new RelayCommand(() => SelectItem("Le mie prenotazioni"));
+            SelectCarCommand = new RelayCommand(() => SelectItem("Nuova prenotazione"));
         }
 
         public RelayCommand SelectBookingCommand { get; }

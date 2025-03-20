@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
+             x:Class="Frontend.Views.MyAreaView"
+             xmlns:vm="using:Frontend.ViewModels"
+             x:DataType="vm:MyAreaViewModel">
+
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+
+     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="15">
+
+        <TextBlock Text="La Mia Area" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+        
+        <Border Background="#1e1e1e" CornerRadius="10" Padding="20" Width="400">
+            <StackPanel Spacing="10">
+
+                <TextBlock Text="Username" Foreground="White"/>
+                <TextBox Text="{Binding EditedUser.Username}" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Email" Foreground="White"/>
+                <TextBox Text="{Binding EditedUser.Email}" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Regione" Foreground="White"/>
+                <ComboBox ItemsSource="{Binding Regions}" SelectedItem="{Binding EditedUser.Region}" Width="250"/>
+
+                <TextBlock  Text="Passwrod Attuale" Foreground="White"/>
+                <TextBox IsVisible="{Binding ShowEditPasswordForm}" Text="{Binding EditedUser.Password}" PasswordChar="*" Margin="0,0,0,10"/>
+                
+                <TextBlock IsVisible="{Binding ShowEditPasswordForm}" Text="Nuova Password" Foreground="White"/>
+                <TextBox IsVisible="{Binding ShowEditPasswordForm}" Text="{Binding NewPassword}" PasswordChar="*" Margin="0,0,0,10"/>
+
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" HorizontalAlignment="Center"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20" Margin="10">
+                    <Button Content="Salva modifiche" IsEnabled="{Binding IsSaveEnabled}" Command="{Binding SaveCommand}" Background="#28A745"/>
+                    <Button Content="Modifica password" IsVisible="{Binding ShowEditPasswordBtn}" Command="{Binding ShowEditPasswordCommand}" Background="007ACC"/>
+                    <Button Content="Indietro" IsVisible="{Binding ShowEditPasswordForm}" Command="{Binding CancelCommand}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Text="{Binding SuccessMessage}" Foreground="Green" HorizontalAlignment="Center"/>
+    </StackPanel>
+  </StackPanel>
+
+</UserControl>
