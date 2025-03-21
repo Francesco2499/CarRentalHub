@@ -134,6 +134,7 @@ namespace Frontend.ViewModels
         [RelayCommand]
         private void GoBack()
         {
+            BookingMessage = string.Empty;
             IsVisibleList = false;
             IsVisibleSearchDate = true;   
             IsVisibleSubTitle = true;

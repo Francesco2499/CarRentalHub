@@ -11,7 +11,7 @@
         <TextBlock Text="Welcome to Your Car Rental Service!" FontSize="24" FontWeight="Bold" 
                    HorizontalAlignment="Center" Margin="0,0,0,20"/>
         <!-- Intestazione con immagine -->
-        <Image Source="../Assets/home_banner.jpg" Stretch="UniformToFill" Height="500" Width="1300" Margin="30"/>        
+        <Image Source="../Assets/home_banner.jpg" Stretch="Uniform" Height="400" Width="1300" Margin="20, 0, 20, 20"/>        
         
         <!-- Contenitore delle Card -->
         <StackPanel Orientation="Horizontal" Spacing="30" HorizontalAlignment="Center">
