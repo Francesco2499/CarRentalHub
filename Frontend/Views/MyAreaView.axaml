@@ -30,7 +30,7 @@
                 <TextBox Text="{Binding EditedUser.Email}" Margin="0,0,0,10"/>
 
                 <TextBlock Text="Regione" Foreground="White"/>
-                <ComboBox ItemsSource="{Binding Regions}" SelectedItem="{Binding EditedUser.Region}" Width="400"/>
+                <ComboBox ItemsSource="{Binding Regions}" SelectedItem="{Binding EditedUser.Region}" Width="360"/>
 
                 <TextBlock IsVisible="{Binding ShowEditPasswordForm}" Text="Password Attuale" Foreground="White"/>
                 <TextBox IsVisible="{Binding ShowEditPasswordForm}" Text="{Binding EditedUser.Password}" PasswordChar="*" Margin="0,0,0,10"/>
