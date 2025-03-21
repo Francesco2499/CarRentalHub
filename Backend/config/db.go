@@ -176,13 +176,13 @@ func SeedData() error {
 			INSERT INTO users (username, email, password, region, role) 
 			VALUES 
 				('testadmin', 'admin@example.com', 'e0e6097a6f8af07daf5fc7244336ba37133713a8fc7345c36d667dfa513fabaa', 'Sicilia', 'admin'),
-       			('testcustomer', 'testcustomer@example.com', '6cb75f652a9b52798eb6cf2201057c73d1e2277bb2b10b89a90203b9f60c68c0', 'Piemonte', 'customer'),
-				('testuser', 'testuser@example.com', '6cb75f652a9b52798eb6cf2201057c73d1e2277bb2b10b89a90203b9f60c68c0', 'Lombardia', 'customer'),
-				('mariorossi', 'mario.rossi@example.com', '6cb75f652a9b52798eb6cf2201057c73d1e2277bb2b10b89a90203b9f60c68c0', 'Lazio', 'customer'),
-				('giovannibianchi', 'giovanni.bianchi@example.com', '6cb75f652a9b52798eb6cf2201057c73d1e2277bb2b10b89a90203b9f60c68c0', 'Sicilia', 'customer'),
-				('francescaneri', 'francesca.neri@example.com', '6cb75f652a9b52798eb6cf2201057c73d1e2277bb2b10b89a90203b9f60c68c0', 'Emilia-Romagna', 'customer'),
-				('lucalongo', 'luca.longo@example.com', '6cb75f652a9b52798eb6cf2201057c73d1e2277bb2b10b89a90203b9f60c68c0', 'Toscana', 'customer'),
-				('martinamartini', 'martina.martini@example.com', '6cb75f652a9b52798eb6cf2201057c73d1e2277bb2b10b89a90203b9f60c68c0', 'Sicilia', 'customer'),
+       			('testcustomer', 'testcustomer@example.com', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 'Piemonte', 'customer'),
+				('testuser', 'testuser@example.com', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 'Lombardia', 'customer'),
+				('mariorossi', 'mario.rossi@example.com', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 'Lazio', 'customer'),
+				('giovannibianchi', 'giovanni.bianchi@example.com', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 'Sicilia', 'customer'),
+				('francescaneri', 'francesca.neri@example.com', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 'Emilia-Romagna', 'customer'),
+				('lucalongo', 'luca.longo@example.com', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 'Toscana', 'customer'),
+				('martinamartini', 'martina.martini@example.com', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 'Sicilia', 'customer');
 				`)
 
 		//Password per test -> ADMIN: securepassword Customer:password123
