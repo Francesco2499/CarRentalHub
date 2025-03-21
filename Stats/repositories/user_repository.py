@@ -5,7 +5,7 @@ def get_top_3_users():
     SELECT u.username, COUNT(*) AS bookings
     FROM users u
     JOIN bookings b ON u.id = b.user_id
-    WHERE u.role = 'costumer'
+    WHERE u.role = 'customer'
     GROUP BY u.username
     ORDER BY bookings DESC
     LIMIT 3;
@@ -33,7 +33,7 @@ def get_user_statistics(user_id):
     FROM users u
     LEFT JOIN bookings b ON u.id = b.user_id
     LEFT JOIN vehicles v ON b.vehicle_id = v.id
-    WHERE u.id = {user_id} AND u.role = 'costumer'
+    WHERE u.id = {user_id} AND u.role = 'customer'
     GROUP BY u.id, u.username;
     """
     return execute_query(query)
