@@ -4,7 +4,6 @@ import os
 from flask import send_file
 from repositories.vehicle_repository import *
 
-
 IMAGE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "static", "images"))
 os.makedirs(IMAGE_DIR, exist_ok=True)
 
@@ -32,3 +31,4 @@ def generate_top_vehicles_plot(start_date=None, end_date=None):
     file_path = os.path.join(IMAGE_DIR, "top_vehicles_plot.png")
     fig.savefig(file_path)
     return send_file(file_path, as_attachment=True)
+

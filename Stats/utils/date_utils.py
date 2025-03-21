@@ -1,30 +1,28 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from flask import jsonify
 
-def validate_and_get_date_range(start_date, end_date, default_days_range=30):
+def validate_and_get_date_range(start_date, end_date):
     """
-    Verifica che le date siano nel formato corretto. 
-    Se non fornite, applica valori di default: 
-    - end_date = oggi
-    - start_date = oggi - default_days_range
+    Valida il formato delle date se presenti.
+    Se uno dei due è presente, l'altro deve esserlo.
+    Se entrambi sono assenti, ritorna None (nessun filtro temporale).
     """
-
     try:
-        if end_date:
-            end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
-        else:
-            end_date_obj = datetime.today()
-
-        if start_date:
+        if start_date and end_date:
             start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+            end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+
+            if start_date_obj > end_date_obj:
+                return None, None, jsonify({"error": "Start date must be before or equal to end date"}), 400
+
+            return start_date_obj.strftime("%Y-%m-%d"), end_date_obj.strftime("%Y-%m-%d"), None, None
+
+        elif start_date or end_date:
+            return None, None, jsonify({"error": "Both start_date and end_date are required"}), 400
+
         else:
-            start_date_obj = end_date_obj - timedelta(days=default_days_range)
-
-        if start_date_obj > end_date_obj:
-            return None, None, jsonify({"error": "Start date must be before or equal to end date"}), 400
-
-        # ritorna stringhe ben formattate da usare nelle query
-        return start_date_obj.strftime("%Y-%m-%d"), end_date_obj.strftime("%Y-%m-%d"), None, None
+            # Entrambe assenti => nessun filtro (restituisci None)
+            return None, None, None, None
 
     except ValueError:
         return None, None, jsonify({"error": "Invalid date format. Expected YYYY-MM-DD"}), 400

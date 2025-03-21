@@ -59,7 +59,8 @@ def get_top_5_vehicles(start_date=None, end_date=None):
         GROUP BY v.model
         ORDER BY rentals DESC
         LIMIT 5;
-        """
+        """        
+        
         params = (start_date, end_date)
         return execute_query(query, params)
     else:
@@ -71,4 +72,5 @@ def get_top_5_vehicles(start_date=None, end_date=None):
         ORDER BY rentals DESC
         LIMIT 5;
         """
+        
         return execute_query(query)
