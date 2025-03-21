@@ -1,20 +1,15 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using System.Diagnostics; // Aggiungi questa direttiva per il debug
-
 
 namespace Frontend.Services
 {
     public class HttpService
     {
-        private static readonly HttpClient _httpClient = new HttpClient();
+        private static readonly HttpClient _httpClient = new();
 
         // Impostazioni per la serializzazione JSON
         private static readonly JsonSerializerOptions JsonOptions = new()
@@ -23,67 +18,71 @@ namespace Frontend.Services
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
 
-        // Metodo generico per fare richieste POST
-        public async Task<TResponse> PostAsync<TResponse>(string url, object requestBody)
+        // Metodo generico per fare richieste POST (sincrono)
+        public static TResponse? Post<TResponse>(string url, object requestBody)
         {
-            return await SendRequestAsync<TResponse>(HttpMethod.Post, url, requestBody);
+            return SendRequest<TResponse>(HttpMethod.Post, url, requestBody);
         }
 
-        // Metodo generico per fare richieste PUT
-        public async Task<TResponse> PutAsync<TResponse>(string url, object requestBody)
+        // Metodo generico per fare richieste PUT (sincrono)
+        public static TResponse? Put<TResponse>(string url, object requestBody)
         {
-            return await SendRequestAsync<TResponse>(HttpMethod.Put, url, requestBody);
+            return SendRequest<TResponse>(HttpMethod.Put, url, requestBody);
         }
 
-        // Metodo generico per fare richieste DELETE
-        public async Task<TResponse> DeleteAsync<TResponse>(string url)
+        // Metodo generico per fare richieste DELETE (sincrono)
+        public static TResponse? Delete<TResponse>(string url)
         {
-            return await SendRequestAsync<TResponse>(HttpMethod.Delete, url, null);
+            return SendRequest<TResponse>(HttpMethod.Delete, url, null);
         }
 
-        // Metodo generico per fare richieste GET
-        public async Task<TResponse> GetAsync<TResponse>(string url)
+        // Metodo generico per fare richieste GET (sincrono)
+        public static TResponse? Get<TResponse>(string url)
         {
-            return await SendRequestAsync<TResponse>(HttpMethod.Get, url, null);
+            return SendRequest<TResponse>(HttpMethod.Get, url, null);
         }
 
-        // Metodo che gestisce le richieste in base al tipo di metodo HTTP (GET, POST, PUT, DELETE)
-        private static async Task<TResponse> SendRequestAsync<TResponse>(HttpMethod method, string url, object? requestBody)
+        // Metodo per gestire richieste HTTP in modo sincrono
+        private static TResponse? SendRequest<TResponse>(HttpMethod method, string url, object? requestBody)
         {
             try
             {
                 // Aggiungi l'header di autorizzazione con il token, se disponibile
                 string? token = TokenService.GetToken();
 
-                Debug.WriteLine($"Token ottenuto: {token}");
-
                 if (!string.IsNullOrEmpty(token))
                 {
                     _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 }
 
-                HttpRequestMessage requestMessage = new HttpRequestMessage(method, url);
+                HttpRequestMessage requestMessage = new(method, url);
 
                 if (requestBody != null)
                 {
-                    // Imposta il corpo della richiesta JSON per POST, PUT, DELETE
                     requestMessage.Content = JsonContent.Create(requestBody);
                 }
 
-                // Invia la richiesta HTTP
-                HttpResponseMessage response = await _httpClient.SendAsync(requestMessage);
+                // Invia la richiesta HTTP (sincrona)
+                HttpResponseMessage response = _httpClient.Send(requestMessage);
 
-                // Ottieni la risposta come stringa
-                string responseBody = await response.Content.ReadAsStringAsync();
+                // Leggi il corpo della risposta
+                string responseBody = response.Content.ReadAsStringAsync().Result;
+                Console.WriteLine("Response Body: " + responseBody);
 
-                // Se la richiesta ha avuto successo, deserializza il corpo JSON nella risposta desiderata
-                
-                return JsonSerializer.Deserialize<TResponse>(responseBody, JsonOptions) ?? throw new InvalidOperationException("Deserializzazione fallita.");          
+                // Se la risposta è vuota o nulla, restituisci un valore predefinito
+                if (string.IsNullOrWhiteSpace(responseBody))
+                {
+                    return default;
+                }
+
+                // Deserializza la risposta in TResponse
+                return JsonSerializer.Deserialize<TResponse>(responseBody, JsonOptions);
             }
             catch (Exception ex)
             {
-                // Gestisci gli errori di connessione
-                return JsonSerializer.Deserialize<TResponse>($"{{\"Message\": \"Errore di connessione: {ex.Message}\", \"Token\": null}}", JsonOptions) ?? throw new InvalidOperationException("Deserializzazione fallita.");
+                // Gestisci errori di connessione e altri errori generali
+                Console.WriteLine("Errore: " + ex.Message);
+                return default;
             }
         }
     }

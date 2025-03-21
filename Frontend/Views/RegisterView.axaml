@@ -5,7 +5,8 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Frontend.Views.RegisterView"
              xmlns:vm="using:Frontend.ViewModels"
-             x:DataType="vm:RegisterViewModel">
+             x:DataType="vm:RegisterViewModel"
+             Background="{Binding BackgroundColor}">
 
     <StackPanel Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center">
         
@@ -23,17 +24,25 @@
         <TextBox Watermark="Conferma Password" Width="250" Height="40" PasswordChar="*"
                  Text="{Binding ConfirmPassword}" />
 
+        <ComboBox ItemsSource="{Binding Regions}" IsVisible="{Binding ShowBack}"  PlaceholderText="Seleziona una regione..."
+                SelectedItem="{Binding SelectedRegion, Mode=TwoWay}" 
+                Width="250" 
+                Height="40"
+                Foreground="White" />
+
         <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" TextAlignment="Center"/>
 
         <Button Content="Vai al Login!" IsVisible="{Binding ShowGoToLogin}" Width="250" Height="40"
-                Command="{Binding GoToLoginCommand}" Background="#28A745" Foreground="White"/>
+                Command="{Binding GoToLoginCommand}" Background="#28A745"/>
 
         <Button Content="Registrati" IsVisible="{Binding ShowSubmitForm}" Width="250" Height="40"
-                Command="{Binding SubmitRegistrationCommand}"  HorizontalAlignment="Center" Background="#28A745" Foreground="White"/>
+                Command="{Binding SubmitRegistrationCommand}"  HorizontalAlignment="Center" Background="#28A745"/>
         
-        <TextBlock Text="{Binding RegisterMessage}" Foreground="Green" TextAlignment="Center"/>
 
         <Button Content="Torna Indietro" IsVisible="{Binding ShowBack}" Width="250" Height="40"
-                Command="{Binding BackCommand}" Background="Gray" Foreground="White"/>
+                Command="{Binding BackCommand}" Background="Gray" Foreground="White"/>        
+                
+        <TextBlock Text="{Binding RegisterMessage}" Foreground="Green" TextAlignment="Center"/>
+
     </StackPanel>
 </UserControl>

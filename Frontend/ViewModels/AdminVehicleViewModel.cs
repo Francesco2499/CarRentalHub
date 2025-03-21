@@ -12,34 +12,34 @@ namespace Frontend.ViewModels
 {
     public partial class AdminVehicleViewModel : SearchableViewModel<VehicleModel>
     {
-        private readonly VehicleService _vehicleService;
-
-        [ObservableProperty]
-        private VehicleModel? _selectedVehicle;
-
-        [ObservableProperty]
-        private string _errorMessage = string.Empty;
-
-        [ObservableProperty]
-        private bool _isFormVisible = false;
-
-        [ObservableProperty]
-        private bool _isGridVisible = true;
-
-        [ObservableProperty]
-        private VehicleModel _editingVehicle = new(0, "", "", 0, "", 0, 0); 
+        [ObservableProperty] private VehicleModel? _selectedVehicle;
+        [ObservableProperty] private string? _successMessage;
+        [ObservableProperty] private bool _isConfirmationModalVisible = false;
+        [ObservableProperty] private bool _isFormVisible = false;
+        [ObservableProperty] private VehicleModel _editingVehicle = new(0, "", "", 0, ""); 
+    
+        public AdminVehicleViewModel()
+        {
+            IsVisibleList = true;
+            LoadItems();
+        }
 
         [RelayCommand]
         private void ShowAddVehicleForm()
         {
-            EditingVehicle = new VehicleModel(0, "", "", 0, "", 0, 0);
-            IsGridVisible = false;
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+            EditingVehicle = new VehicleModel(0, "", "", 0, "");
+            IsVisibleList = false;
             IsFormVisible = true;
         }
 
         [RelayCommand]
         private void ShowEditVehicleForm()
         {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+
             if (SelectedVehicle == null)
             {
                 ErrorMessage = "Seleziona un veicolo da modificare.";
@@ -47,12 +47,12 @@ namespace Frontend.ViewModels
             }
 
             EditingVehicle = SelectedVehicle with { };
-            IsGridVisible = false;
+            IsVisibleList = false;
             IsFormVisible = true;
         }
 
         [RelayCommand]
-        private async Task SaveVehicle()
+        private void SaveVehicle()
         {
             if (string.IsNullOrWhiteSpace(EditingVehicle.Model) || string.IsNullOrWhiteSpace(EditingVehicle.Category))
             {
@@ -61,55 +61,110 @@ namespace Frontend.ViewModels
             }
 
             try {
+                VehicleResponse? vehicleResponse;
+                string? msg;
+
                 if (EditingVehicle.Id == 0) // Aggiunta di un nuovo veicolo
                 {
-                    await _vehicleService.AddVehicle(EditingVehicle);
+                    vehicleResponse = VehicleService.AddVehicle(EditingVehicle);
+                    msg = "Errore nell'aggiunta del veicolo!";
                 }
                 else
                 {
-                    await _vehicleService.EditVehicle(EditingVehicle);
+                    vehicleResponse = VehicleService.EditVehicle(EditingVehicle);
+                    msg = "Errore nella modifica del veicolo!";
                 }
+
                 ErrorMessage = "";
-                await LoadItems();
-                IsFormVisible = false;  
-                IsGridVisible = true;
+
+                if (vehicleResponse?.Vehicle != null) {
+                    LoadItems();
+                    SuccessMessage = vehicleResponse?.Message;
+                    IsFormVisible = false;  
+                    IsVisibleList = true; 
+                } else {
+                    ErrorMessage = vehicleResponse?.Message ?? msg;
+                }
+               
             } catch (Exception ex)
             {
                 ErrorMessage = $"Si è verificato un errore imprevisto: {ex.Message}";
             } 
         }
 
-        public AdminVehicleViewModel()
+        protected override List<VehicleModel>? LoadAllItemsAsync()
         {
-            _vehicleService = new VehicleService();
-            LoadItems();
-        }
-
-        protected override async Task<List<VehicleModel>?> LoadAllItemsAsync()
-        {
-            return await _vehicleService.GetAllVehicles();
+            return VehicleService.GetAllVehicles();
         }
 
         protected override List<VehicleModel> ApplySearch(List<VehicleModel> items, string query)
         {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
             return [.. items.Where(v =>
-                    (v.Model.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-                    v.Category.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)) 
+                    v.Model.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    v.Category.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)
                 )];
         }
 
+
         [RelayCommand]
-        private async Task DeleteVehicle()
+        private void GoBack()
         {
-            ErrorMessage = "";
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+            SearchQuery = string.Empty;
+            IsVisibleList = true;
+            IsFormVisible = false;
+        }
+
+        [RelayCommand]
+        private void ShowConfirmationModal()
+        {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+
+            if (SelectedVehicle== null)
+            {
+                ErrorMessage = "Seleziona un veicolo da eliminare.";
+                return;
+            }
+            
+            // Mostra la modale di conferma
+            IsConfirmationModalVisible = true;
+        }
+
+        [RelayCommand]
+        private void ConfirmDelete()
+        {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+
             if (SelectedVehicle == null)
             {
-                ErrorMessage = "Seleziona un'auto da eliminare.";
+                ErrorMessage = "Seleziona un veicolo da eliminare.";
                 return;
             }
 
-            await _vehicleService.DeleteVehicle(SelectedVehicle.Id);
-            await LoadItems();
+            try
+            {
+                VehicleService.DeleteVehicle(SelectedVehicle.Id);
+                SuccessMessage = $"Veicolo '{SelectedVehicle.Model}' eliminato correttamente!";
+
+                LoadItems();
+                
+                IsConfirmationModalVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Errore: {ex.Message}";
+            }
+        }
+
+        [RelayCommand]
+        private void CancelDelete()
+        {
+            IsConfirmationModalVisible = false;
         }
     }
 }

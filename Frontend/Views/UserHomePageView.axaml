@@ -1,0 +1,66 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Class="Frontend.Views.UserHomePageView"
+             xmlns:vm="using:Frontend.ViewModels"
+             x:DataType="vm:UserHomePageViewModel"
+             mc:Ignorable="d" d:DesignWidth="768" d:DesignHeight="800">
+
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20" Spacing="20">
+        <TextBlock Text="Welcome to Your Car Rental Service!" FontSize="24" FontWeight="Bold" 
+                   HorizontalAlignment="Center" Margin="0,0,0,20"/>
+        <!-- Intestazione con immagine -->
+        <Image Source="../Assets/home_banner.jpg" Stretch="Uniform" Height="500" Width="1300" Margin="20, 0, 20, 20"/>        
+        
+        <!-- Contenitore delle Card -->
+        <StackPanel Orientation="Horizontal" Spacing="30" HorizontalAlignment="Center">
+
+            <!-- Card Prenota un'Auto -->
+            <Border Background="#4e4e4e" CornerRadius="10" Padding="15"
+                    Width="250" Height="200">
+                
+                <Border.Styles>
+                    <Style Selector="Border:pointerover /template/ ContentPresenter">
+                        <Setter Property="Background" Value="Black"/>
+                    </Style>
+                </Border.Styles>
+                <StackPanel HorizontalAlignment="Center">
+                    <Image Source="../Assets/car_icon.png" Width="50" Height="50" Margin="0,0,0,10"/>
+                    <TextBlock Text="Book a Car" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
+                    <TextBlock Text="Choose your ideal car and book it in seconds!" 
+                               TextWrapping="Wrap" TextAlignment="Center" Margin="5"/>
+                    <Button Content="Prenota un auto!" HorizontalAlignment="Center" Command="{Binding SelectCarCommand}" Margin="5"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Card Le Tue Prenotazioni -->
+            <Border Background="#4e4e4e" CornerRadius="10" Padding="15"
+                    Width="250" Height="200"
+                    Classes="hover-card">
+                <StackPanel HorizontalAlignment="Center">
+                    <Image Source="../Assets/calendar_icon.png" Width="50" Height="50" Margin="0,0,0,10"/>
+                    <TextBlock Text="Your Bookings" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
+                    <TextBlock Text="Check your past and upcoming reservations." 
+                               TextWrapping="Wrap" TextAlignment="Center" Margin="5"/>
+                    <Button Content="Vedi le tue prenotazioni!" HorizontalAlignment="Center" Command="{Binding SelectBookingCommand}" Margin="5"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Card My Area -->
+            <Border Background="#4e4e4e" CornerRadius="10" Padding="15"
+                    Width="250" Height="200"
+                    Classes="hover-card">
+                <StackPanel HorizontalAlignment="Center">
+                    <Image Source="../Assets/user_icon.png" Width="50" Height="50" Margin="0,0,0,10"/>
+                    <TextBlock Text="My Area" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
+                    <TextBlock Text="Manage your profile and settings." 
+                               TextWrapping="Wrap" TextAlignment="Center" Margin="5"/>
+                    <Button Content="Vai alla MyArea!" HorizontalAlignment="Center" Command="{Binding GoToMyAreaCommand}" Margin="5"/>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+
+    </StackPanel>
+</UserControl>

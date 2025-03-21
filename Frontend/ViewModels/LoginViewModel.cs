@@ -6,11 +6,9 @@ using Frontend.Services;
 
 namespace Frontend.ViewModels;
 
-public partial class LoginViewModel : ViewModelBase
+public partial class LoginViewModel(MainWindowViewModel mainViewModel) : ViewModelBase
 {
-    private readonly MainWindowViewModel _mainViewModel;
-    private readonly UserService _userService;
-
+    private readonly MainWindowViewModel _mainViewModel = mainViewModel;
     [ObservableProperty]
     private string emailOrUsername = string.Empty;
 
@@ -20,28 +18,22 @@ public partial class LoginViewModel : ViewModelBase
     [ObservableProperty]
     private string loginMessage = string.Empty;
 
-    public LoginViewModel(MainWindowViewModel mainViewModel)
-    {
-        _mainViewModel = mainViewModel;
-        _userService = new UserService();
-    }
-
     [RelayCommand]
-    public async Task SubmitLogin()
+    public void SubmitLogin()
     {
         if (string.IsNullOrWhiteSpace(EmailOrUsername) || string.IsNullOrWhiteSpace(Password))
         {
             LoginMessage = "Compila tutti i campi!";
             return;
         }        
-        var response = await _userService.Authenticate(EmailOrUsername, Password);
+        var response = UserService.Authenticate(EmailOrUsername, Password);
 
         if (response != null) {
-            if (!string.IsNullOrEmpty(response.Token)) 
+            if (response.Error == null && response.User != null) 
             {
-                _mainViewModel.ChangeViewModel(new UserMainViewModel(response.IsAdmin));
+                _mainViewModel.ChangeViewModel(new UserMainViewModel(response.User.Role == "admin", response.User, _mainViewModel));
             } else {
-                LoginMessage = response.Message;
+                LoginMessage = response.Message ?? "Errore login!";
                 return;
             }
         }

@@ -1,62 +1,57 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Frontend.Models;
 
-namespace Frontend.Services
-{
-    public class BookingService
-    {
-        private readonly HttpService _httpService;
+namespace Frontend.Services;
 
-        public BookingService()
+public class BookingService
+{
+    public static BookingResponse? AddBooking(int vehicleId, DateTime? startDate, DateTime? endDate)
+    {
+        var requestBody = new Dictionary<string, object>
         {
-            _httpService = new HttpService();
-        }
-        
-        private static readonly JsonSerializerOptions JsonOptions = new()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            { "vehicle_id", vehicleId }
         };
 
-        public async Task<BookingModel?> AddBooking(int vehicle_id, DateTime? start_date, DateTime? end_date)
-        {
-            var requestBody = new
-            {
-                vehicle_id,
-                start_date = start_date?.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-                end_date = end_date?.ToString("yyyy-MM-ddTHH:mm:ssZ")
-            };
+        if (startDate.HasValue)
+            requestBody["start_date"] = startDate.Value.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
- 
-            return await _httpService.PostAsync<BookingModel?>("http://localhost:8085/api/v1/booking/new", requestBody);
+        if (endDate.HasValue)
+            requestBody["end_date"] = endDate.Value.ToString("yyyy-MM-ddTHH:mm:ssZ");
+
+        return HttpService.Post<BookingResponse>("http://localhost:8085/api/v1/booking/new", requestBody);
+    }
+
+    public static List<BookingModel> GetAllBookings()
+    {
+        var bookings = HttpService.Get<List<BookingModel>>("http://localhost:8085/api/v1/booking/getAll");
+        return bookings ?? []; // Restituisce una lista vuota se null
+    }
+
+    public static void DeleteBooking(int bookingId)
+    {
+        try
+        {
+            HttpService.Delete<dynamic>($"http://localhost:8085/api/v1/booking/delete/{bookingId}");
         }
-
-        public async Task<List<BookingModel>?> GetAllBookings()
+        catch (Exception ex)
         {
-            return await _httpService.GetAsync<List<BookingModel>>("http://localhost:8085/api/v1/booking/getAll");
+            Console.WriteLine($"Errore durante l'eliminazione della prenotazione {bookingId}: {ex.Message}");
         }
+    }
 
-        public async Task DeleteBooking(int bookingId)
+    public static BookingResponse? EditBooking(BookingModel booking, int vehicleId)
+    {
+        var requestBody = new Dictionary<string, object>
         {
-            await _httpService.DeleteAsync<List<BookingModel>>($"http://localhost:8085/api/v1/booking/delete/{bookingId}");
-        }
+            { "user_id", booking.user_id },
+            { "vehicle_id", vehicleId },
+            { "start_date", booking.start_date.ToString("yyyy-MM-ddTHH:mm:ssZ")},
+            { "end_date", booking.end_date.ToString("yyyy-MM-ddTHH:mm:ssZ")}
+        };
 
-        public async Task<List<BookingModel>?> EditBooking(BookingModel booking)
-        {
-            var requestBody = new
-            {
-                booking.user_id,
-                booking.vehicle_id,
-                start_date = booking.start_date.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-                end_date = booking.end_date.ToString("yyyy-MM-ddTHH:mm:ssZ")
-            };
-
-            return await _httpService.PutAsync<List<BookingModel>>($"http://localhost:8085/api/v1/booking/update/{booking.Id}", requestBody);        }
+        return HttpService.Put<BookingResponse>($"http://localhost:8085/api/v1/booking/update/{booking.Id}", requestBody);
     }
 }
+
+public record BookingResponse(BookingModel? Booking, string? Message, object? Error);

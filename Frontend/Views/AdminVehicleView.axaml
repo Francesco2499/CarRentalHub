@@ -10,81 +10,121 @@
              x:Class="Frontend.Views.AdminVehicleView">
              
    <StackPanel Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock Text="Gestione Veicoli" FontSize="24" FontWeight="Bold" TextAlignment="Center"/>
+        <TextBlock Text="Puoi aggiungere nuovi veicoli, modificare quelli esistenti o eliminarli. Usa i comandi per gestire la lista dei veicoli in modo semplice e veloce." 
+            Width="550" 
+            FontSize="16"
+            TextWrapping="Wrap"
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Center"
+            TextAlignment="Justify" 
+            Margin="0,0,0,10"/>
 
-        <StackPanel Margin="10" HorizontalAlignment="Center" Orientation="Horizontal">
-            <Button Content="Aggiungi Veicolo" Command="{Binding ShowAddVehicleFormCommand}" Margin="5"/>
-            <Button Content="Modifica Veicolo" Command="{Binding ShowEditVehicleFormCommand}" Margin="5"/>
-            <Button Content="Elimina Veicolo" Command="{Binding DeleteVehicleCommand}" Margin="5"/>
-        </StackPanel>
+        <StackPanel IsVisible="{Binding IsVisibleList}">
+            <TextBox Text="{Binding SearchQuery}" 
+                        Watermark="Cerca per modello, marca o comune..." Width="350" Margin="10"/>
+            <Button HorizontalAlignment="Center" Content="Cerca" Command="{Binding SearchItemsCommand}" CommandParameter="text" Margin="10"/>
+            <Grid ColumnDefinitions="2*, 2*, 2*, 2*, 2*" Background="#1e1e1e" Margin="10" Width="750">
+                <TextBlock Text="ID" Grid.Column="0" TextAlignment="Center" FontWeight="Bold" Margin="5"/>
+                <TextBlock Text="Modello" Grid.Column="1"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
+                <TextBlock Text="Categoria" Grid.Column="2"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
+                <TextBlock Text="Prezzo" Grid.Column="3"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
+                <TextBlock Text="Comune" Grid.Column="4"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
+            </Grid>
 
-        <TextBox Text="{Binding SearchQuery}" 
-                 Watermark="Cerca per modello o marca..." Width="300" Margin="10"/>
-        <Button HorizontalAlignment="Center" Content="Cerca" Command="{Binding SearchItemsCommand}" Margin="10"/>
+            <!-- Lista delle prenotazioni -->
+            <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedVehicle, Mode=TwoWay}"  Width="750">
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Padding" Value="8" />
+                    </Style>
+                </ListBox.Styles>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="2*, 2*, 2*, 2*, 2*" Margin="10">
+                            <TextBlock Text="{Binding Id}" TextAlignment="Center" Grid.Column="0" Margin="5"/>
+                            <TextBlock Text="{Binding Model}" TextAlignment="Center" Grid.Column="1" Margin="5"/>
+                            <TextBlock Text="{Binding Category}" TextAlignment="Center" Grid.Column="2" Margin="5"/>
+                            <TextBlock Text="{Binding Price}" TextAlignment="Center" Grid.Column="3" Margin="5"/>
+                            <TextBlock Text="{Binding Location}" TextAlignment="Center" Grid.Column="4" Margin="5"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
 
-        <StackPanel IsVisible="{Binding IsGridVisible}">
+            <!-- Paginazione -->
+            <StackPanel IsVisible="{Binding IsPaginationVisible}" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                <Button Command="{Binding GoToPreviousPageCommand}" Margin="5" IsEnabled="{Binding IsPreviousPageEnabled}">
+                    <Button.Opacity>
+                        <Binding Path="PreviousPageOpacity" />
+                    </Button.Opacity>
+                    <PathIcon Data="{Binding Source=chevron_left_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Width="14"/>
+                </Button>
 
-          <Grid ColumnDefinitions="2*, 2*, 2*, 2*" Background="#1e1e1e" Margin="10" Width="600">
-              <TextBlock Text="ID" Grid.Column="0" TextAlignment="Center" FontWeight="Bold" Margin="5"/>
-              <TextBlock Text="Modello" Grid.Column="1"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
-              <TextBlock Text="Categoria" Grid.Column="2"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
-              <TextBlock Text="Prezzo" Grid.Column="3"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
-          </Grid>
+                <Button Command="{Binding GoToNextPageCommand}" Margin="5" IsEnabled="{Binding IsNextPageEnabled}">
+                    <Button.Opacity>
+                        <Binding Path="NextPageOpacity" />
+                    </Button.Opacity>
+                    <PathIcon Data="{Binding Source=chevron_right_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Width="14"/>
+                </Button>
+            </StackPanel>
 
-          <!-- Lista delle prenotazioni -->
-          <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedVehicle, Mode=TwoWay}"  Width="600">
-              <ListBox.Styles>
-                  <Style Selector="ListBoxItem">
-                      <Setter Property="Padding" Value="8" />
-                  </Style>
-              </ListBox.Styles>
-              <ListBox.ItemTemplate>
-                  <DataTemplate>
-                      <Grid ColumnDefinitions="2*, 2*, 2*, 2*" Margin="10">
-                          <TextBlock Text="{Binding Id}" TextAlignment="Center" Grid.Column="0" Margin="5"/>
-                          <TextBlock Text="{Binding Model}" TextAlignment="Center" Grid.Column="1" Margin="5"/>
-                          <TextBlock Text="{Binding Category}" TextAlignment="Center" Grid.Column="2" Margin="5"/>
-                          <TextBlock Text="{Binding Price}" TextAlignment="Center" Grid.Column="3" Margin="5"/>
-                      </Grid>
-                  </DataTemplate>
-              </ListBox.ItemTemplate>
-          </ListBox>
+            <StackPanel Margin="10" HorizontalAlignment="Center" Orientation="Horizontal">
+                <Button Content="Aggiungi Veicolo" Command="{Binding ShowAddVehicleFormCommand}" Margin="5"/>
+                <Button Content="Modifica Veicolo" Command="{Binding ShowEditVehicleFormCommand}" Margin="5"/>
+                <Button Content="Elimina Veicolo" Command="{Binding ShowConfirmationModalCommand}" Margin="5"/>
+            </StackPanel>
 
-          <!-- Paginazione -->
-          <StackPanel IsVisible="{Binding IsPaginationVisible}" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
-              <Button Command="{Binding GoToPreviousPageCommand}" Margin="5" IsEnabled="{Binding IsPreviousPageEnabled}">
-                  <Button.Opacity>
-                      <Binding Path="PreviousPageOpacity" />
-                  </Button.Opacity>
-                  <PathIcon Data="{Binding Source=chevron_left_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Width="14"/>
-              </Button>
-
-              <Button Command="{Binding GoToNextPageCommand}" Margin="5" IsEnabled="{Binding IsNextPageEnabled}">
-                  <Button.Opacity>
-                      <Binding Path="NextPageOpacity" />
-                  </Button.Opacity>
-                  <PathIcon Data="{Binding Source=chevron_right_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Width="14"/>
-              </Button>
-          </StackPanel>
         </StackPanel>
 
         <!-- Form per Aggiunta/Modifica -->
-        <StackPanel Margin="5" IsVisible="{Binding IsFormVisible}" Background="#1e1e1e" Width="400">
-            <TextBlock Text="Modello" />
-            <TextBox Text="{Binding EditingVehicle.Model}" />
+        <Border Background="#252525" IsVisible="{Binding IsFormVisible}" 
+            CornerRadius="10" Padding="20" Width="450" 
+            HorizontalAlignment="Center" BorderBrush="#444" BorderThickness="2">
 
-            <TextBlock Text="Categoria" />
-            <TextBox Text="{Binding EditingVehicle.Category}" />
+            <StackPanel Margin="5" Width="400">
+                
+                <TextBlock Text="Modello" FontWeight="Bold" Foreground="White" Margin="0,5"/>
+                <TextBox Text="{Binding EditingVehicle.Model}" Margin="0, 0, 0, 15"
+                        Background="#333" Foreground="White" BorderBrush="#555" 
+                        CornerRadius="6" Padding="5"/>
 
-            <TextBlock Text="Prezzo" />
-            <TextBox Text="{Binding EditingVehicle.Price}" />
+                <TextBlock Text="Categoria" FontWeight="Bold" Foreground="White" Margin="0,5"/>
+                <TextBox Text="{Binding EditingVehicle.Category}" Margin="0, 0, 0, 15"
+                        Background="#333" Foreground="White" BorderBrush="#555" Padding="5"/>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
-                <Button Content="Salva" Command="{Binding SaveVehicleCommand}" Margin="5"/>
+                <TextBlock Text="Prezzo" FontWeight="Bold" Foreground="White" Margin="0,5"/>
+                <TextBox Text="{Binding EditingVehicle.Price}" Margin="0, 0, 0, 15"
+                        Background="#333" Foreground="White" BorderBrush="#555" Padding="5"/>
+
+                <TextBlock Text="Comune" FontWeight="Bold" Foreground="White" Margin="0,5"/>
+                <TextBox Text="{Binding EditingVehicle.Location}" Margin="0, 0, 0, 20"
+                        Background="#333" Foreground="White" BorderBrush="#555" Padding="5"/>
+
+                <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Center">
+                    <Button Content="Salva" HorizontalAlignment="Center" Background="#28A745" Command="{Binding SaveVehicleCommand}" Margin="5"/>
+
+                    <Button Content="Torna indietro" HorizontalAlignment="Center" Command="{Binding GoBackCommand}" Margin="5"/>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
+        </Border>
 
+        <TextBlock Text="{Binding ErrorMessage}" HorizontalAlignment="Center" Foreground="Red" Margin="0,10, 0, 0"/>
+        <TextBlock Text="{Binding SuccessMessage}" HorizontalAlignment="Center" Foreground="#28A745"/>
 
+        <Border IsVisible="{Binding IsConfirmationModalVisible}"  Background="#252525" Width="300" HorizontalAlignment="Center" VerticalAlignment="Center" Height="150" BorderBrush="#444" BorderThickness="2" CornerRadius="10" Padding="20">
+            <StackPanel HorizontalAlignment="Center">
+                <TextBlock Text="Sei sicuro di voler eliminare?" Foreground="White" FontSize="16" TextAlignment="Center" Margin="10"/>
+                
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Sì" HorizontalAlignment="Center" Command="{Binding ConfirmDeleteCommand}" Margin="10, 10, 10, 0" Width="75"/>
+                    <Button Content="Annulla" HorizontalAlignment="Center" Command="{Binding CancelDeleteCommand}" Margin="10, 10, 10, 0" Width="75"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </StackPanel>
 
-        <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" Margin="10"/>
-  </StackPanel>
+    <!-- Modale di conferma -->
+    
+
 </UserControl>

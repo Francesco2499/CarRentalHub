@@ -10,8 +10,9 @@ namespace Frontend.ViewModels
 {
     public abstract partial class SearchableViewModel<TModel> : PaginatedViewModel<TModel>
     {
-        [ObservableProperty]
-        private string _searchQuery = string.Empty;  // Per la ricerca testuale (es. modello veicolo)
+        [ObservableProperty] private string _searchQuery = string.Empty;  // Per la ricerca testuale (es. modello veicolo)
+
+         [ObservableProperty] private bool _enableShowAll = false;
         protected abstract List<TModel> ApplySearch(List<TModel> items, string query);
         protected virtual List<TModel> ApplySearchByUserId(List<TModel> items, int query)
         {
@@ -27,24 +28,42 @@ namespace Frontend.ViewModels
         private void SearchItems(object parameter)
         {
             if (_allItems != null) {
+                ErrorMessage = string.Empty;
                 List<TModel> filteredResults = _allItems;
 
-                switch (parameter)
-                {
-                    case "text":
-                        filteredResults = ApplySearch(_allItems, SearchQuery);
-                        break;
-                    case "user":
-                        filteredResults = ApplySearchByUserId(_allItems, int.Parse(SearchQuery));
-                        break;
-                    case "booking":
-                        filteredResults = ApplySearchByBookingId(_allItems, int.Parse(SearchQuery));
-                        break;
+                if (parameter.ToString() == "all") {
+                    UpdatePaginatedItems(filteredResults);
+                    EnableShowAll = false;
+                    SearchQuery = string.Empty;
+                    return;
                 }
 
-                UpdatePaginatedItems(filteredResults);
+                if (!string.IsNullOrEmpty(SearchQuery)) {
+                    EnableShowAll = true;
+
+                    switch (parameter)
+                    {
+                        case "text":
+                            filteredResults = ApplySearch(_allItems, SearchQuery);
+                            break;
+                        case "user":
+                            filteredResults = ApplySearchByUserId(_allItems, int.Parse(SearchQuery));
+                            break;
+                        case "booking":
+                            filteredResults = ApplySearchByBookingId(_allItems, int.Parse(SearchQuery));
+                            break;
+                    }
+
+                    UpdatePaginatedItems(filteredResults);
+                }
+                else {
+                    ErrorMessage = "Please enter a search term before proceeding.";
+                }
+
+                
+                SearchQuery = string.Empty;
             }
-            
+
         }
     }
 

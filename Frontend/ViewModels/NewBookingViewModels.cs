@@ -13,99 +13,101 @@ namespace Frontend.ViewModels
 {
     public partial class NewBookingViewModel : SearchableViewModel<VehicleModel>
     {
+        [ObservableProperty] private BookingModel? _booking;
 
-        private readonly VehicleService _vehicleService;
-        private readonly BookingService _bookingService;
-        [ObservableProperty]
-        private BookingModel? _booking;
+        [ObservableProperty] private bool _isBookingSummaryVisible = false;
 
-        [ObservableProperty]
-        private string? _errorMessage;
+        [ObservableProperty] private bool _isVisibleSubTitle = true;
 
-        [ObservableProperty]
-        private bool _isBookingSummaryVisible = false;
+        [ObservableProperty] private string _firstErrorMessage = string.Empty;
 
-        [ObservableProperty]
-        private string _dateSearchMessage = string.Empty;
+        [ObservableProperty] private string _bookingMessage = string.Empty;
 
-        [ObservableProperty]
-        private bool _isVisibleList = false;
+        [ObservableProperty] private bool _isVisibleSearchDate = true;
 
-        [ObservableProperty]
-        private bool _isVisibleSearchDate = true;
+        [ObservableProperty] private string _location = string.Empty;
 
-        [ObservableProperty]
-        private VehicleModel? _selectedVehicle;
+        [ObservableProperty] private VehicleModel? _selectedVehicle;
 
-        // Proprietà per la data di inizio (simulata)
-        [ObservableProperty]
-        private DateTime? _startDate = DateTime.Today.Date;
-
-        // Proprietà per la data di fine (simulata)
-        [ObservableProperty]
-        private DateTime? _endDate = DateTime.Today.AddDays(1).Date;
-
-        public NewBookingViewModel()
+        private DateTime? _startDate;
+        public DateTime? StartDate
         {
-            _vehicleService = new VehicleService();
-            _bookingService = new BookingService();
+            get => _startDate;
+            set
+            {
+                SetProperty(ref _startDate, value);
+                
+                // Imposta EndDate al giorno successivo, solo se StartDate è selezionata
+                if (value.HasValue)
+                {
+                    EndDate = value.Value.AddDays(1);
+                }
+            }
         }
 
-        protected override async Task<List<VehicleModel>?> LoadAllItemsAsync()
+        [ObservableProperty]
+        private DateTime? _endDate;
+        protected override List<VehicleModel>? LoadAllItemsAsync()
         {
-            return await _vehicleService.GetVehiclesByDate(StartDate, EndDate);
+            return VehicleService.GetVehiclesByDate(StartDate, EndDate, Location);
         }
 
         [RelayCommand]
-        private async Task CercaVeicoliTest()
+        private void SearchVehicles()
         {
             // Resetta il messaggio di errore all'inizio
-            DateSearchMessage = string.Empty;
+            FirstErrorMessage = string.Empty;
 
             // Verifica che entrambe le date siano selezionate
             if (StartDate == null || EndDate == null)
             {
-                DateSearchMessage = "Seleziona entrambe le date (inizio e fine).";
+                FirstErrorMessage = "Seleziona entrambe le date (inizio e fine).";
                 return;
             }
 
             // Verifica che la data di inizio non sia nel passato
             if (StartDate.Value.Date < DateTime.Today)
             {
-                DateSearchMessage = "La data di inizio non può essere nel passato.";
+                FirstErrorMessage = "La data di inizio non può essere nel passato.";
                 return;
             }
 
             // Verifica che la data di fine non sia prima della data di inizio
             if (EndDate.Value.Date < StartDate.Value.Date)
             {
-                DateSearchMessage = "La data di fine non può essere prima della data di inizio.";
+                FirstErrorMessage = "La data di fine non può essere prima della data di inizio.";
+                return;
+            }
+
+            if (Location == string.Empty)
+            {
+                FirstErrorMessage = "Inserisci un comune per la tua ricerca!";
                 return;
             }
 
             // Se tutte le verifiche sono superate, mostra la lista
-            await LoadItems();
+            LoadItems();
             
             if (Items != null && Items is { Count: > 0 })
             {
                 IsVisibleList = true;
                 IsVisibleSearchDate = false;    
             } else {
-                DateSearchMessage = "Non ci sono auto disponibili per le date selezionate!";
+                BookingMessage = "Non ci sono auto disponibili per i parametri selezionati!";
             }
         }
 
         protected override List<VehicleModel> ApplySearch(List<VehicleModel> items, string query)
         {
             return [.. items.Where(v =>
-                    (v.Model.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-                    v.Category.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)) 
+                    v.Model.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    v.Category.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) 
                 )];
         }
 
 
         [RelayCommand]
-        private async Task AddBooking()
+        private void AddBooking()
         {
             if (SelectedVehicle == null)
             {
@@ -113,18 +115,31 @@ namespace Frontend.ViewModels
                 return;
             }  
 
-            var booking = await _bookingService.AddBooking(SelectedVehicle.Id, StartDate, EndDate);
+            var bookingResponse = BookingService.AddBooking(SelectedVehicle.Id, StartDate, EndDate);
             
-            if (booking != null)
+            if (bookingResponse?.Booking != null)
             {
-                Booking = booking;
+                Booking = bookingResponse?.Booking;
                 ErrorMessage = string.Empty;
                 IsBookingSummaryVisible = true;
+                IsVisibleSubTitle = false;
+                IsVisibleList = false;
             } else
             {
-                ErrorMessage = "Errore nella prenotazione. Riprova.";
+                ErrorMessage = bookingResponse?.Message ?? "Errore nella prenotazione!";
                 return;
             }           
+        }
+
+        [RelayCommand]
+        private void GoBack()
+        {
+            BookingMessage = string.Empty;
+            IsVisibleList = false;
+            IsVisibleSearchDate = true;   
+            IsVisibleSubTitle = true;
+            IsBookingSummaryVisible = false;
+
         }
     }
 }
