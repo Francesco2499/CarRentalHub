@@ -15,3 +15,4 @@ def execute_query(query, params=None):
         return df
     finally:
         conn.close()
+

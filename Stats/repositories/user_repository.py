@@ -22,7 +22,7 @@ def get_users_by_region():
     return execute_query(query)
 
 def get_user_statistics(user_id):
-    query = f"""
+    query = """
     SELECT 
         u.id,
         u.username,
@@ -33,8 +33,8 @@ def get_user_statistics(user_id):
     FROM users u
     LEFT JOIN bookings b ON u.id = b.user_id
     LEFT JOIN vehicles v ON b.vehicle_id = v.id
-    WHERE u.id = {user_id} AND u.role = 'customer'
+    WHERE u.id = %s AND u.role = 'customer'
     GROUP BY u.id, u.username;
     """
-    return execute_query(query)
+    return execute_query(query, (user_id,))
 
