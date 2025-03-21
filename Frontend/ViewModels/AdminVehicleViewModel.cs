@@ -13,11 +13,11 @@ namespace Frontend.ViewModels
     public partial class AdminVehicleViewModel : SearchableViewModel<VehicleModel>
     {
         [ObservableProperty] private VehicleModel? _selectedVehicle;
-
+        [ObservableProperty] private string? _successMessage;
+        [ObservableProperty] private bool _isConfirmationModalVisible = false;
         [ObservableProperty] private bool _isFormVisible = false;
-
         [ObservableProperty] private VehicleModel _editingVehicle = new(0, "", "", 0, ""); 
-        
+    
         public AdminVehicleViewModel()
         {
             IsVisibleList = true;
@@ -27,6 +27,8 @@ namespace Frontend.ViewModels
         [RelayCommand]
         private void ShowAddVehicleForm()
         {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
             EditingVehicle = new VehicleModel(0, "", "", 0, "");
             IsVisibleList = false;
             IsFormVisible = true;
@@ -35,6 +37,9 @@ namespace Frontend.ViewModels
         [RelayCommand]
         private void ShowEditVehicleForm()
         {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+
             if (SelectedVehicle == null)
             {
                 ErrorMessage = "Seleziona un veicolo da modificare.";
@@ -74,6 +79,7 @@ namespace Frontend.ViewModels
 
                 if (vehicleResponse?.Vehicle != null) {
                     LoadItems();
+                    SuccessMessage = vehicleResponse?.Message;
                     IsFormVisible = false;  
                     IsVisibleList = true; 
                 } else {
@@ -93,32 +99,72 @@ namespace Frontend.ViewModels
 
         protected override List<VehicleModel> ApplySearch(List<VehicleModel> items, string query)
         {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
             return [.. items.Where(v =>
                     v.Model.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
                     v.Category.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)
                 )];
         }
 
-        [RelayCommand]
-        private void DeleteVehicle()
-        {
-            ErrorMessage = "";
-            if (SelectedVehicle == null)
-            {
-                ErrorMessage = "Seleziona un'auto da eliminare.";
-                return;
-            }
-
-            VehicleService.DeleteVehicle(SelectedVehicle.Id);
-            LoadItems();
-        }
 
         [RelayCommand]
         private void GoBack()
         {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
             SearchQuery = string.Empty;
             IsVisibleList = true;
             IsFormVisible = false;
+        }
+
+        [RelayCommand]
+        private void ShowConfirmationModal()
+        {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+
+            if (SelectedVehicle== null)
+            {
+                ErrorMessage = "Seleziona un veicolo da eliminare.";
+                return;
+            }
+            
+            // Mostra la modale di conferma
+            IsConfirmationModalVisible = true;
+        }
+
+        [RelayCommand]
+        private void ConfirmDelete()
+        {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+
+            if (SelectedVehicle == null)
+            {
+                ErrorMessage = "Seleziona un veicolo da eliminare.";
+                return;
+            }
+
+            try
+            {
+                VehicleService.DeleteVehicle(SelectedVehicle.Id);
+                SuccessMessage = $"Veicolo '{SelectedVehicle.Model}' eliminato correttamente!";
+
+                LoadItems();
+                
+                IsConfirmationModalVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Errore: {ex.Message}";
+            }
+        }
+
+        [RelayCommand]
+        private void CancelDelete()
+        {
+            IsConfirmationModalVisible = false;
         }
     }
 }

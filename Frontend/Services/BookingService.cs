@@ -40,12 +40,12 @@ public class BookingService
         }
     }
 
-    public static BookingResponse? EditBooking(BookingModel booking)
+    public static BookingResponse? EditBooking(BookingModel booking, int vehicleId)
     {
         var requestBody = new Dictionary<string, object>
         {
             { "user_id", booking.user_id },
-            { "vehicle_id", booking.vehicle_id },
+            { "vehicle_id", vehicleId },
             { "start_date", booking.start_date.ToString("yyyy-MM-ddTHH:mm:ssZ")},
             { "end_date", booking.end_date.ToString("yyyy-MM-ddTHH:mm:ssZ")}
         };
@@ -54,4 +54,4 @@ public class BookingService
     }
 }
 
-public record BookingResponse(BookingModel? Booking, string? Message, string? Error);
+public record BookingResponse(BookingModel? Booking, string? Message, object? Error);

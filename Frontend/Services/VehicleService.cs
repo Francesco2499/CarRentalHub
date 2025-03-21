@@ -74,6 +74,6 @@ namespace Frontend.Services
         }
     }
 
-    public record VehicleResponse(VehicleModel? Vehicle, string? Message, string? Error);
+    public record VehicleResponse(VehicleModel? Vehicle, string? Message, object? Error);
 
 }

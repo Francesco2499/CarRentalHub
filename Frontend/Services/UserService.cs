@@ -42,7 +42,7 @@ public class UserService
         return HttpService.Post<RegistrationResponse>("http://localhost:8085/api/v1/auth/register", requestBody);
     }
 
-    public static RegistrationResponse? EditProfile(UserModel user, string newPassword)
+    public static RegistrationResponse? EditProfile(UserModel user, string? newPassword)
     {
         var requestBody = new Dictionary<string, object>
         {
@@ -61,6 +61,6 @@ public class UserService
     }
 }
 
-public record RegistrationResponse(string? Message, UserModel? User, string? Error);
+public record RegistrationResponse(string? Message, UserModel? User, object? Error);
 
-public record LoginResponse(string? Message, string? Token, UserModel? User, string Error);
+public record LoginResponse(string? Message, string? Token, UserModel? User, object? Error);

@@ -13,13 +13,34 @@ namespace Frontend.ViewModels
     public partial class AdminBookingViewModel : SearchableViewModel<BookingModel>
     {
         [ObservableProperty] private BookingModel? _selectedBooking;
+        [ObservableProperty] private Dictionary<int, string>  _vehicles = VehicleService.GetAllVehicles()?.Select((vehicle, index) => new { vehicle.Model, vehicle.Id }).ToDictionary(v => v.Id, v => v.Model) ?? [];
+        public List<string> VehicleModels => Vehicles?.Values.ToList() ?? [];
+        private string? _selectedVehicleModel;
+
+        public int SelectedVehicleId { get; set; }
+
+        // Proprietà che aggiorna l'ID quando viene selezionato un modello
+        public string? SelectedVehicleModel
+        {
+            get => _selectedVehicleModel;
+            set
+            {
+                if (SetProperty(ref _selectedVehicleModel, value))
+                {
+                    // Quando il valore cambia, aggiorna l'ID corrispondente
+                    var selectedVehicle = Vehicles?.FirstOrDefault(v => v.Value == value);
+                    SelectedVehicleId = selectedVehicle?.Key ?? 0;
+                }
+            }
+        }
+        [ObservableProperty] private bool _isConfirmationModalVisible = false;
+        [ObservableProperty] private string? _successMessage;
         [ObservableProperty] private bool _isFormVisible = false;
-        [ObservableProperty] private bool _isGridVisible = true;
         [ObservableProperty] private BookingModel _editingBooking = new(0, 0, 0, "", DateTime.Now, DateTime.Now, DateTime.Now, DateTime.Now);
-        private readonly BookingService _bookingService;
+
         public AdminBookingViewModel()
         {
-            _bookingService = new BookingService();
+            IsVisibleList = true;
             LoadItems();
         }
 
@@ -30,16 +51,22 @@ namespace Frontend.ViewModels
        
         protected override List<BookingModel> ApplySearch(List<BookingModel> items, string query)
         {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
             return [.. items.Where(b => b.vehicle_model.Contains(query, StringComparison.OrdinalIgnoreCase))];
         }
 
         protected override List<BookingModel> ApplySearchByUserId(List<BookingModel> items, int query)
         {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
             return [.. items.Where(b => b.user_id == query)];
         }
 
         protected override List<BookingModel> ApplySearchByBookingId(List<BookingModel> items, int query)
         {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
             return [.. items.Where(b => b.Id == query)];
         }
         
@@ -47,20 +74,29 @@ namespace Frontend.ViewModels
         [RelayCommand]
         private void ShowEditBookingForm()
         {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+
+            SelectedVehicleModel = SelectedBooking?.vehicle_model;
+
             if (SelectedBooking == null)
             {
                 ErrorMessage = "Seleziona una prenotazione da modificare.";
                 return;
             }
+            
 
             EditingBooking = SelectedBooking with { };
-            IsGridVisible = false;
+            IsVisibleList = false;
             IsFormVisible = true;
         }
 
         [RelayCommand]
         private void SaveBooking()
         {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+
             if (SelectedBooking == null)
             {
                 ErrorMessage = "Nessuna prenotazione selezionata.";
@@ -69,14 +105,16 @@ namespace Frontend.ViewModels
 
             try
             {
-                var bookingResponse = BookingService.EditBooking(EditingBooking);
+                var bookingResponse = BookingService.EditBooking(EditingBooking, SelectedVehicleId);
                 if (bookingResponse?.Booking != null) {
                     LoadItems();
+                    SuccessMessage = bookingResponse?.Message;
                     IsFormVisible = false;
-                    IsGridVisible = true;  
+                    IsVisibleList = true;  
                 } else {
                     ErrorMessage = bookingResponse?.Message ?? "Errore nella modifica della prenotazione!";
                 }
+                Console.WriteLine(SelectedVehicleId);
             }
             catch (Exception ex)
             {
@@ -85,17 +123,61 @@ namespace Frontend.ViewModels
         }
 
         [RelayCommand]
-        private void DeleteBooking()
+        private void GoBack()
         {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+            SearchQuery = string.Empty;
+            IsVisibleList = true;
+            IsFormVisible = false;
+        }
+
+        [RelayCommand]
+        private void ShowConfirmationModal()
+        {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+
+            if (SelectedBooking == null)
+            {
+                ErrorMessage = "Seleziona una prenotazione da eliminare.";
+                return;
+            }
+            
+            IsConfirmationModalVisible = true;
+        }
+
+        [RelayCommand]
+        private void ConfirmDelete()
+        {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+
             if (SelectedBooking == null)
             {
                 ErrorMessage = "Seleziona una prenotazione da eliminare.";
                 return;
             }
 
-            BookingService.DeleteBooking(SelectedBooking.Id);
-            LoadItems();
+            try
+            {
+                VehicleService.DeleteVehicle(SelectedBooking.Id);
+                SuccessMessage = $"Prenotazione con ID '{SelectedBooking.Id}' eliminata correttamente!";
+
+                LoadItems();
+                
+                IsConfirmationModalVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Errore: {ex.Message}";
+            }
         }
 
+        [RelayCommand]
+        private void CancelDelete()
+        {
+            IsConfirmationModalVisible = false;
+        }
     }
 }

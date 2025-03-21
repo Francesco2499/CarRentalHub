@@ -56,6 +56,7 @@
                     <TextBlock Text="My Area" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
                     <TextBlock Text="Manage your profile and settings." 
                                TextWrapping="Wrap" TextAlignment="Center" Margin="5"/>
+                    <Button Content="Vai alla MyArea!" HorizontalAlignment="Center" Command="{Binding GoToMyAreaCommand}" Margin="5"/>
                 </StackPanel>
             </Border>
 

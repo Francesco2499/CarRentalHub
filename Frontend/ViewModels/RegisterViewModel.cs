@@ -60,14 +60,14 @@ public partial class RegisterViewModel : ViewModelBase
         if (response != null) 
         {
             if (IsAdmin) {
-                if (!string.IsNullOrWhiteSpace(response.Error)) {
+                if (response.Error != null) {
                     ErrorMessage = response.Message ?? "Errore nella registrazione!";
                 } else {
                     RegisterMessage = "Aggiunto nuovo amministratore!";
                 }
             } else {
 
-                if (string.IsNullOrWhiteSpace(response.Error) && !string.IsNullOrWhiteSpace(response.Message))
+                if (response.Error == null && !string.IsNullOrWhiteSpace(response.Message))
                 {
                     ShowSubmitForm = false;
                     ShowGoToLogin = true;

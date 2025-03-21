@@ -93,7 +93,7 @@ namespace Frontend.ViewModels
                 IsVisibleList = true;
                 IsVisibleSearchDate = false;    
             } else {
-                BookingMessage = "Non ci sono auto disponibili per le date selezionate!";
+                BookingMessage = "Non ci sono auto disponibili per i parametri selezionati!";
             }
         }
 

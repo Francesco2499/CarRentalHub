@@ -11,17 +11,16 @@ public partial class MyAreaViewModel : ViewModelBase
     private readonly UserModel _originalUser;
 
     [ObservableProperty] private UserModel _editedUser;
-    [ObservableProperty] private bool isSaveEnabled;
-    [ObservableProperty] private string _errorMessage;
-    [ObservableProperty] private string _newPassword;
-    [ObservableProperty] private string _successMessage;
-    [ObservableProperty] private bool _showEditPasswordBtn;
-    [ObservableProperty] private bool _showEditPasswordForm;
+    [ObservableProperty] private string? _errorMessage;
+    [ObservableProperty] private string? _newPassword;
+    [ObservableProperty] private string? _successMessage;
+    [ObservableProperty] private bool _showEditPasswordBtn = true;
+    [ObservableProperty] private bool _showEditPasswordForm = false;
 
-    public ObservableCollection<string> Regions { get; } = new()
-    {
+    public ObservableCollection<string> Regions { get; } =
+    [
         "Lombardia", "Lazio", "Sicilia", "Campania", "Veneto"
-    };
+    ];
 
     public MyAreaViewModel(UserModel User)
     {
@@ -29,12 +28,10 @@ public partial class MyAreaViewModel : ViewModelBase
         EditedUser = User;
     }
 
-    partial void OnEditedUserChanged(UserModel value) => CheckModified();
-
-    private void CheckModified()
+    private bool CheckModified()
     {
         ErrorMessage = "";
-        IsSaveEnabled = EditedUser.Username != _originalUser.Username ||
+        return EditedUser.Username != _originalUser.Username ||
                         EditedUser.Email != _originalUser.Email ||
                         EditedUser.Region != _originalUser.Region ||
                         EditedUser.Password != _originalUser.Password;    
@@ -57,6 +54,12 @@ public partial class MyAreaViewModel : ViewModelBase
         || (ShowEditPasswordForm && (string.IsNullOrWhiteSpace(EditedUser.Password) || string.IsNullOrWhiteSpace(NewPassword))))
         {
             ErrorMessage = "Inserisci un valore per tutti i campi!";
+            return;
+        }
+
+        if (!CheckModified()) {
+            ErrorMessage = "Modifica uno dei campi!";
+            return;
         }
 
         var editResponse = UserService.EditProfile(EditedUser, NewPassword);
