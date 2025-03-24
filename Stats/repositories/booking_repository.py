@@ -19,7 +19,6 @@ def get_revenue_trend(start_date=None, end_date=None):
                SUM((DATE_PART('day', b.end_date - b.start_date) + 1) * v.price) AS total_revenue
         FROM bookings b
         JOIN vehicles v ON b.vehicle_id = v.id
-        WHERE b.start_date BETWEEN NOW() - INTERVAL '30 days' AND NOW()
         GROUP BY date
         ORDER BY date;
         """
@@ -42,7 +41,6 @@ def get_booking_trend(start_date=None, end_date=None):
         SELECT b.start_date::date AS date,
                COUNT(*) AS booking_count
         FROM bookings b
-        WHERE b.start_date BETWEEN NOW() - INTERVAL '30 days' AND NOW()
         GROUP BY date
         ORDER BY date;
         """
@@ -67,7 +65,6 @@ def get_revenue_per_vehicle(start_date=None, end_date=None):
                SUM((DATE_PART('day', b.end_date - b.start_date) + 1) * v.price) AS revenue
         FROM bookings b
         JOIN vehicles v ON b.vehicle_id = v.id
-        WHERE b.start_date BETWEEN NOW() - INTERVAL '30 days' AND NOW()
         GROUP BY v.model
         ORDER BY revenue DESC;
         """

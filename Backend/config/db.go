@@ -204,17 +204,31 @@ func SeedData() error {
 
 	if count == 0 { // Inserisce i dati solo se la tabella è vuota
 		_, err := db.Exec(`
-			INSERT INTO vehicles (model, category, price, location) VALUES 
-				('Toyota Corolla', 'Berlina', 50.00, 'Catania'),
-				('Ford Fiesta', 'Hatchback', 40.00, 'Roma'),
-				('BMW X5', 'SUV', 90.00, 'Napoli'),
-				('Audi A4', 'Berlina', 75.00, 'Catania'),
-				('Fiat Panda', 'City Car', 30.00, 'Bologna'),
-				('Mercedes-Benz GLC', 'SUV', 120.00, 'Firenze'),
-				('Tesla Model 3', 'Berlina Elettrica', 150.00, 'Catania'),
-				('Jeep Wrangler', 'SUV', 100.00, 'Palermo'),
-				('Peugeot 208', 'Hatchback', 35.00, 'Genova'),
-				('Alfa Romeo Giulietta', 'Compact', 55.00, 'Catania');
+		INSERT INTO vehicles (model, category, price, location) VALUES 
+			('Toyota Corolla', 'Berlina', 50.00, 'Catania'),
+			('Ford Fiesta', 'Hatchback', 40.00, 'Roma'),
+			('BMW X5', 'SUV', 90.00, 'Napoli'),
+			('Audi A4', 'Berlina', 75.00, 'Catania'),
+			('Fiat Panda', 'City Car', 30.00, 'Bologna'),
+			('Mercedes-Benz GLC', 'SUV', 120.00, 'Firenze'),
+			('Tesla Model 3', 'Berlina Elettrica', 150.00, 'Milano'),
+			('Jeep Wrangler', 'SUV', 100.00, 'Palermo'),
+			('Peugeot 208', 'Hatchback', 35.00, 'Genova'),
+			('Alfa Romeo Giulietta', 'Compact', 55.00, 'Catania'),
+			('Volkswagen Golf', 'Hatchback', 45.00, 'Milano'),
+			('Renault Clio', 'Hatchback', 38.00, 'Torino'),
+			('Honda CR-V', 'SUV', 85.00, 'Bologna'),
+			('Nissan Qashqai', 'SUV', 80.00, 'Roma'),
+			('Skoda Octavia', 'Berlina', 60.00, 'Verona'),
+			('Dacia Duster', 'SUV', 65.00, 'Bari'),
+			('Maserati Levante', 'SUV', 200.00, 'Napoli'),
+			('Citroen C3', 'City Car', 33.00, 'Palermo'),
+			('Hyundai Tucson', 'SUV', 75.00, 'Genova'),
+			('Opel Corsa', 'Hatchback', 36.00, 'Cagliari'),
+			('Suzuki Jimny', 'Off-road', 70.00, 'Firenze'),
+			('Kia Sportage', 'SUV', 82.00, 'Torino'),
+			('Toyota Yaris', 'City Car', 32.00, 'Bari'),
+			('Volvo XC60', 'SUV', 95.00, 'Catania');
 		`)
 		if err != nil {
 			return err
@@ -232,16 +246,36 @@ func SeedData() error {
 
 	if count == 0 { // Inserisce i dati solo se la tabella è vuota
 		_, err := db.Exec(`
-			INSERT INTO bookings (user_id, vehicle_id, start_date, end_date) VALUES 
-				(2, 2, '2025-03-01 10:00:00', '2025-03-10 10:00:00'),
-				(3, 3, '2025-04-05 08:00:00', '2025-04-13 08:00:00'),
-				(4, 4, '2025-05-15 09:00:00', '2025-05-22 09:00:00'),
-				(5, 2, '2025-06-10 10:30:00', '2025-06-20 10:30:00'),
-				(6, 6, '2025-07-01 11:00:00', '2025-07-10 11:00:00'),
-				(4, 7, '2025-08-01 12:00:00', '2025-08-07 12:00:00'),
-				(5, 7, '2025-09-10 14:00:00', '2025-09-15 14:00:00'),
-				(5, 7, '2025-10-05 13:00:00', '2025-10-12 13:00:00'),
-				(3, 5, '2025-11-20 15:00:00', '2025-11-27 15:00:00');
+		INSERT INTO bookings (user_id, vehicle_id, start_date, end_date) VALUES 
+			(4, 5, '2024-01-10', '2024-01-15'),
+			(6, 12, '2024-01-20', '2024-01-27'),
+			(5, 10, '2024-02-05', '2024-02-12'),
+			(3, 6, '2024-02-18', '2024-02-25'),
+			(6, 7, '2024-03-01', '2024-03-07'),
+			(3, 1, '2024-03-05', '2024-03-10'),
+			(4, 3, '2024-06-10', '2024-06-15'),
+			(4, 3, '2024-06-25', '2024-06-30'),
+			(2, 8, '2024-07-05', '2024-07-12'),
+			(2, 5, '2025-01-10', '2025-01-14'),
+			(4, 10, '2025-01-15', '2025-01-20'),
+			(6, 7, '2025-02-01', '2025-02-05'),
+			(3, 8, '2025-02-01', '2025-02-05'),
+			(4, 14, '2025-02-15', '2025-02-20'),
+			(2, 12, '2025-02-10', '2025-02-14'),
+			(6, 5, '2025-03-01', '2025-03-07'),
+			(5, 6, '2025-03-03', '2025-03-05'),
+			(5, 7, '2025-03-05', '2025-03-10'),
+			(3, 10, '2025-03-01', '2025-03-05'),
+			(4, 8, '2025-02-06', '2025-02-10'),
+			(6, 3, '2025-03-10', '2025-03-15'),
+			(5, 6, '2025-03-15', '2025-03-20'),
+			(2, 7, '2025-04-01', '2025-04-05'),
+			(4, 5, '2025-04-10', '2025-04-15'),
+			(6, 10, '2025-06-01', '2025-06-05'),
+			(5, 12, '2025-07-05', '2025-07-10'),
+			(3, 3, '2025-08-10', '2025-08-15'),
+			(4, 7, '2025-08-18', '2025-08-25'),
+			(2, 14, '2025-09-01', '2025-09-07');
 		`)
 		if err != nil {
 			return err

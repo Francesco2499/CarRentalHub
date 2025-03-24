@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,16 +10,10 @@ namespace Frontend.ViewModels;
 
 public partial class UserMainViewModel : ViewModelBase
 {
-    [ObservableProperty]
-    private bool _isPaneOpen;
-
-    [ObservableProperty]
-    private ViewModelBase? _currentPage;
-
-    [ObservableProperty]
-    private ListItemTemplate? _selectedListItem;
+    [ObservableProperty] private bool _isPaneOpen;
+    [ObservableProperty] private ViewModelBase? _currentPage;
+    [ObservableProperty] private ListItemTemplate? _selectedListItem;
     private readonly MainWindowViewModel _mainViewModel;
-
     public ObservableCollection<ListItemTemplate> Items { get; }
 
     public UserMainViewModel(bool isAdmin, UserModel user, MainWindowViewModel mainViewModel)
@@ -33,14 +26,15 @@ public partial class UserMainViewModel : ViewModelBase
                 new(() => new NewBookingViewModel(), "add_regular", "Nuova prenotazione"),
                 new(() => new MyBookingsViewModel(), "book_search_regular", "Le mie prenotazioni"),
                 new(() => new MyAreaViewModel(user), "person_regular", "My Area"),
-                new(() => new MainWindowViewModel(), "sign_out_regular", "Logout")  // Qui non c'è un ViewModel da creare
+                new(() => new MainWindowViewModel(), "sign_out_regular", "Logout")
             }
             :
             [
                 new(() => new AdminVehicleViewModel(), "vehicle_car_regular", "Gestisci veicoli"),
                 new(() => new AdminBookingViewModel(), "book_search_regular", "Gestisci prenotazioni"),
-                new(() => new RegisterViewModel(true), "personal_regular", "Aggiungi admin"),
-                new(() => new StatsViewModel(), "personal_regular", "Visualizza stats")
+                new(() => new RegisterViewModel(true), "person_regular", "Aggiungi admin"),
+                new(() => new StatsViewModel(), "document_catch_up_regularr", "Visualizza statistiche"),
+                new(() => new MainWindowViewModel(), "sign_out_regular", "Logout")  // Qui non c'è un ViewModel da creare
             ];
 
         Items = [.. templates];
@@ -53,6 +47,7 @@ public partial class UserMainViewModel : ViewModelBase
         {
             if (value.Label == "Logout")
             {
+                TokenService.RemoveToken();
                 Logout();  // Esegui l'azione di logout
             }
             else
