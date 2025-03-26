@@ -1,71 +1,11 @@
-<!-- 1 prova
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avaloniaMap="clr-namespace:Mapsui.UI.Avalonia;assembly=Mapsui.UI.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Frontend.Views.TileMapView">
-  <ScrollViewer>
-    <Image Name="MapImage"/>
-  </ScrollViewer>
-</UserControl>-->
+  
+    <avaloniaMap:MapControl x:Name="MapView" />
 
-<!-- funzionante ma con linee
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Frontend.Views.TileMapView">
-  <Grid Name="MapGrid">
-    <Canvas Name="MarkerCanvas" IsHitTestVisible="False" ZIndex="10"/>
-  </Grid>
 </UserControl>
--->
-<!-- funzionante con bande larghe ai lati
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Frontend.Views.TileMapView">
-  <Grid>
-    <Image Name="MapImage"/>
-    <Canvas Name="MarkerCanvas"
-            IsHitTestVisible="False"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Width="768"
-            Height="768"/>
-  </Grid>
-</UserControl>-->
-<!--
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Frontend.Views.TileMapView">
-    <Grid>
-        <Image Name="MapImage"
-               Stretch="Uniform"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center"
-               />
-        
-        <Canvas Name="MarkerCanvas"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                ZIndex="1"/>
-    </Grid>
-</UserControl>
--->  
-
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Frontend.Views.TileMapView">
-  <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                VerticalScrollBarVisibility="Auto">
-    <Canvas x:Name="MainCanvas">
-      <Image x:Name="MapImage"
-             Source="avares://Frontend/Assets/italy-map.png"
-             Stretch="None"/>
-    </Canvas>
-  </ScrollViewer>
-</UserControl>
-
-
-
-
-
-
-
-

@@ -25,6 +25,8 @@
     </PackageReference>
     <PackageReference Include="CefNet.Avalonia" Version="105.3.22248.142" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Mapsui" Version="4.1.8" />
+    <PackageReference Include="Mapsui.Avalonia" Version="4.1.8" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
   </ItemGroup>
 </Project>
