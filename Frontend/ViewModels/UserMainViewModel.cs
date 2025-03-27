@@ -26,7 +26,8 @@ public partial class UserMainViewModel : ViewModelBase
                 new(() => new NewBookingViewModel(), "add_regular", "Nuova prenotazione"),
                 new(() => new MyBookingsViewModel(), "book_search_regular", "Le mie prenotazioni"),
                 new(() => new MyAreaViewModel(user), "person_regular", "My Area"),
-                new(() => new MainWindowViewModel(), "sign_out_regular", "Logout")
+                new(() => new TileMapViewModel(), "map_regular", "Mappa"),
+                new(() => new MainWindowViewModel(), "sign_out_regular", "Logout")  // Qui non c'è un ViewModel da creare
             }
             :
             [

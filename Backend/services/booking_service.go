@@ -12,7 +12,7 @@ import (
 // Struttura per la richiesta di prenotazione
 type BookingRequest struct {
 	Booking  models.Booking
-	Response chan *models.BookingWithVehicleDTO
+	Response chan *models.BookingDTO
 	Error    chan error
 }
 
@@ -42,7 +42,7 @@ func processBookingRequests() {
 	}
 }
 
-func CreateBooking(booking *models.Booking) (*models.BookingWithVehicleDTO, error) {
+func CreateBooking(booking *models.Booking) (*models.BookingDTO, error) {
 	createdBooking, err := repositories.CreateBooking(booking)
 	if err != nil {
 		return nil, err
@@ -56,9 +56,9 @@ func CreateBooking(booking *models.Booking) (*models.BookingWithVehicleDTO, erro
 }
 
 // Funzione chiamata dal controller per gestire la prenotazione
-func RequestBooking(booking models.Booking) (*models.BookingWithVehicleDTO, error) {
+func RequestBooking(booking models.Booking) (*models.BookingDTO, error) {
 	log.Println("Inviando richiesta di prenotazione al canale...")
-	response := make(chan *models.BookingWithVehicleDTO)
+	response := make(chan *models.BookingDTO)
 	errorChan := make(chan error)
 
 	bookingChannel <- BookingRequest{Booking: booking, Response: response, Error: errorChan}
@@ -72,12 +72,12 @@ func RequestBooking(booking models.Booking) (*models.BookingWithVehicleDTO, erro
 	}
 }
 
-func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, error) {
+func GetAllBookings(userID int, isAdmin bool) ([]models.BookingDTO, error) {
 	cacheKey := fmt.Sprintf("bookings_user_%d_admin_%t", userID, isAdmin)
 	// Controllo se il dato è in cache
 	if cachedData, found := cache.BookingCache.Get(cacheKey); found {
 		log.Println("all bookings found in cache")
-		return cachedData.([]models.BookingWithVehicleDTO), nil
+		return cachedData.([]models.BookingDTO), nil
 	}
 
 	bookings, err := repositories.GetAllBookings(userID, isAdmin)

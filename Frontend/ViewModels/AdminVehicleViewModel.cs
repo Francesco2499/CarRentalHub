@@ -16,7 +16,7 @@ namespace Frontend.ViewModels
         [ObservableProperty] private string? _successMessage;
         [ObservableProperty] private bool _isConfirmationModalVisible = false;
         [ObservableProperty] private bool _isFormVisible = false;
-        [ObservableProperty] private VehicleModel _editingVehicle = new(0, "", "", 0, ""); 
+        [ObservableProperty] private VehicleModel _editingVehicle = new(0, "", "", 0, "", 0, 0); 
     
         public AdminVehicleViewModel()
         {

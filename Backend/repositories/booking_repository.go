@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, error) {
+func GetAllBookings(userID int, isAdmin bool) ([]models.BookingDTO, error) {
 	db := config.GetDB()
 	var query string
 	var rows *sql.Rows
@@ -19,7 +19,7 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, e
 	if isAdmin {
 		query = `
 			SELECT 
-				b.id, b.user_id, v.model, b.start_date, b.end_date, b.created_at, b.updated_at
+				b.id, b.user_id, v.id, v.model, b.start_date, b.end_date, b.created_at, b.updated_at
 			FROM bookings b
 			JOIN vehicles v ON b.vehicle_id = v.id`
 		//log.Printf("Executing query: %s", query)
@@ -27,7 +27,7 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, e
 	} else {
 		query = `
 			SELECT 
-				b.id, b.user_id, v.model, b.start_date, b.end_date, b.created_at, b.updated_at
+				b.id, b.user_id, v.id, v.model, b.start_date, b.end_date, b.created_at, b.updated_at
 			FROM bookings b
 			JOIN vehicles v ON b.vehicle_id = v.id
 			WHERE b.user_id = $1`
@@ -40,12 +40,36 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingWithVehicleDTO, e
 	}
 	defer rows.Close()
 
-	var bookings []models.BookingWithVehicleDTO
+	var bookings []models.BookingDTO
 	for rows.Next() {
-		var booking models.BookingWithVehicleDTO
-		if err := rows.Scan(&booking.ID, &booking.UserID, &booking.VehicleModel, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
+		var booking models.BookingDTO
+		var vehicleID int
+		/*if err := rows.Scan(&booking.ID, &booking.UserID, &booking.VehicleModel, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("data scan error: %w", err)
+		}*/
+		if err := rows.Scan(&booking.ID, &userID, &vehicleID, &booking.VehicleModel, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("data scan error: %w", err)
 		}
+
+		var username string
+		err = db.QueryRow(`SELECT username FROM users WHERE id = $1`, userID).Scan(&username)
+		if err != nil {
+			return nil, fmt.Errorf("failed to fetch user details: %w", err)
+		}
+		booking.Username = username
+
+		var priceForDay float64
+		err = db.QueryRow(`SELECT price FROM vehicles WHERE id = $1`, vehicleID).Scan(&priceForDay)
+		if err != nil {
+			return nil, fmt.Errorf("failed to fetch vehicle details: %w", err)
+		}
+
+		days := int(booking.EndDate.Truncate(24*time.Hour).Sub(booking.StartDate.Truncate(24*time.Hour)).Hours()/24) + 1
+		if days < 1 {
+			days = 1 // fallback di sicurezza
+		}
+		booking.TotalPrice = priceForDay * float64(days)
+
 		bookings = append(bookings, booking)
 	}
 	if err := rows.Err(); err != nil {
@@ -122,7 +146,7 @@ func IsVehicleAvailable(vehicleID int, bookingID int, startDate, endDate time.Ti
 	return count == 0, nil
 }
 
-func CreateBooking(booking *models.Booking) (*models.BookingWithVehicleDTO, error) {
+func CreateBooking(booking *models.Booking) (*models.BookingDTO, error) {
 	db := config.GetDB()
 
 	tx, err := db.Begin()
@@ -141,9 +165,9 @@ func CreateBooking(booking *models.Booking) (*models.BookingWithVehicleDTO, erro
 		RETURNING id, user_id, vehicle_id, start_date, end_date, created_at, updated_at`
 
 	var vehicleID int
-	var newBooking models.BookingWithVehicleDTO
+	var newBooking models.BookingDTO
 	err = tx.QueryRow(query, booking.UserID, booking.VehicleID, booking.StartDate, booking.EndDate).
-		Scan(&newBooking.ID, &newBooking.UserID, &vehicleID, &newBooking.StartDate, &newBooking.EndDate, &newBooking.CreatedAt, &newBooking.UpdatedAt)
+		Scan(&newBooking.ID, &booking.UserID, &vehicleID, &newBooking.StartDate, &newBooking.EndDate, &newBooking.CreatedAt, &newBooking.UpdatedAt)
 
 	if err != nil {
 		tx.Rollback()
@@ -161,12 +185,19 @@ func CreateBooking(booking *models.Booking) (*models.BookingWithVehicleDTO, erro
 		return nil, fmt.Errorf("failed to fetch vehicle details: %w", err)
 	}
 
-	//days := int(newBooking.EndDate.Sub(newBooking.StartDate).Hours()/24) + 1
 	days := int(newBooking.EndDate.Truncate(24*time.Hour).Sub(newBooking.StartDate.Truncate(24*time.Hour)).Hours()/24) + 1
 	if days < 1 {
 		days = 1 // fallback di sicurezza
 	}
 	newBooking.TotalPrice = priceForDay * float64(days)
+
+	var username string
+	err = db.QueryRow(`SELECT username FROM users WHERE id = $1`, booking.UserID).Scan(&username)
+	if err != nil {
+		tx.Rollback()
+		return nil, fmt.Errorf("failed to fetch user details: %w", err)
+	}
+	newBooking.Username = username
 
 	// Conferma la transazione
 	err = tx.Commit()

@@ -5,6 +5,8 @@ public record VehicleModel(
     string Model,
     string Category,
     decimal Price,
-    string Location
+    string Location,
+    float Latitude,
+    float Longitude
 );
 

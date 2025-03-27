@@ -71,10 +71,10 @@
       <Button Content="Mostra dettagli" HorizontalAlignment="Center" Command="{Binding LoadUserInfoCommand}" />
     </StackPanel>
    
-    <Image IsVisible="{Binding IsVisibleImage}" Source="{Binding StatsImage}"  Stretch="Uniform" Height="600" Width="700" Margin="10"/>
+    <Image IsVisible="{Binding IsVisibleImage}" Source="{Binding StatsImage}"  Stretch="Uniform" Height="400" Width="600" Margin="10"/>
 
-    <StackPanel IsVisible="{Binding IsVisibleSliderDate}" Orientation="Vertical" HorizontalAlignment="Center" Margin="10">
-      <TextBlock Text="Seleziona il periodo" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,5"/>
+    <StackPanel IsVisible="{Binding IsVisibleSliderDate}" Orientation="Vertical" HorizontalAlignment="Center" Margin="0">
+      <TextBlock Text="Seleziona il periodo" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,5,0,5"/>
       <Slider Minimum="0" Maximum="2" Value="{Binding SelectedRangeIndex, Mode=TwoWay}" TickFrequency="1" TickPlacement="BottomRight" IsSnapToTickEnabled="True" Width="200"/>
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20" Margin="5">
           <TextBlock Text="Ultimo mese"/>
@@ -86,7 +86,7 @@
     <StackPanel IsVisible="{Binding IsVisibleText}" HorizontalAlignment="Center" Spacing="10">
       <Border Background="#4e4e4e" CornerRadius="10" Padding="30" Width="400" HorizontalAlignment="Center">
           <StackPanel>
-              <TextBlock Text="Dettagli Utente" FontSize="20" FontWeight="Bold" Foreground="White" TextAlignment="Center" Margin="0,0,0,20"/>
+              <TextBlock Text="Dettagli Utente" FontSize="20" FontWeight="Bold" Foreground="White" TextAlignment="Center" Margin="0,0,0,30"/>
               
               <Separator Background="Gray" Height="1" Margin="0,10"/>
               
