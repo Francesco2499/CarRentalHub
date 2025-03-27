@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Text.RegularExpressions;
+using System;
 
 namespace Frontend.ViewModels
 {
@@ -12,26 +10,23 @@ namespace Frontend.ViewModels
     {
         [ObservableProperty] private string _searchQuery = string.Empty;  // Per la ricerca testuale (es. modello veicolo)
 
-         [ObservableProperty] private bool _enableShowAll = false;
+        [ObservableProperty] private bool _enableShowAll = false;
+        private List<TModel>? filteredResults;
         protected abstract List<TModel> ApplySearch(List<TModel> items, string query);
-        protected virtual List<TModel> ApplySearchByUserId(List<TModel> items, int query)
-        {
-            return items; // Default: non applica alcun filtro
-        }
 
-        protected virtual List<TModel> ApplySearchByBookingId(List<TModel> items, int query)
+        protected virtual List<TModel> ApplySearchByBookingId(List<TModel> items, string query)
         {
-            return items; // Default: non applica alcun filtro
+            return items;
         }
 
         [RelayCommand]
-        private void SearchItems(object parameter)
+        private void SearchItems(string parameter)
         {
             if (_allItems != null) {
                 ErrorMessage = string.Empty;
-                List<TModel> filteredResults = _allItems;
+                filteredResults = _allItems;
 
-                if (parameter.ToString() == "all") {
+                if (parameter == "all") {
                     UpdatePaginatedItems(filteredResults);
                     EnableShowAll = false;
                     SearchQuery = string.Empty;
@@ -41,31 +36,47 @@ namespace Frontend.ViewModels
                 if (!string.IsNullOrEmpty(SearchQuery)) {
                     EnableShowAll = true;
 
-                    switch (parameter)
-                    {
-                        case "text":
+                    if (parameter == "text") {
+                        if (MyRegex().IsMatch(SearchQuery)) {
+                            filteredResults = ApplySearchByBookingId(_allItems, SearchQuery);
+                        } else {
                             filteredResults = ApplySearch(_allItems, SearchQuery);
-                            break;
-                        case "user":
-                            filteredResults = ApplySearchByUserId(_allItems, int.Parse(SearchQuery));
-                            break;
-                        case "booking":
-                            filteredResults = ApplySearchByBookingId(_allItems, int.Parse(SearchQuery));
-                            break;
+                        }
                     }
+                            
+                } else {
+                    ErrorMessage = "Digita qualcosa nella barra di ricerca";
+                    return;
+                } 
 
-                    UpdatePaginatedItems(filteredResults);
-                }
-                else {
-                    ErrorMessage = "Please enter a search term before proceeding.";
-                }
+                UpdatePaginatedItems(filteredResults);
+            }      
 
-                
-                SearchQuery = string.Empty;
-            }
-
+            SearchQuery = string.Empty;
         }
+
+                [RelayCommand]
+        private void GoToPreviousPage()
+        {
+            if (IsPreviousPageEnabled)
+            {
+                CurrentPage--;
+                UpdatePaginatedItems(filteredResults ?? _allItems);
+            }
+        }
+
+        [RelayCommand]
+        private void GoToNextPage()
+        {
+            if (IsNextPageEnabled)
+            {
+                CurrentPage++;
+                UpdatePaginatedItems(filteredResults ?? _allItems);
+            }
+        }
+        
+
+        [GeneratedRegex("^[0-9]{1,10}?$")]
+        private static partial Regex MyRegex();
     }
-
-
 }

@@ -44,10 +44,10 @@ public class BookingService
     {
         var requestBody = new Dictionary<string, object>
         {
-            { "user_id", booking.user_id },
+            { "user_id", booking.UserId },
             { "vehicle_id", vehicleId },
-            { "start_date", booking.start_date.ToString("yyyy-MM-ddTHH:mm:ssZ")},
-            { "end_date", booking.end_date.ToString("yyyy-MM-ddTHH:mm:ssZ")}
+            { "start_date", booking.StartDate.ToString("yyyy-MM-ddTHH:mm:ssZ")},
+            { "end_date", booking.EndDate.ToString("yyyy-MM-ddTHH:mm:ssZ")}
         };
 
         return HttpService.Put<BookingResponse>($"http://localhost:8085/api/v1/booking/update/{booking.Id}", requestBody);

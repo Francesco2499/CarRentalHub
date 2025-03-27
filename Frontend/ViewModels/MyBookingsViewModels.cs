@@ -49,7 +49,7 @@ namespace Frontend.ViewModels
             {
                 BookingMessage = "Non hai ancora effettuata nessuna prenotazione";
                 IsVisibleList = false;
-                return []; // Restituisce una lista vuota invece di null
+                return [];
             }
             IsVisibleList = true;
             return bookings;
@@ -57,12 +57,7 @@ namespace Frontend.ViewModels
 
         protected override List<BookingModel> ApplySearch(List<BookingModel> items, string query)
         {
-            return [.. items.Where(b => b.vehicle_model.Contains(query, StringComparison.OrdinalIgnoreCase))];
-        }
-
-        protected override List<BookingModel> ApplySearchByBookingId(List<BookingModel> items, int query)
-        {
-            return [.. items.Where(b => b.Id == query)];
+            return [.. items.Where(b => b.VehicleModel.Contains(query, StringComparison.OrdinalIgnoreCase))];
         }
 
         [RelayCommand]
@@ -73,14 +68,12 @@ namespace Frontend.ViewModels
 
             if(_allItems != null) {
                EnableShowAll = true;
-                var bookings = new List<BookingModel>(_allItems.Where(b => b.start_date >= StartDate.Value && b.end_date <= EndDate.Value)    );
+                var bookings = new List<BookingModel>(_allItems.Where(b => b.StartDate >= StartDate.Value && b.EndDate <= EndDate.Value)    );
                 UpdatePaginatedItems(bookings);
                 if (bookings.Count == 0) {
                     ErrorMessage = "Nessun risultato trovato. Cambia i parametri di ricerca.";
                 } 
             }
-            
-            
         }
     }
 }

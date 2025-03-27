@@ -29,7 +29,7 @@ namespace Frontend.ViewModels
         {
             SuccessMessage = string.Empty;
             ErrorMessage = string.Empty;
-            EditingVehicle = new VehicleModel(0, "", "", 0, "");
+            EditingVehicle = new VehicleModel(0, "", "", 0, "", 0, 0);
             IsVisibleList = false;
             IsFormVisible = true;
         }
@@ -103,7 +103,8 @@ namespace Frontend.ViewModels
             ErrorMessage = string.Empty;
             return [.. items.Where(v =>
                     v.Model.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-                    v.Category.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)
+                    v.Category.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    v.Location.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)
                 )];
         }
 

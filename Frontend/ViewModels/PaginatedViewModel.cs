@@ -61,29 +61,10 @@ namespace Frontend.ViewModels
                 IsPaginationVisible = _allItems != null && _allItems.Count > PageSize;
                 PreviousPageOpacity = IsPreviousPageEnabled ? 1.0 : 0.5;
                 NextPageOpacity = IsNextPageEnabled ? 1.0 : 0.5;   
+                
                 if (results.Count == 0) {
                     ErrorMessage = "Nessun risultato trovato. Cambia i parametri di ricerca.";
                 }
-            }
-        }
-
-        [RelayCommand]
-        private void GoToPreviousPage()
-        {
-            if (IsPreviousPageEnabled)
-            {
-                CurrentPage--;
-                UpdatePaginatedItems(null);
-            }
-        }
-
-        [RelayCommand]
-        private void GoToNextPage()
-        {
-            if (IsNextPageEnabled)
-            {
-                CurrentPage++;
-                UpdatePaginatedItems(null);
             }
         }
         

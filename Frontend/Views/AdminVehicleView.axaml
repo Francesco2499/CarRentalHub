@@ -11,6 +11,7 @@
              
    <StackPanel Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center">
         <TextBlock Text="Gestione Veicoli" FontSize="24" FontWeight="Bold" TextAlignment="Center"/>
+
         <TextBlock Text="Puoi aggiungere nuovi veicoli, modificare quelli esistenti o eliminarli. Usa i comandi per gestire la lista dei veicoli in modo semplice e veloce." 
             Width="550" 
             FontSize="16"
@@ -22,8 +23,11 @@
 
         <StackPanel IsVisible="{Binding IsVisibleList}">
             <TextBox Text="{Binding SearchQuery}" 
-                        Watermark="Cerca per modello, marca o comune..." Width="350" Margin="10"/>
-            <Button HorizontalAlignment="Center" Content="Cerca" Command="{Binding SearchItemsCommand}" CommandParameter="text" Margin="10"/>
+                        Watermark="Cerca per modello, marca o comune" Width="350" Margin="10"/>
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <Button Content="Cerca" Command="{Binding SearchItemsCommand}" CommandParameter="text" Margin="10"/>
+                <Button Content="Mostra tutte" IsEnabled="{Binding EnableShowAll}" Command="{Binding SearchItemsCommand}" CommandParameter="all" Margin="10"/>
+            </StackPanel>
             <Grid ColumnDefinitions="2*, 2*, 2*, 2*, 2*" Background="#1e1e1e" Margin="10" Width="750">
                 <TextBlock Text="ID" Grid.Column="0" TextAlignment="Center" FontWeight="Bold" Margin="5"/>
                 <TextBlock Text="Modello" Grid.Column="1"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
@@ -32,7 +36,6 @@
                 <TextBlock Text="Comune" Grid.Column="4"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
             </Grid>
 
-            <!-- Lista delle prenotazioni -->
             <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedVehicle, Mode=TwoWay}"  Width="750">
                 <ListBox.Styles>
                     <Style Selector="ListBoxItem">
@@ -52,7 +55,6 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <!-- Paginazione -->
             <StackPanel IsVisible="{Binding IsPaginationVisible}" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
                 <Button Command="{Binding GoToPreviousPageCommand}" Margin="5" IsEnabled="{Binding IsPreviousPageEnabled}">
                     <Button.Opacity>
@@ -77,7 +79,6 @@
 
         </StackPanel>
 
-        <!-- Form per Aggiunta/Modifica -->
         <Border Background="#252525" IsVisible="{Binding IsFormVisible}" 
             CornerRadius="10" Padding="20" Width="450" 
             HorizontalAlignment="Center" BorderBrush="#444" BorderThickness="2">
@@ -109,22 +110,18 @@
             </StackPanel>
         </Border>
 
-        <TextBlock Text="{Binding ErrorMessage}" HorizontalAlignment="Center" Foreground="Red" Margin="0,10, 0, 0"/>
-        <TextBlock Text="{Binding SuccessMessage}" HorizontalAlignment="Center" Foreground="#28A745"/>
+        <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding ErrorMessage, Converter={StaticResource VisibilityConverter}}" HorizontalAlignment="Center" Foreground="Red" Margin="0,10, 0, 0"/>
+        <TextBlock Text="{Binding SuccessMessage}" IsVisible="{Binding SuccessMessage, Converter={StaticResource VisibilityConverter}}" HorizontalAlignment="Center" Foreground="#28A745"/>
 
         <Border IsVisible="{Binding IsConfirmationModalVisible}"  Background="#252525" Width="300" HorizontalAlignment="Center" VerticalAlignment="Center" Height="150" BorderBrush="#444" BorderThickness="2" CornerRadius="10" Padding="20">
             <StackPanel HorizontalAlignment="Center">
                 <TextBlock Text="Sei sicuro di voler eliminare?" Foreground="White" FontSize="16" TextAlignment="Center" Margin="10"/>
                 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Sì" HorizontalAlignment="Center" Command="{Binding ConfirmDeleteCommand}" Margin="10, 10, 10, 0" Width="75"/>
-                    <Button Content="Annulla" HorizontalAlignment="Center" Command="{Binding CancelDeleteCommand}" Margin="10, 10, 10, 0" Width="75"/>
+                    <Button Content="Sì" HorizontalAlignment="Center" Command="{Binding ConfirmDeleteCommand}" Margin="10, 10, 10, 0" />
+                    <Button Content="Annulla" HorizontalAlignment="Center" Command="{Binding CancelDeleteCommand}" Margin="10, 10, 10, 0"/>
                 </StackPanel>
             </StackPanel>
         </Border>
     </StackPanel>
-
-    <!-- Modale di conferma -->
-    
-
 </UserControl>

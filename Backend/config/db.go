@@ -91,7 +91,9 @@ func CreateTables() error {
 			model VARCHAR(255) NOT NULL,
 			category VARCHAR(255) NOT NULL,
 			price DECIMAL(10,2) NOT NULL,
-			location VARCHAR(255) NOT NULL
+			location VARCHAR(255) NOT NULL,
+			latitude DECIMAL(10,6) NOT NULL,
+			longitude DECIMAL(10,6) NOT NULL
 		);`,
 
 		`CREATE TABLE IF NOT EXISTS users (
@@ -186,7 +188,6 @@ func SeedData() error {
 				`)
 
 		//Password per test -> ADMIN: securepassword Customer:password123
-		
 
 		if err != nil {
 			return err
@@ -204,31 +205,31 @@ func SeedData() error {
 
 	if count == 0 { // Inserisce i dati solo se la tabella è vuota
 		_, err := db.Exec(`
-		INSERT INTO vehicles (model, category, price, location) VALUES 
-			('Toyota Corolla', 'Berlina', 50.00, 'Catania'),
-			('Ford Fiesta', 'Hatchback', 40.00, 'Roma'),
-			('BMW X5', 'SUV', 90.00, 'Napoli'),
-			('Audi A4', 'Berlina', 75.00, 'Catania'),
-			('Fiat Panda', 'City Car', 30.00, 'Bologna'),
-			('Mercedes-Benz GLC', 'SUV', 120.00, 'Firenze'),
-			('Tesla Model 3', 'Berlina Elettrica', 150.00, 'Milano'),
-			('Jeep Wrangler', 'SUV', 100.00, 'Palermo'),
-			('Peugeot 208', 'Hatchback', 35.00, 'Genova'),
-			('Alfa Romeo Giulietta', 'Compact', 55.00, 'Catania'),
-			('Volkswagen Golf', 'Hatchback', 45.00, 'Milano'),
-			('Renault Clio', 'Hatchback', 38.00, 'Torino'),
-			('Honda CR-V', 'SUV', 85.00, 'Bologna'),
-			('Nissan Qashqai', 'SUV', 80.00, 'Roma'),
-			('Skoda Octavia', 'Berlina', 60.00, 'Verona'),
-			('Dacia Duster', 'SUV', 65.00, 'Bari'),
-			('Maserati Levante', 'SUV', 200.00, 'Napoli'),
-			('Citroen C3', 'City Car', 33.00, 'Palermo'),
-			('Hyundai Tucson', 'SUV', 75.00, 'Genova'),
-			('Opel Corsa', 'Hatchback', 36.00, 'Cagliari'),
-			('Suzuki Jimny', 'Off-road', 70.00, 'Firenze'),
-			('Kia Sportage', 'SUV', 82.00, 'Torino'),
-			('Toyota Yaris', 'City Car', 32.00, 'Bari'),
-			('Volvo XC60', 'SUV', 95.00, 'Catania');
+		INSERT INTO vehicles (model, category, price, location, latitude, longitude) VALUES 
+			('Toyota Corolla', 'Berlina', 50.00, 'Catania', 37.502361, 15.087372),
+			('Ford Fiesta', 'Hatchback', 40.00, 'Roma', 41.906567, 12.477145),
+			('BMW X5', 'SUV', 90.00, 'Napoli', 40.842349, 14.244212),
+			('Audi A4', 'Berlina', 75.00, 'Catania', 37.508703, 15.056066),
+			('Fiat Panda', 'City Car', 30.00, 'Bologna', 44.498144, 11.339746),
+			('Mercedes-Benz GLC', 'SUV', 120.00, 'Firenze', 43.771376, 11.252829),
+			('Tesla Model 3', 'Berlina Elettrica', 150.00, 'Milano', 45.483189, 9.159212),
+			('Jeep Wrangler', 'SUV', 100.00, 'Palermo', 38.105647, 13.366171),
+			('Peugeot 208', 'Hatchback', 35.00, 'Genova', 44.406386, 8.936147),
+			('Alfa Romeo Giulietta', 'Compact', 55.00, 'Catania', 37.526029, 15.103236),
+			('Volkswagen Golf', 'Hatchback', 45.00, 'Milano', 45.435701, 9.228306),
+			('Renault Clio', 'Hatchback', 38.00, 'Torino', 45.048839, 7.678265),
+			('Honda CR-V', 'SUV', 85.00, 'Palermo', 38.100277, 13.384166),
+			('Nissan Qashqai', 'SUV', 80.00, 'Roma', 41.894634, 12.506650),
+			('Skoda Octavia', 'Berlina', 60.00, 'Verona', 45.420713, 10.976738),
+			('Dacia Duster', 'SUV', 65.00, 'Bari', 41.113745, 16.867134),
+			('Maserati Levante', 'SUV', 200.00, 'Napoli', 40.834402, 14.225204),
+			('Citroen C3', 'City Car', 33.00, 'Palermo', 38.152105, 13.341030),
+			('Hyundai Tucson', 'SUV', 75.00, 'Genova', 44.410981, 8.896543),
+			('Opel Corsa', 'Hatchback', 36.00, 'Cagliari', 39.220787, 9.125712),
+			('Suzuki Jimny', 'Off-road', 70.00, 'Verona', 45.442458, 10.996382),
+			('Kia Sportage', 'SUV', 82.00, 'Torino', 45.109337, 7.645222),
+			('Toyota Yaris', 'City Car', 32.00, 'Bari', 41.116128, 16.877928),
+			('Volvo XC60', 'SUV', 95.00, 'Catania', 37.526636, 15.083868);
 		`)
 		if err != nil {
 			return err
@@ -287,7 +288,6 @@ func SeedData() error {
 
 	return nil
 }
-
 
 func GetDB() *sql.DB {
 	if db == nil {

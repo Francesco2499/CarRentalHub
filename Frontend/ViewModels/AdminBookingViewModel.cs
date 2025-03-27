@@ -16,7 +16,6 @@ namespace Frontend.ViewModels
         [ObservableProperty] private Dictionary<int, string>  _vehicles = VehicleService.GetAllVehicles()?.Select((vehicle, index) => new { vehicle.Model, vehicle.Id }).ToDictionary(v => v.Id, v => v.Model) ?? [];
         public List<string> VehicleModels => Vehicles?.Values.ToList() ?? [];
         private string? _selectedVehicleModel;
-
         public int SelectedVehicleId { get; set; }
 
         // Proprietà che aggiorna l'ID quando viene selezionato un modello
@@ -36,7 +35,7 @@ namespace Frontend.ViewModels
         [ObservableProperty] private bool _isConfirmationModalVisible = false;
         [ObservableProperty] private string? _successMessage;
         [ObservableProperty] private bool _isFormVisible = false;
-        [ObservableProperty] private BookingModel _editingBooking = new(0, 0, 0, "", DateTime.Now, DateTime.Now, DateTime.Now, DateTime.Now);
+        [ObservableProperty] private BookingModel _editingBooking = new(0, 0, "", 0, "", 0, DateTime.Now, DateTime.Now, DateTime.Now);
 
         public AdminBookingViewModel()
         {
@@ -53,21 +52,17 @@ namespace Frontend.ViewModels
         {
             SuccessMessage = string.Empty;
             ErrorMessage = string.Empty;
-            return [.. items.Where(b => b.vehicle_model.Contains(query, StringComparison.OrdinalIgnoreCase))];
+            return [.. items.Where(b => b.VehicleModel.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                b.Username.Contains(query, StringComparison.OrdinalIgnoreCase)
+            )];
         }
 
-        protected override List<BookingModel> ApplySearchByUserId(List<BookingModel> items, int query)
+        protected override List<BookingModel> ApplySearchByBookingId(List<BookingModel> items, string query)
         {
             SuccessMessage = string.Empty;
             ErrorMessage = string.Empty;
-            return [.. items.Where(b => b.user_id == query)];
-        }
-
-        protected override List<BookingModel> ApplySearchByBookingId(List<BookingModel> items, int query)
-        {
-            SuccessMessage = string.Empty;
-            ErrorMessage = string.Empty;
-            return [.. items.Where(b => b.Id == query)];
+            Console.WriteLine(query);
+            return [.. items.Where(b => b.Id.ToString().Contains(query))];
         }
         
 
@@ -77,7 +72,7 @@ namespace Frontend.ViewModels
             SuccessMessage = string.Empty;
             ErrorMessage = string.Empty;
 
-            SelectedVehicleModel = SelectedBooking?.vehicle_model;
+            SelectedVehicleModel = SelectedBooking?.VehicleModel;
 
             if (SelectedBooking == null)
             {

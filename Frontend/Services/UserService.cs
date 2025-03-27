@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using Frontend.Models;
 using Frontend.Helpers;
-using System;
-
 namespace Frontend.Services;
 
 public class UserService
@@ -20,7 +18,7 @@ public class UserService
 
         if (loginResponse != null && !string.IsNullOrEmpty(loginResponse.Token))
         {
-            TokenService.SetToken(loginResponse.Token);
+            TokenHelper.SetToken(loginResponse.Token);
         }
 
         return loginResponse;

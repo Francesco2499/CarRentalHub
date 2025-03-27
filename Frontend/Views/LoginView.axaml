@@ -18,9 +18,9 @@
         <TextBox Watermark="Password" Width="250" Height="40" PasswordChar="*"
                  Text="{Binding Password}" />
 
-        <TextBlock Text="{Binding LoginMessage}" Foreground="Red" TextAlignment="Center"/>
+        <TextBlock Text="{Binding LoginMessage}" IsVisible="{Binding LoginMessage, Converter={StaticResource VisibilityConverter}}" Margin="0,5,0,0" Foreground="Red" TextAlignment="Center"/>
 
-        <Button Content="Accedi" Width="250" Height="40"
+        <Button Content="Accedi" Width="250" Height="40" Margin="0,10,0,0"
                 Command="{Binding SubmitLoginCommand}" Background="#007ACC"/>
 
         <Button Content="Torna Indietro" Width="250" Height="40"

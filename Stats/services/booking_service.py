@@ -28,7 +28,7 @@ def generate_booking_trend_plot(start_date=None, end_date=None):
     ax.bar(df['date'], df['booking_count'], width=0.5)
     ax.set_title("Trend Prenotazioni", fontweight='bold', fontsize=16)
     ax.set_xlabel("Periodo", fontweight='bold', fontsize=12, labelpad=10)
-    ax.set_ylabel("Numerod di prenotazioni", fontweight='bold', fontsize=12, labelpad=10)
+    ax.set_ylabel("Numero di prenotazioni", fontweight='bold', fontsize=12, labelpad=10)
     ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
 
     fig.autofmt_xdate()
@@ -50,7 +50,7 @@ def generate_revenue_per_vehicle_plot(start_date=None, end_date=None):
     
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.bar(df['vehicle_model'], df['revenue'], width=0.5)
-    ax.set_title("Revenue per Vehicle", fontweight='bold', fontsize=16)
+    ax.set_title("Guadagno per veicolo", fontweight='bold', fontsize=16)
     ax.set_xlabel("Veicoli", fontweight='bold', fontsize=12, labelpad=10)
     ax.set_ylabel("Guadagno (€)", fontweight='bold', fontsize=12, labelpad=10)
     

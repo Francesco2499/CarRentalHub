@@ -4,7 +4,7 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Frontend.Models;
-using Frontend.Services;
+using Frontend.Helpers;
 
 namespace Frontend.ViewModels;
 
@@ -34,7 +34,7 @@ public partial class UserMainViewModel : ViewModelBase
                 new(() => new AdminVehicleViewModel(), "vehicle_car_regular", "Gestisci veicoli"),
                 new(() => new AdminBookingViewModel(), "book_search_regular", "Gestisci prenotazioni"),
                 new(() => new RegisterViewModel(true), "person_regular", "Aggiungi admin"),
-                new(() => new StatsViewModel(), "document_catch_up_regularr", "Visualizza statistiche"),
+                new(() => new StatsViewModel(), "document_catch_up_regular", "Visualizza statistiche"),
                 new(() => new MainWindowViewModel(), "sign_out_regular", "Logout")  // Qui non c'è un ViewModel da creare
             ];
 
@@ -48,7 +48,7 @@ public partial class UserMainViewModel : ViewModelBase
         {
             if (value.Label == "Logout")
             {
-                TokenService.RemoveToken();
+                TokenHelper.RemoveToken();
                 Logout();  // Esegui l'azione di logout
             }
             else
