@@ -91,7 +91,9 @@ func CreateTables() error {
 			model VARCHAR(255) NOT NULL,
 			category VARCHAR(255) NOT NULL,
 			price DECIMAL(10,2) NOT NULL,
-			location VARCHAR(255) NOT NULL
+			location VARCHAR(255) NOT NULL,
+			latitude DECIMAL(10,6) NOT NULL,
+			longitude DECIMAL(10,6) NOT NULL
 		);`,
 
 		`CREATE TABLE IF NOT EXISTS users (
@@ -186,7 +188,6 @@ func SeedData() error {
 				`)
 
 		//Password per test -> ADMIN: securepassword Customer:password123
-		
 
 		if err != nil {
 			return err
@@ -204,17 +205,17 @@ func SeedData() error {
 
 	if count == 0 { // Inserisce i dati solo se la tabella è vuota
 		_, err := db.Exec(`
-			INSERT INTO vehicles (model, category, price, location) VALUES 
-				('Toyota Corolla', 'Berlina', 50.00, 'Catania'),
-				('Ford Fiesta', 'Hatchback', 40.00, 'Roma'),
-				('BMW X5', 'SUV', 90.00, 'Napoli'),
-				('Audi A4', 'Berlina', 75.00, 'Catania'),
-				('Fiat Panda', 'City Car', 30.00, 'Bologna'),
-				('Mercedes-Benz GLC', 'SUV', 120.00, 'Firenze'),
-				('Tesla Model 3', 'Berlina Elettrica', 150.00, 'Catania'),
-				('Jeep Wrangler', 'SUV', 100.00, 'Palermo'),
-				('Peugeot 208', 'Hatchback', 35.00, 'Genova'),
-				('Alfa Romeo Giulietta', 'Compact', 55.00, 'Catania');
+			INSERT INTO vehicles (model, category, price, location, latitude, longitude) VALUES 
+				('Toyota Corolla', 'Berlina', 50.00, 'Catania', 37.502361, 15.087372),
+				('Ford Fiesta', 'Hatchback', 40.00, 'Roma', 41.89332, 12.482932),
+				('BMW X5', 'SUV', 90.00, 'Napoli', 40.835885, 14.248768),
+				('Audi A4', 'Berlina', 75.00, 'Catania', 37.502361, 15.087372),
+				('Fiat Panda', 'City Car', 30.00, 'Bologna', 44.49382, 11.342633),
+				('Mercedes-Benz GLC', 'SUV', 120.00, 'Firenze', 43.769796, 11.25564),
+				('Tesla Model 3', 'Berlina Elettrica', 150.00, 'Catania', 37.502361, 15.087372),
+				('Jeep Wrangler', 'SUV', 100.00, 'Palermo', 38.111227, 13.352443),
+				('Peugeot 208', 'Hatchback', 35.00, 'Genova', 44.40726, 8.933862),
+				('Alfa Romeo Giulietta', 'Compact', 55.00, 'Catania', 37.502361, 15.087372);
 		`)
 		if err != nil {
 			return err
@@ -253,7 +254,6 @@ func SeedData() error {
 
 	return nil
 }
-
 
 func GetDB() *sql.DB {
 	if db == nil {
