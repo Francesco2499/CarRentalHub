@@ -3,7 +3,8 @@ package controllers
 import (
 	"Backend/models"
 	"Backend/services"
-	"fmt"
+
+	//"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -52,11 +53,11 @@ func CreateVehicle(c *gin.Context) {
 	}
 	if err := services.CreateVehicle(&vehicle); err != nil {
 		log.Printf("Error saving vehicle to the database: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message":"Errore nella creazione del veicolo", "error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Errore nella creazione del veicolo", "error": err.Error()})
 		return
 	}
 	log.Printf("New vehicle created successfully: %+v", vehicle)
-	c.JSON(http.StatusCreated, gin.H{"message": "Veicolo aggiunto correttamente!", "vehicle":vehicle})
+	c.JSON(http.StatusCreated, gin.H{"message": "Veicolo aggiunto correttamente!", "vehicle": vehicle})
 }
 
 func UpdateVehicle(c *gin.Context) {
@@ -76,7 +77,7 @@ func UpdateVehicle(c *gin.Context) {
 	vehicle.ID = id
 	if err := services.UpdateVehicle(&vehicle); err != nil {
 		log.Printf("Error while updating vehicle ID %d: %v", id, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message":"Errore nella modifica del veicolo", "error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Errore nella modifica del veicolo", "error": err.Error()})
 		return
 	}
 	log.Printf("Vehicle with ID %d updated successfully: %+v", id, vehicle)
@@ -100,7 +101,7 @@ func DeleteVehicle(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func GetAvailableVehicles(c *gin.Context) {
+/*func GetAvailableVehicles(c *gin.Context) {
 	log.Println("Received request to fetch available vehicles")
 
 	startDateStr := c.Query("start_date")
@@ -131,4 +132,41 @@ func GetAvailableVehicles(c *gin.Context) {
 
 	log.Printf("Successfully retrieved %d available vehicles in '%s' between %s and %s", len(vehicles), location, startDateStr, endDateStr)
 	c.JSON(http.StatusOK, vehicles)
+}*/
+
+func GetAvailableVehicles(c *gin.Context) {
+	log.Println("Received request to fetch all available vehicles in car showrooms")
+
+	startDateStr := c.Query("start_date")
+	endDateStr := c.Query("end_date")
+
+	startDate, err := time.Parse("2006-01-02", startDateStr)
+	if err != nil {
+		log.Println("Error: Invalid start_date format")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Formato start_date non valido. Usa YYYY-MM-DD.",
+		})
+		return
+	}
+
+	endDate, err := time.Parse("2006-01-02", endDateStr)
+	if err != nil {
+		log.Println("Error: Invalid end_date format")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Formato end_date non valido. Usa YYYY-MM-DD.",
+		})
+		return
+	}
+
+	carShowrooms, err := services.GetAvailableVehicles(startDate, endDate)
+	if err != nil {
+		log.Printf("Error retrieving available car showrooms: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Printf("Successfully retrieved %d car showrooms with available vehicles between %s and %s",
+		len(carShowrooms), startDateStr, endDateStr)
+
+	c.JSON(http.StatusOK, carShowrooms)
 }
