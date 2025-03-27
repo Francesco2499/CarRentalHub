@@ -1,6 +1,6 @@
-namespace Frontend.Services
+namespace Frontend.Helpers
 {
-    public static class TokenService
+    public static class TokenHelper
     {
         // Variabile statica per il token
         private static string? _accessToken;

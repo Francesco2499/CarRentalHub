@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Frontend.Models;
@@ -19,22 +20,28 @@ public partial class MyAreaViewModel : ViewModelBase
 
     public ObservableCollection<string> Regions { get; } =
     [
-        "Lombardia", "Lazio", "Sicilia", "Campania", "Veneto"
+        "Abruzzo", "Basilicata", "Calabria", "Campania", "Emilia-Romagna",
+        "Friuli-Venezia Giulia", "Lazio", "Liguria", "Lombardia", "Marche",
+        "Molise", "Piemonte", "Puglia", "Sardegna", "Sicilia",
+        "Toscana", "Trentino-Alto Adige", "Umbria", "Valle d'Aosta", "Veneto"
     ];
 
     public MyAreaViewModel(UserModel User)
     {
-        _originalUser = User;
+        _originalUser = User with { };
         EditedUser = User;
     }
 
     private bool CheckModified()
     {
-        ErrorMessage = "";
+        ErrorMessage = "";        
+        Console.WriteLine(EditedUser);
+        Console.WriteLine(_originalUser);
+
         return EditedUser.Username != _originalUser.Username ||
                         EditedUser.Email != _originalUser.Email ||
                         EditedUser.Region != _originalUser.Region ||
-                        EditedUser.Password != _originalUser.Password;    
+                        EditedUser.Password != _originalUser.Password;   
     }
 
     [RelayCommand]
@@ -47,7 +54,9 @@ public partial class MyAreaViewModel : ViewModelBase
     [RelayCommand]
     private void Save()
     {
+        SuccessMessage ="";
         ErrorMessage = "";
+        
         if (string.IsNullOrWhiteSpace(EditedUser.Email) 
         || string.IsNullOrWhiteSpace(EditedUser.Region) 
         || string.IsNullOrWhiteSpace(EditedUser.Username) 

@@ -8,53 +8,41 @@
              mc:Ignorable="d" d:DesignWidth="768" d:DesignHeight="800">
 
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20" Spacing="20">
-        <TextBlock Text="Welcome to Your Car Rental Service!" FontSize="24" FontWeight="Bold" 
+        <TextBlock Text="Benvenuto su CarRentalHub!" FontSize="24" FontWeight="Bold" 
                    HorizontalAlignment="Center" Margin="0,0,0,20"/>
-        <!-- Intestazione con immagine -->
+
         <Image Source="../Assets/home_banner.jpg" Stretch="Uniform" Height="500" Width="1300" Margin="20, 0, 20, 20"/>        
         
-        <!-- Contenitore delle Card -->
         <StackPanel Orientation="Horizontal" Spacing="30" HorizontalAlignment="Center">
 
-            <!-- Card Prenota un'Auto -->
             <Border Background="#4e4e4e" CornerRadius="10" Padding="15"
                     Width="250" Height="200">
-                
-                <Border.Styles>
-                    <Style Selector="Border:pointerover /template/ ContentPresenter">
-                        <Setter Property="Background" Value="Black"/>
-                    </Style>
-                </Border.Styles>
                 <StackPanel HorizontalAlignment="Center">
                     <Image Source="../Assets/car_icon.png" Width="50" Height="50" Margin="0,0,0,10"/>
-                    <TextBlock Text="Book a Car" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
-                    <TextBlock Text="Choose your ideal car and book it in seconds!" 
+                    <TextBlock Text="Prenota un veicolo" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
+                    <TextBlock Text="Scegli il tuo veicolo ideale e prenota in pochi secondi!" 
                                TextWrapping="Wrap" TextAlignment="Center" Margin="5"/>
                     <Button Content="Prenota un auto!" HorizontalAlignment="Center" Command="{Binding SelectCarCommand}" Margin="5"/>
                 </StackPanel>
             </Border>
 
-            <!-- Card Le Tue Prenotazioni -->
             <Border Background="#4e4e4e" CornerRadius="10" Padding="15"
-                    Width="250" Height="200"
-                    Classes="hover-card">
+                    Width="250" Height="200">
                 <StackPanel HorizontalAlignment="Center">
                     <Image Source="../Assets/calendar_icon.png" Width="50" Height="50" Margin="0,0,0,10"/>
-                    <TextBlock Text="Your Bookings" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
-                    <TextBlock Text="Check your past and upcoming reservations." 
+                    <TextBlock Text="Le tue prenotazioni" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
+                    <TextBlock Text="Controlla tutte le tue prenotazioni!" 
                                TextWrapping="Wrap" TextAlignment="Center" Margin="5"/>
                     <Button Content="Vedi le tue prenotazioni!" HorizontalAlignment="Center" Command="{Binding SelectBookingCommand}" Margin="5"/>
                 </StackPanel>
             </Border>
 
-            <!-- Card My Area -->
             <Border Background="#4e4e4e" CornerRadius="10" Padding="15"
-                    Width="250" Height="200"
-                    Classes="hover-card">
+                    Width="250" Height="200">
                 <StackPanel HorizontalAlignment="Center">
                     <Image Source="../Assets/user_icon.png" Width="50" Height="50" Margin="0,0,0,10"/>
                     <TextBlock Text="My Area" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
-                    <TextBlock Text="Manage your profile and settings." 
+                    <TextBlock Text="Gestisci e modifica il tuo profilo!" 
                                TextWrapping="Wrap" TextAlignment="Center" Margin="5"/>
                     <Button Content="Vai alla MyArea!" HorizontalAlignment="Center" Command="{Binding GoToMyAreaCommand}" Margin="5"/>
                 </StackPanel>

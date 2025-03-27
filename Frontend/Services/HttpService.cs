@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Frontend.Helpers;
 
 namespace Frontend.Services
 {
@@ -48,7 +49,7 @@ namespace Frontend.Services
             try
             {
                 // Aggiungi l'header di autorizzazione con il token, se disponibile
-                string? token = TokenService.GetToken();
+                string? token = TokenHelper.GetToken();
 
                 if (!string.IsNullOrEmpty(token))
                 {

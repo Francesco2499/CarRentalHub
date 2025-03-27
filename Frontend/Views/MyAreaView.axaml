@@ -38,7 +38,7 @@
                 <TextBlock IsVisible="{Binding ShowEditPasswordForm}" Text="Nuova Password" Foreground="White"/>
                 <TextBox IsVisible="{Binding ShowEditPasswordForm}" Text="{Binding NewPassword}" PasswordChar="*" Margin="0,0,0,10"/>
 
-                <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding ErrorMessage, Converter={StaticResource VisibilityConverter}}" Foreground="Red" HorizontalAlignment="Center"/>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20" Margin="10">
                     <Button Content="Salva modifiche" Command="{Binding SaveCommand}" Background="#28A745"/>
@@ -48,7 +48,7 @@
             </StackPanel>
         </Border>
 
-        <TextBlock Text="{Binding SuccessMessage}" Foreground="Green" HorizontalAlignment="Center"/>
+        <TextBlock Text="{Binding SuccessMessage}" IsVisible="{Binding SuccessMessage, Converter={StaticResource VisibilityConverter}}" Foreground="Green" HorizontalAlignment="Center"/>
     </StackPanel>
 
 </UserControl>

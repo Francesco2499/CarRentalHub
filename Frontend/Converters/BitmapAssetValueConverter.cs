@@ -7,15 +7,6 @@ using Avalonia.Platform;
 
 namespace Frontend.Converters;
 
-/// <summary>
-/// <para>
-/// Converts a string path to a bitmap asset.
-/// </para>
-/// <para>
-/// The asset must be in the same assembly as the program. If it isn't,
-/// specify "avares://${AssemblyNameHere}/" in front of the path to the asset.
-/// </para>
-/// </summary>
 public class BitmapAssetValueConverter : IValueConverter
 {
     public static BitmapAssetValueConverter Instance { get; } = new();

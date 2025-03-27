@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using Frontend.Models;
 using Frontend.Helpers;
-using System;
-
 namespace Frontend.Services;
 
 public class UserService
@@ -16,13 +14,11 @@ public class UserService
             { "password", PasswordHasher.HashPassword(password) }
         };
 
-        Console.WriteLine(PasswordHasher.HashPassword(password));
-
         var loginResponse = HttpService.Post<LoginResponse>("http://localhost:8085/api/v1/auth/login", requestBody);
 
         if (loginResponse != null && !string.IsNullOrEmpty(loginResponse.Token))
         {
-            TokenService.SetToken(loginResponse.Token);
+            TokenHelper.SetToken(loginResponse.Token);
         }
 
         return loginResponse;
@@ -34,7 +30,7 @@ public class UserService
         {
             { "email", email },
             { "username", username },
-            { "password", password },
+            { "password", PasswordHasher.HashPassword(password) },
             { "region", region },
             { "role", isAdmin ? "admin" : "" }
         };
@@ -53,8 +49,8 @@ public class UserService
 
         if (!string.IsNullOrEmpty(newPassword))
         {
-            requestBody["password"] = user.Password;
-            requestBody["new_password"] = newPassword;
+            requestBody["password"] = PasswordHasher.HashPassword(user.Password);
+            requestBody["new_password"] = PasswordHasher.HashPassword(newPassword);
         }
 
         return HttpService.Put<RegistrationResponse>("http://localhost:8085/api/v1/user/update/me", requestBody);
