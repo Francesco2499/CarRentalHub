@@ -6,5 +6,5 @@ __pycache__/
 *.log
 *.pyc
 *.sln
-*.png
+Stats/static/images
 .DS_Store
