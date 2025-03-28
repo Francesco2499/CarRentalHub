@@ -34,9 +34,7 @@ public partial class MyAreaViewModel : ViewModelBase
 
     private bool CheckModified()
     {
-        ErrorMessage = "";        
-        Console.WriteLine(EditedUser);
-        Console.WriteLine(_originalUser);
+        ErrorMessage = "";
 
         return EditedUser.Username != _originalUser.Username ||
                         EditedUser.Email != _originalUser.Email ||

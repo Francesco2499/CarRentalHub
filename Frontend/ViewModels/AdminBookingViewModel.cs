@@ -47,12 +47,9 @@ namespace Frontend.ViewModels
             set
             {
                 if (SelectedBooking != null) {
-                                        Console.WriteLine("1"+AllVehicles.Count);
-
                     SetProperty(ref _newEndDate, value);
                     EditingBooking = SelectedBooking with {StartDate = NewStartDate, EndDate = value};
                     AllVehicles = GetVehicles();
-                    Console.WriteLine("2" + AllVehicles.Count);
                 }
             }
         }
@@ -120,7 +117,6 @@ namespace Frontend.ViewModels
         {
             SuccessMessage = string.Empty;
             ErrorMessage = string.Empty;
-            Console.WriteLine(query);
             return [.. items.Where(b => b.Id.ToString().Contains(query))];
         }
         
@@ -141,7 +137,6 @@ namespace Frontend.ViewModels
             NewStartDate = SelectedBooking.StartDate;
             NewEndDate = SelectedBooking.EndDate;
 
-            Console.WriteLine(AllVehicles.Count);
             AllVehicles.Add((SelectedBooking.VehicleModel, SelectedBooking.VehicleId));
             VehicleNameList = [.. AllVehicles.Select((v) => { return v.VehicleModel;})];    
             SelectedVehicleModel = SelectedBooking.VehicleModel;
@@ -175,7 +170,6 @@ namespace Frontend.ViewModels
                 } else {
                     ErrorMessage = bookingResponse?.Message ?? "Errore nella modifica della prenotazione!";
                 }
-                Console.WriteLine(SelectedVehicleId);
             }
             catch (Exception ex)
             {
