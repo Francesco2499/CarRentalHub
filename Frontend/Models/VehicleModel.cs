@@ -1,3 +1,6 @@
+using System;
+using System.Text.Json.Serialization;
+
 namespace Frontend.Models;
 
 public record VehicleModel(
@@ -5,8 +8,8 @@ public record VehicleModel(
     string Model,
     string Category,
     decimal Price,
-    string Location,
-    float Latitude,
-    float Longitude
+    [property: JsonPropertyName("car_showroom_id")] int CarShowroomID,
+    [property: JsonPropertyName("car_showroom_name")] string ShowroomName
+
 );
 

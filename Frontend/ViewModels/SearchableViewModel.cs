@@ -19,6 +19,10 @@ namespace Frontend.ViewModels
             return items;
         }
 
+        public void ResetPagination() {
+            UpdatePaginatedItems(_allItems);
+        }
+
         [RelayCommand]
         private void SearchItems(string parameter)
         {
@@ -27,7 +31,7 @@ namespace Frontend.ViewModels
                 filteredResults = _allItems;
 
                 if (parameter == "all") {
-                    UpdatePaginatedItems(filteredResults);
+                    UpdatePaginatedItems(filteredResults, true);
                     EnableShowAll = false;
                     SearchQuery = string.Empty;
                     return;
@@ -49,7 +53,7 @@ namespace Frontend.ViewModels
                     return;
                 } 
 
-                UpdatePaginatedItems(filteredResults);
+                UpdatePaginatedItems(filteredResults, true);
             }      
 
             SearchQuery = string.Empty;

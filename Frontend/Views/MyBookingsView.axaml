@@ -34,7 +34,7 @@
 
             <Button Content="Mostra tutte" IsEnabled="{Binding EnableShowAll}" Command="{Binding SearchItemsCommand}" HorizontalAlignment="Center" CommandParameter="all" Margin="5"/>
 
-            <Grid ColumnDefinitions="2*, 2*, 2*, 2*, 2*" Background="#1e1e1e" Margin="10" Width="650">
+            <Grid ColumnDefinitions="2*, 2*, 2*, 2*, 2*" Background="#1e1e1e" Margin="10" Width="700">
                 <TextBlock Text="Veicolo" Grid.Column="0" TextAlignment="Center" FontWeight="Bold" Margin="5"/>
                 <TextBlock Text="Prezzo" Grid.Column="1" TextAlignment="Center" FontWeight="Bold" Margin="5"/>
                 <TextBlock Text="Inizio" Grid.Column="2"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
@@ -42,7 +42,7 @@
                 <TextBlock Text="Creazione" Grid.Column="4"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
             </Grid>
 
-            <ListBox ItemsSource="{Binding Items}" Width="650">
+            <ListBox ItemsSource="{Binding Items}" Width="700">
                 <ListBox.Styles>
                     <Style Selector="ListBoxItem">
                         <Setter Property="Padding" Value="8" />
@@ -66,14 +66,14 @@
                     <Button.Opacity>
                         <Binding Path="PreviousPageOpacity" />
                     </Button.Opacity>
-                    <PathIcon Data="{Binding Source=chevron_left_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Width="14"/>
+                    <PathIcon Data="{Binding Source=chevron_left_regular, Converter={x:Static converters:TypeConverters.IconConverter}}"  Height="10" Width="8"/>
                 </Button>
 
                 <Button Command="{Binding GoToNextPageCommand}" Margin="5" IsEnabled="{Binding IsNextPageEnabled}">
                     <Button.Opacity>
                         <Binding Path="NextPageOpacity" />
                     </Button.Opacity>
-                    <PathIcon Data="{Binding Source=chevron_right_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Width="14"/>
+                    <PathIcon Data="{Binding Source=chevron_right_regular, Converter={x:Static converters:TypeConverters.IconConverter}}"  Height="10" Width="8"/>
                 </Button>
             </StackPanel>
 

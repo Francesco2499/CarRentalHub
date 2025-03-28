@@ -42,7 +42,7 @@ namespace Frontend.ViewModels
             LoadItems();
         }
 
-        protected override List<BookingModel>? LoadAllItemsAsync()
+        protected override List<BookingModel>? LoadAllItems()
         {
             var bookings = BookingService.GetAllBookings();
             if (bookings == null || bookings.Count == 0)
@@ -69,7 +69,7 @@ namespace Frontend.ViewModels
             if(_allItems != null) {
                EnableShowAll = true;
                 var bookings = new List<BookingModel>(_allItems.Where(b => b.StartDate >= StartDate.Value && b.EndDate <= EndDate.Value)    );
-                UpdatePaginatedItems(bookings);
+                UpdatePaginatedItems(bookings, false);
                 if (bookings.Count == 0) {
                     ErrorMessage = "Nessun risultato trovato. Cambia i parametri di ricerca.";
                 } 

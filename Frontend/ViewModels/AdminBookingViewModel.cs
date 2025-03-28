@@ -12,11 +12,47 @@ namespace Frontend.ViewModels
 {
     public partial class AdminBookingViewModel : SearchableViewModel<BookingModel>
     {
-        [ObservableProperty] private BookingModel? _selectedBooking;
-        [ObservableProperty] private Dictionary<int, string>  _vehicles = VehicleService.GetAllVehicles()?.Select((vehicle, index) => new { vehicle.Model, vehicle.Id }).ToDictionary(v => v.Id, v => v.Model) ?? [];
-        public List<string> VehicleModels => Vehicles?.Values.ToList() ?? [];
+        [ObservableProperty] private BookingModel? _selectedBooking = null;
+        [ObservableProperty] public List<(string VehicleModel, int VehicleId)> _allVehicles = [];
+
+        [ObservableProperty] private List<string> _vehicleNameList = [];
+        
+               
         private string? _selectedVehicleModel;
         public int SelectedVehicleId { get; set; }
+
+        public DateTime _newStartDate;
+
+        public DateTime NewStartDate
+        {
+            get => _newStartDate;
+            set
+            {
+                if (SelectedBooking != null) {
+                    
+                    SetProperty(ref _newStartDate, value);
+                    EditingBooking = SelectedBooking with {StartDate = value, EndDate = NewEndDate};
+                    AllVehicles = GetVehicles();
+                    
+                }
+
+            }
+        }
+
+        public DateTime _newEndDate;
+
+        public DateTime NewEndDate
+        {
+            get => _newEndDate;
+            set
+            {
+                if (SelectedBooking != null) {
+                    SetProperty(ref _newEndDate, value);
+                    EditingBooking = SelectedBooking with {StartDate = NewStartDate, EndDate = value};
+                    AllVehicles = GetVehicles();
+                }
+            }
+        }
 
         // Proprietà che aggiorna l'ID quando viene selezionato un modello
         public string? SelectedVehicleModel
@@ -27,8 +63,8 @@ namespace Frontend.ViewModels
                 if (SetProperty(ref _selectedVehicleModel, value))
                 {
                     // Quando il valore cambia, aggiorna l'ID corrispondente
-                    var selectedVehicle = Vehicles?.FirstOrDefault(v => v.Value == value);
-                    SelectedVehicleId = selectedVehicle?.Key ?? 0;
+                    var selectedVehicle = AllVehicles?.FirstOrDefault(v => v.VehicleModel == value);
+                    SelectedVehicleId = selectedVehicle?.VehicleId ?? 0;
                 }
             }
         }
@@ -39,11 +75,31 @@ namespace Frontend.ViewModels
 
         public AdminBookingViewModel()
         {
+            AllVehicles = GetVehicles();
             IsVisibleList = true;
             LoadItems();
         }
 
-        protected override List<BookingModel>? LoadAllItemsAsync()
+        protected List<(string VehicleModel, int VehicleId)> GetVehicles()
+        {
+                var allVehicles = new List<(string VehicleModel, int VehicleId)>();
+
+                // Itera su tutti gli showroom
+                foreach (var showroom in VehicleService.GetAvailableShowrooms(EditingBooking.StartDate, EditingBooking.EndDate))
+                {
+                    // Aggiungi ogni veicolo come una tupla alla lista
+                    foreach (var vehicle in showroom.Vehicles) // 'Vehicles' contiene i veicoli dello showroom
+                    {
+                        allVehicles.Add((vehicle.Model, vehicle.Id));
+                    }
+                }
+
+                VehicleNameList = [.. allVehicles.Select((v) => { return v.VehicleModel;})];    
+
+                return allVehicles;
+        }
+
+        protected override List<BookingModel>? LoadAllItems()
         {
             return BookingService.GetAllBookings();
         }
@@ -61,7 +117,6 @@ namespace Frontend.ViewModels
         {
             SuccessMessage = string.Empty;
             ErrorMessage = string.Empty;
-            Console.WriteLine(query);
             return [.. items.Where(b => b.Id.ToString().Contains(query))];
         }
         
@@ -72,14 +127,20 @@ namespace Frontend.ViewModels
             SuccessMessage = string.Empty;
             ErrorMessage = string.Empty;
 
-            SelectedVehicleModel = SelectedBooking?.VehicleModel;
 
             if (SelectedBooking == null)
             {
                 ErrorMessage = "Seleziona una prenotazione da modificare.";
                 return;
             }
-            
+
+            NewStartDate = SelectedBooking.StartDate;
+            NewEndDate = SelectedBooking.EndDate;
+
+            AllVehicles.Add((SelectedBooking.VehicleModel, SelectedBooking.VehicleId));
+            VehicleNameList = [.. AllVehicles.Select((v) => { return v.VehicleModel;})];    
+            SelectedVehicleModel = SelectedBooking.VehicleModel;
+        
 
             EditingBooking = SelectedBooking with { };
             IsVisibleList = false;
@@ -109,7 +170,6 @@ namespace Frontend.ViewModels
                 } else {
                     ErrorMessage = bookingResponse?.Message ?? "Errore nella modifica della prenotazione!";
                 }
-                Console.WriteLine(SelectedVehicleId);
             }
             catch (Exception ex)
             {
