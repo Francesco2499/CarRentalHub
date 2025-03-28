@@ -101,64 +101,38 @@ func DeleteVehicle(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-/*func GetAvailableVehicles(c *gin.Context) {
-	log.Println("Received request to fetch available vehicles")
-
-	startDateStr := c.Query("start_date")
-	endDateStr := c.Query("end_date")
-	location := c.Query("location")
-
-	startDate, err := time.Parse("2006-01-02", startDateStr)
-
-	if err != nil {
-		log.Println("Error: Invalid start_date format")
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Formato non valido. Usa YYYY-MM-DD.", "error": fmt.Errorf("")})
-		return
-	}
-
-	endDate, err := time.Parse("2006-01-02", endDateStr)
-	if err != nil {
-		log.Println("Error: Invalid end_date format")
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Formato non valido. Usa YYYY-MM-DD.", "error": fmt.Errorf("")})
-		return
-	}
-
-	vehicles, err := services.GetAvailableVehicles(startDate, endDate, location)
-	if err != nil {
-		log.Printf("Error retrieving available vehicles: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	log.Printf("Successfully retrieved %d available vehicles in '%s' between %s and %s", len(vehicles), location, startDateStr, endDateStr)
-	c.JSON(http.StatusOK, vehicles)
-}*/
-
 func GetAvailableVehicles(c *gin.Context) {
 	log.Println("Received request to fetch all available vehicles in car showrooms")
 
 	startDateStr := c.Query("start_date")
 	endDateStr := c.Query("end_date")
 
-	startDate, err := time.Parse("2006-01-02", startDateStr)
-	if err != nil {
-		log.Println("Error: Invalid start_date format")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Formato start_date non valido. Usa YYYY-MM-DD.",
-		})
-		return
+	var startDatePtr, endDatePtr *time.Time
+
+	if startDateStr != "" && endDateStr != "" {
+		startDate, err := time.Parse("2006-01-02", startDateStr)
+		if err != nil {
+			log.Println("Error: Invalid start_date format")
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Formato start_date non valido. Usa YYYY-MM-DD.",
+			})
+			return
+		}
+
+		endDate, err := time.Parse("2006-01-02", endDateStr)
+		if err != nil {
+			log.Println("Error: Invalid end_date format")
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Formato end_date non valido. Usa YYYY-MM-DD.",
+			})
+			return
+		}
+
+		startDatePtr = &startDate
+		endDatePtr = &endDate
 	}
 
-	endDate, err := time.Parse("2006-01-02", endDateStr)
-	if err != nil {
-		log.Println("Error: Invalid end_date format")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Formato end_date non valido. Usa YYYY-MM-DD.",
-		})
-		return
-	}
-
-	carShowrooms, err := services.GetAvailableVehicles(startDate, endDate)
+	carShowrooms, err := services.GetAvailableVehicles(startDatePtr, endDatePtr)
 	if err != nil {
 		log.Printf("Error retrieving available car showrooms: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

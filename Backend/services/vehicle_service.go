@@ -85,29 +85,17 @@ func GetVehicleById(id int) (*models.Vehicle, error) {
 	return vehicle, nil
 }
 
-/*func GetAvailableVehicles(startDate, endDate time.Time, location string) ([]models.Vehicle, error) {
-	cacheKey := fmt.Sprintf("available_vehicles_%s_%s_%s", location, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
+func GetAvailableVehicles(startDate, endDate *time.Time) ([]models.CarShowroomVehiclesDTO, error) {
 
-	if cachedData, found := cache.VehicleCache.Get(cacheKey); found {
-		log.Println("Available vehicles found in cache")
-		return cachedData.([]models.Vehicle), nil
+	var cacheKey string
+	if startDate != nil && endDate != nil {
+		cacheKey = fmt.Sprintf("available_vehicles_%s_%s", startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
+	} else {
+		cacheKey = "all_vehicles_nodates"
 	}
 
-	vehicles, err := repositories.GetAvailableVehicles(startDate, endDate, location)
-	if err != nil {
-		return nil, err
-	}
-
-	// Salva in cache
-	cache.VehicleCache.Set(cacheKey, vehicles)
-	return vehicles, nil
-}*/
-
-func GetAvailableVehicles(startDate, endDate time.Time) ([]models.CarShowroomVehiclesDTO, error) {
-	cacheKey := fmt.Sprintf("available_vehicles_%s_%s", startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
-
 	if cachedData, found := cache.VehicleCache.Get(cacheKey); found {
-		log.Println("Available vehicles in car showrooms found in cache")
+		log.Println("Car showroom vehicles found in cache")
 		return cachedData.([]models.CarShowroomVehiclesDTO), nil
 	}
 
@@ -116,7 +104,6 @@ func GetAvailableVehicles(startDate, endDate time.Time) ([]models.CarShowroomVeh
 		return nil, err
 	}
 
-	// Salva in cache
 	cache.VehicleCache.Set(cacheKey, vehicles)
 	return vehicles, nil
 }

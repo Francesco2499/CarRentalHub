@@ -6,8 +6,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-
-	//"log"
 	"time"
 )
 
@@ -126,55 +124,35 @@ func DeleteVehicle(id int) error {
 	return nil
 }
 
-/*func GetAvailableVehicles(startDate, endDate time.Time, location string) ([]models.Vehicle, error) {
-	db := config.GetDB()
-	query := `SELECT id, model, category, price, location, latitude, longitude
-		FROM vehicles
-		WHERE id NOT IN (
-			SELECT vehicle_id FROM bookings
-			WHERE (start_date, end_date) OVERLAPS ($1, $2)
-		) AND LOWER(location) = LOWER($3)`
-	// overlaps = start_date <= param_end AND end_date >= param_start
+func GetAvailableVehicles(startDate, endDate *time.Time) ([]models.CarShowroomVehiclesDTO, error) {
 
-	rows, err := db.Query(query, startDate, endDate, location)
-	if err != nil {
-		return nil, fmt.Errorf("error retrieving available vehicles: %w", err)
-	}
-	defer rows.Close()
-
-	//var vehicles []models.Vehicle
-	vehicles := make([]models.Vehicle, 0)
-	for rows.Next() {
-		var vehicle models.Vehicle
-		if err := rows.Scan(&vehicle.ID, &vehicle.Model, &vehicle.Category, &vehicle.Price, &vehicle.Location, &vehicle.Latitude, &vehicle.Longitude); err != nil {
-			return nil, fmt.Errorf("error scanning vehicle data: %w", err)
-		}
-		vehicles = append(vehicles, vehicle)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error after iteration: %w", err)
-	}
-	return vehicles, nil
-}*/
-
-// GetAvailableCarShowroomsWithVehicles
-func GetAvailableVehicles(startDate, endDate time.Time) ([]models.CarShowroomVehiclesDTO, error) {
 	db := config.GetDB()
 
-	query := `SELECT cs.id, cs.name, cs.location, cs.latitude, cs.longitude,
-				v.id, v.model, v.category, v.price, v.car_showroom_id
-			FROM car_showrooms cs
-			JOIN vehicles v ON cs.id = v.car_showroom_id
-			WHERE v.id NOT IN (
-					SELECT vehicle_id FROM bookings 
-					WHERE (start_date, end_date) OVERLAPS ($1, $2)
-				)
-			ORDER BY cs.id;`
+	var rows *sql.Rows
+	var err error
 
-	rows, err := db.Query(query, startDate, endDate)
+	if startDate != nil && endDate != nil {
+		query := `SELECT cs.id, cs.name, cs.location, cs.latitude, cs.longitude,
+						v.id, v.model, v.category, v.price, v.car_showroom_id
+					FROM car_showrooms cs
+					JOIN vehicles v ON cs.id = v.car_showroom_id
+					WHERE v.id NOT IN (
+							SELECT vehicle_id FROM bookings 
+							WHERE (start_date, end_date) OVERLAPS ($1, $2)
+						)
+					ORDER BY cs.id;`
+		rows, err = db.Query(query, *startDate, *endDate)
+	} else {
+		query := `SELECT cs.id, cs.name, cs.location, cs.latitude, cs.longitude,
+						v.id, v.model, v.category, v.price, v.car_showroom_id
+					FROM car_showrooms cs
+					JOIN vehicles v ON cs.id = v.car_showroom_id
+					ORDER BY cs.id;`
+		rows, err = db.Query(query)
+	}
+
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving available vehicles: %w", err)
+		return nil, fmt.Errorf("error retrieving vehicles: %w", err)
 	}
 	defer rows.Close()
 
@@ -197,8 +175,7 @@ func GetAvailableVehicles(startDate, endDate time.Time) ([]models.CarShowroomVeh
 			vShowroomID int
 		)
 
-		err := rows.Scan(&csID, &csName, &csLocation, &csLat, &csLong, &vID, &vModel, &vCategory, &vPrice, &vShowroomID)
-		if err != nil {
+		if err := rows.Scan(&csID, &csName, &csLocation, &csLat, &csLong, &vID, &vModel, &vCategory, &vPrice, &vShowroomID); err != nil {
 			return nil, fmt.Errorf("error scanning row: %w", err)
 		}
 
@@ -224,7 +201,6 @@ func GetAvailableVehicles(startDate, endDate time.Time) ([]models.CarShowroomVeh
 		})
 	}
 
-	// Convert map to slice
 	result := make([]models.CarShowroomVehiclesDTO, 0, len(showroomMap))
 	for _, showroom := range showroomMap {
 		result = append(result, *showroom)
