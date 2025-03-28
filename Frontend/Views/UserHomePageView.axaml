@@ -11,7 +11,7 @@
         <TextBlock Text="Benvenuto su CarRentalHub!" FontSize="24" FontWeight="Bold" 
                    HorizontalAlignment="Center" Margin="0,0,0,10"/>
 
-        <Image Source="../Assets/home_banner.jpg" Stretch="UniformToFill" Height="470" Width="1200" Margin="20, 0, 20, 20"/>        
+        <Image Source="../Assets/home_banner.jpg" Stretch="UniformToFill" Height="450" Width="800" Margin="15, 0, 15, 15"/>        
         
         <StackPanel Orientation="Horizontal" Spacing="30" HorizontalAlignment="Center">
 
