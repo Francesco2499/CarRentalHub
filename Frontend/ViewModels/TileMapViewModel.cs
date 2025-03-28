@@ -8,6 +8,10 @@ using Mapsui.Projections;
 using System.Linq;
 using Frontend.Services;
 using Frontend.Models;
+using System.Collections.Generic;
+using Mapsui.Widgets;
+using System.Reflection.Metadata.Ecma335;
+using System;
 
 namespace Frontend.ViewModels;
 public class TileMapViewModel : ViewModelBase
@@ -29,20 +33,12 @@ public class TileMapViewModel : ViewModelBase
 
         var (x1, y2) = SphericalMercator.FromLonLat(12.4964, 41.9028);
         var centerPoint = new MPoint(x1, y2);
-        var vehicles = VehicleService.GetAllVehicles();
 
-            // Per ogni veicolo, crea un marker sulla mappa
-        foreach (var vehicle in vehicles)
-        {
-            var (x, y) = SphericalMercator.FromLonLat(vehicle.Longitude, vehicle.Latitude);
-            var point = new MPoint(x, y);
-
-            // Aggiungi il marker per ogni veicolo
-            MapView.Layers.Add(CreateMarkerLayer(point, vehicle));
-        }
+        MapView.Layers.Add(CreateMarkerLayer());
+        
         MapView.Info += MapOnInfo;
 
-        MapView.Home = n => n.CenterOnAndZoomTo(MapView.Layers[1].Extent!.Centroid, n.Resolutions[7]);
+        MapView.Home = n => n.CenterOnAndZoomTo(MapView.Layers[1].Extent!.Centroid, n.Resolutions[6]);
 
     }
 
@@ -56,53 +52,49 @@ public class TileMapViewModel : ViewModelBase
         }
     }
 
-private static MemoryLayer CreateMarkerLayer(MPoint position, VehicleModel vehicle)
-        {
-            var feature = new PointFeature(position);
-            feature.Styles.Clear();
-
-            // Aggiungi le informazioni del veicolo
-            feature[nameof(VehicleModel.Id)] = vehicle.Id.ToString();
-            feature[nameof(VehicleModel.Model)] = vehicle.Model;
-            feature[nameof(VehicleModel.Category)] = vehicle.Category;
-            feature[nameof(VehicleModel.Price)] = vehicle.Price.ToString("C"); // Formatta il prezzo come valuta
-
-            // Aggiungi lo stile del callout
-            feature.Styles.Add(CreateCalloutStyle(vehicle));
-
-            return new MemoryLayer
-            {
-                Name = "VehicleMarkers",
-                IsMapInfoLayer = true,
-                Features = new MemoryProvider(feature).Features,
-                Style = SymbolStyles.CreatePinStyle(symbolScale: 0.7) // Puoi cambiare l'icona del marker se lo desideri
-            };
-        }
-        private static CalloutStyle CreateCalloutStyle(VehicleModel vehicle)
-        {
-            string price = vehicle.Price.ToString("C");
-            string id = vehicle.Id.ToString("");
-            // Crea un callout che mostra le informazioni del veicolo
-            return new CalloutStyle
-            {
-                Title = $"Modello: {vehicle.Model}\nCategoria:{vehicle.Category}\nID: {vehicle.Id}\nPrice: {vehicle.Price:C}",
-                TitleFont = { FontFamily = null, Size = 14, Italic = false, Bold = true }, // Font più grande
-                TitleFontColor = Color.FromArgb(255, 40, 167, 69), // Testo più visibile
-                Color = Color.FromArgb(255, 40, 167, 69),
-                MaxWidth = 200, // Più spazio per il testo
-                RectRadius = 10,
-                ShadowWidth = 5,
-                Enabled = false,  // Disabilita per renderlo visibile solo quando richiesto
-                SymbolOffset = new Offset(0, 30), // Posiziona il callout sopra il marker
-            };
-        }
-
-    private class City
+    private static MemoryLayer CreateMarkerLayer()
     {
-        public string? Country { get; set; }
-        public string? Name { get; set; }
-        public double Lat { get; set; }
-        public double Lng { get; set; }
+        return new MemoryLayer
+        {
+            Name = "VehicleMarkers",
+            IsMapInfoLayer = true,
+            Features = new MemoryProvider(GetLocationFromShowrooms()).Features,
+            Style = SymbolStyles.CreatePinStyle(symbolScale: 0.7) // Puoi cambiare l'icona del marker se lo desideri
+        };
+    }
+
+    private static IEnumerable<IFeature> GetLocationFromShowrooms()
+    {
+        var showrooms = VehicleService.GetAvailableShowrooms(null, null);
+
+        return showrooms.Select(c =>
+        {
+            var feature = new PointFeature(SphericalMercator.FromLonLat(c.Longitude, c.Latitude).ToMPoint());
+            feature.Styles.Add(CreateCalloutStyle(c.Name + "\n\n", "Lista veicoli:\n" + string.Join(", ", c.Vehicles.Select(v => $"\n{v.Model} ({v.Category}, {v.Price})"))));
+            return feature;
+        });
+    }
+
+    private static CalloutStyle CreateCalloutStyle(string title, string content)
+    {
+        // Crea un callout che mostra le informazioni del veicolo
+        return new CalloutStyle
+        {
+            Type = CalloutType.Detail,
+            Title = title,
+            Subtitle = content,
+            TitleTextAlignment = Alignment.Center,
+            SubtitleFont = { FontFamily = null, Size = 14, Italic = false, Bold = false }, // Font più grande
+            TitleFont = { FontFamily = null, Size = 14, Italic = false, Bold = true }, // Font più grande
+            TitleFontColor = Color.White, // Testo più visibile
+            SubtitleFontColor = Color.White,
+            BackgroundColor = Color.FromArgb(255, 78, 78, 78),
+            MaxWidth = 250,
+            RectRadius = 10,
+            ShadowWidth = 5,
+            Enabled = false,  // Disabilita per renderlo visibile solo quando richiesto
+            SymbolOffset = new Offset(0, 30), // Posiziona il callout sopra il marker
+        };
     }
 }
 

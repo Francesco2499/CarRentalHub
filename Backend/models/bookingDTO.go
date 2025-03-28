@@ -16,6 +16,7 @@ import "time"
 type BookingDTO struct {
 	ID           int       `json:"id"`
 	Username     string    `json:"username"`
+	VehicleID    int       `json:"vehicle_id"`
 	VehicleModel string    `json:"vehicle_model"`
 	StartDate    time.Time `json:"start_date"`
 	EndDate      time.Time `json:"end_date"`

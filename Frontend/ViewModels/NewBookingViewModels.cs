@@ -11,8 +11,15 @@ using Frontend.Services;
 
 namespace Frontend.ViewModels
 {
-    public partial class NewBookingViewModel : SearchableViewModel<VehicleModel>
+    public partial class NewBookingViewModel : ViewModelBase
     {
+        public SearchShowroomViewModel ShowroomSearch { get; } = new();
+        public SearchVehicleViewModel VehicleSearch { get; } = new();
+
+        [ObservableProperty] private VehicleModel? _selectedVehicle;
+        [ObservableProperty] private ShowroomModel? _selectedShowroom;    
+        [ObservableProperty] private string _errorMessage = string.Empty;  
+
         [ObservableProperty] private BookingModel? _booking;
 
         [ObservableProperty] private bool _isBookingSummaryVisible = false;
@@ -27,85 +34,69 @@ namespace Frontend.ViewModels
 
         [ObservableProperty] private string _location = string.Empty;
 
-        [ObservableProperty] private VehicleModel? _selectedVehicle;
-
-        private DateTime? _startDate;
-        public DateTime? StartDate
-        {
-            get => _startDate;
-            set
-            {
-                SetProperty(ref _startDate, value);
-                
-                // Imposta EndDate al giorno successivo, solo se StartDate è selezionata
-                if (value.HasValue)
-                {
-                    EndDate = value.Value.AddDays(1);
-                }
-            }
-        }
-
-        [ObservableProperty]
-        private DateTime? _endDate;
-        protected override List<VehicleModel>? LoadAllItemsAsync()
-        {
-            return VehicleService.GetVehiclesByDate(StartDate, EndDate, Location);
-        }
-
         [RelayCommand]
-        private void SearchVehicles()
+        private void SearchShowrooms()
         {
             // Resetta il messaggio di errore all'inizio
             FirstErrorMessage = string.Empty;
 
             // Verifica che entrambe le date siano selezionate
-            if (StartDate == null || EndDate == null)
+            if (ShowroomSearch.StartDate == null || ShowroomSearch.EndDate == null)
             {
                 FirstErrorMessage = "Seleziona entrambe le date (inizio e fine).";
                 return;
             }
 
             // Verifica che la data di inizio non sia nel passato
-            if (StartDate.Value.Date < DateTime.Today)
+            if (ShowroomSearch.StartDate.Value.Date < DateTime.Today)
             {
                 FirstErrorMessage = "La data di inizio non può essere nel passato.";
                 return;
             }
 
             // Verifica che la data di fine non sia prima della data di inizio
-            if (EndDate.Value.Date < StartDate.Value.Date)
+            if (ShowroomSearch.EndDate.Value.Date < ShowroomSearch.StartDate.Value.Date)
             {
                 FirstErrorMessage = "La data di fine non può essere prima della data di inizio.";
                 return;
             }
 
-            if (Location == string.Empty)
+            // Se tutte le verifiche sono superate, mostra la lista
+            ShowroomSearch.LoadItems();
+
+            if (ShowroomSearch.Items != null && ShowroomSearch.Items is { Count: > 0 })
             {
-                FirstErrorMessage = "Inserisci un comune per la tua ricerca!";
+                ShowroomSearch.IsVisibleList = true;
+                IsVisibleSearchDate = false;    
+            } else {
+                BookingMessage = "Nelle date richieste on ci sono auto disponibili per l'autosalone selezionato";
+            }
+        }
+
+        [RelayCommand]
+        private void SearchVehicles()
+        {
+            if (SelectedShowroom == null)
+            {
+                ErrorMessage = "Seleziona entrambe le date (inizio e fine).";
                 return;
             }
 
+            ShowroomSearch.IsVisibleList = false;
+
             // Se tutte le verifiche sono superate, mostra la lista
-            LoadItems();
-            
-            if (Items != null && Items is { Count: > 0 })
+            VehicleSearch.SetShowroom(SelectedShowroom);
+
+            if (VehicleSearch.Items != null && VehicleSearch.Items is { Count: > 0 })
             {
-                IsVisibleList = true;
+                VehicleSearch.IsVisibleList = true;
                 IsVisibleSearchDate = false;    
             } else {
-                BookingMessage = "Non ci sono auto disponibili per i parametri selezionati!";
+                BookingMessage = "Nelle date richieste on ci sono auto disponibili per l'autosalone selezionato";
             }
         }
 
-        protected override List<VehicleModel> ApplySearch(List<VehicleModel> items, string query)
-        {
-            return [.. items.Where(v =>
-                    v.Model.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-                    v.Category.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) 
-                )];
-        }
-
-
+    
         [RelayCommand]
         private void AddBooking()
         {
@@ -115,7 +106,7 @@ namespace Frontend.ViewModels
                 return;
             }  
 
-            var bookingResponse = BookingService.AddBooking(SelectedVehicle.Id, StartDate, EndDate);
+            var bookingResponse = BookingService.AddBooking(SelectedVehicle.Id, ShowroomSearch.StartDate, ShowroomSearch.EndDate);
             
             if (bookingResponse?.Booking != null)
             {
@@ -123,7 +114,8 @@ namespace Frontend.ViewModels
                 ErrorMessage = string.Empty;
                 IsBookingSummaryVisible = true;
                 IsVisibleSubTitle = false;
-                IsVisibleList = false;
+                ShowroomSearch.IsVisibleList = false;
+                VehicleSearch.IsVisibleList = false;
             } else
             {
                 ErrorMessage = bookingResponse?.Message ?? "Errore nella prenotazione!";
@@ -135,11 +127,13 @@ namespace Frontend.ViewModels
         private void GoBack()
         {
             BookingMessage = string.Empty;
-            IsVisibleList = false;
+            ShowroomSearch.IsVisibleList = false;
+            VehicleSearch.IsVisibleList = false;            
             IsVisibleSearchDate = true;   
             IsVisibleSubTitle = true;
             IsBookingSummaryVisible = false;
-
+            ShowroomSearch.ResetPagination();
+            VehicleSearch.ResetPagination();
         }
     }
 }

@@ -7,13 +7,17 @@ namespace Frontend.Services
     public class VehicleService
     {
         // Recupera i veicoli disponibili in una data specifica (restituisce una lista vuota in caso di errore)
-        public static List<VehicleModel> GetVehiclesByDate(DateTime? startDate, DateTime? endDate, string location)
+        public static List<ShowroomModel> GetAvailableShowrooms(DateTime? startDate, DateTime? endDate)
         {
-            string url = $"http://localhost:8085/api/v1/vehicle/getAllAvailable?location={location}&start_date={startDate:yyyy-MM-dd}&end_date={endDate:yyyy-MM-dd}";
+            string url = "http://localhost:8085/api/v1/vehicle/getAllAvailable";
             
-            var vehicles = HttpService.Get<List<VehicleModel>>(url);
+            if (startDate != null && endDate != null) {
+                url += $"?start_date={startDate:yyyy-MM-dd}&end_date={endDate:yyyy-MM-dd}";
+            }
+            
+            var showrooms = HttpService.Get<List<ShowroomModel>>(url);
 
-            return vehicles ?? [];  // Se la risposta è nulla, ritorna una lista vuota
+            return showrooms ?? [];  // Se la risposta è nulla, ritorna una lista vuota
         }
 
         // Recupera tutti i veicoli (restituisce una lista vuota in caso di errore)
@@ -33,7 +37,7 @@ namespace Frontend.Services
                 { "model", vehicle.Model },
                 { "category", vehicle.Category },
                 { "price", vehicle.Price },
-                { "location", vehicle.Location }
+                { "car_showroom_id", vehicle.CarShowroomID }
             };
 
             // Invia la richiesta POST per aggiungere un nuovo veicolo
@@ -51,7 +55,7 @@ namespace Frontend.Services
                 { "model", vehicle.Model },
                 { "category", vehicle.Category },
                 { "price", vehicle.Price },
-                { "location", vehicle.Location }
+                { "car_showroom_id", vehicle.CarShowroomID }
             };
 
             // Invia la richiesta PUT per aggiornare un veicolo

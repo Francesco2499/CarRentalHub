@@ -12,7 +12,7 @@
   <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
     <TextBlock Text="Nuova Prenotazione" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
 
-    <TextBlock IsVisible="{Binding IsVisibleSubTitle}" Text="Per effettuare una prenotazione, inizia selezionando le date in cui desideri noleggiare un'auto e il comune di ritiro. Una volta scelto il periodo e la località, ti mostreremo le auto disponibili. Potrai confrontare le opzioni, selezionare il veicolo più adatto alle tue esigenze e completare la prenotazione in pochi passaggi!" 
+    <TextBlock IsVisible="{Binding IsVisibleSubTitle}" Text="Per effettuare una prenotazione, inizia selezionando le date in cui desideri noleggiare un'auto. Scelto il periodo ti mostreremo gli autosaloni disponibili, seleziona quello che ti interessa.  Seleziona il veicolo che preferisci tra quelli che vedi presenti in lista e completa la prenotazione in pochissimi passaggi!" 
            Width="800" 
            FontSize="16"
            TextWrapping="Wrap"
@@ -23,12 +23,12 @@
 
     <StackPanel IsVisible="{Binding IsVisibleSearchDate}">
 
-      <TextBlock Text="Scegli la data e il comune per la tua prenotazione:" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,20"/>
+      <TextBlock Text="Scegli la data per la tua prenotazione" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,20"/>
       
       <StackPanel Spacing="20" Margin="20" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <CalendarDatePicker SelectedDateFormat="Short" SelectedDate="{Binding StartDate}" Margin="40,0,80,0"/>
+        <CalendarDatePicker SelectedDateFormat="Short" SelectedDate="{Binding ShowroomSearch.StartDate}" Margin="40,0,80,0"/>
         <StackPanel Orientation="Horizontal">
-                <CalendarDatePicker SelectedDateFormat="Short" SelectedDate="{Binding EndDate}" />
+                <CalendarDatePicker SelectedDateFormat="Short" SelectedDate="{Binding ShowroomSearch.EndDate}" />
                 
                 <!-- Icona info con tooltip -->
                 <PathIcon Data="{Binding Source=info_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" 
@@ -40,9 +40,7 @@
             </StackPanel>
       </StackPanel>
 
-      <TextBox Watermark="Inserisci il comune"  Width="350" Margin="20" HorizontalAlignment="Center" Text="{Binding Location}" />
-
-      <Button Content="Vedi le auto disponibili"  Command="{Binding SearchVehiclesCommand}" HorizontalAlignment="Center" Margin="10"/>
+      <Button Content="Vedi gli autosaloni disponibili"  Command="{Binding SearchShowroomsCommand}" HorizontalAlignment="Center" Margin="10"/>
 
       <TextBlock Text="{Binding FirstErrorMessage}" IsVisible="{Binding FirstErrorMessage, Converter={StaticResource VisibilityConverter}}" HorizontalAlignment="Center" Foreground="Red"/>
 
@@ -50,24 +48,81 @@
 
     </StackPanel>
 
-    <StackPanel IsVisible="{Binding IsVisibleList}">
+    <StackPanel IsVisible="{Binding ShowroomSearch.IsVisibleList}">
       
-      <TextBox Watermark="Inserisci modello o marca"  Width="350" Margin="20" HorizontalAlignment="Center" Text="{Binding SearchQuery}" />
+      <TextBox Watermark="Cerca per comune"  Width="350" Margin="20" HorizontalAlignment="Center" Text="{Binding ShowroomSearch.SearchQuery}" />
       
       <StackPanel HorizontalAlignment="Center" Margin="20" Orientation="Horizontal">
-          <Button Content="Cerca" Command="{Binding SearchItemsCommand}" CommandParameter="text" Margin="10"/>
-          <Button Content="Mostra tutte" IsEnabled="{Binding EnableShowAll}" Command="{Binding SearchItemsCommand}" CommandParameter="all" Margin="10"/>
+          <Button Content="Cerca" Command="{Binding ShowroomSearch.SearchItemsCommand}" CommandParameter="text" Margin="10"/>
+          <Button Content="Mostra tutte" IsEnabled="{Binding ShowroomSearch.EnableShowAll}" Command="{Binding ShowroomSearch.SearchItemsCommand}" CommandParameter="all" Margin="10"/>
       </StackPanel>
 
-      <Grid ColumnDefinitions="2*, 2*, 2*, 2*" Background="#1e1e1e" Margin="10" Width="650">
+      <Grid ColumnDefinitions="2*, 2*, 2*" Background="#1e1e1e" Margin="10" Width="650">
+          <TextBlock Text="Nome" Grid.Column="0" TextAlignment="Center" FontWeight="Bold" Margin="5"/>
+          <TextBlock Text="Comune" Grid.Column="1"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
+          <TextBlock Text="Q.tà veicoli" Grid.Column="2"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
+      </Grid>      
+      <ListBox Padding="0"
+              Width="650"
+              ItemsSource="{Binding ShowroomSearch.Items}"
+              SelectedItem="{Binding SelectedShowroom, Mode=TwoWay}">
+          <ListBox.ItemTemplate>
+              <DataTemplate>
+                  <Grid ColumnDefinitions="2*, 2*, 2*">
+                      <TextBlock Text="{Binding Name}" TextAlignment="Center"  Grid.Column="0" Margin="5"/>
+                      <TextBlock Text="{Binding Location}" TextAlignment="Center"  Grid.Column="1" Margin="5"/>
+                      <TextBlock Text="{Binding Vehicles.Count}" TextAlignment="Center"  Grid.Column="2" Margin="5"/>
+                  </Grid>
+              </DataTemplate>
+          </ListBox.ItemTemplate>
+      </ListBox>
+
+      <StackPanel IsVisible="{Binding ShowroomSearch.IsPaginationVisible}" HorizontalAlignment="Center" Orientation="Horizontal" Margin="10">
+        <Button Command="{Binding ShowroomSearch.GoToPreviousPageCommand}" Margin="5" IsEnabled="{Binding ShowroomSearch.IsPreviousPageEnabled}">
+          <Button.Opacity>
+              <Binding Path="ShowroomSearch.PreviousPageOpacity" />
+          </Button.Opacity>
+          <PathIcon Data="{Binding Source=chevron_left_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Height="10" Width="8"/>
+        </Button>
+
+        <Button Command="{Binding ShowroomSearch.GoToNextPageCommand}" Margin="5" IsEnabled="{Binding ShowroomSearch.IsNextPageEnabled}">
+          <Button.Opacity>
+              <Binding Path="ShowroomSearch.NextPageOpacity" />
+          </Button.Opacity>
+          <PathIcon Data="{Binding Source=chevron_right_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Height="10" Width="8"/>
+        </Button>
+      </StackPanel>
+
+      <StackPanel Margin="20" HorizontalAlignment="Center">
+        <!-- Bottone per prenotare l'auto -->
+        <StackPanel Margin="10, 20" Orientation="Horizontal" Spacing="30">
+          <Button Content="Vedi auto disponibili" Command="{Binding SearchVehiclesCommand}" />
+          <Button Content="Indietro" Command="{Binding GoBackCommand}" />
+        </StackPanel>
+      </StackPanel> 
+
+      <TextBlock Text="{Binding ErrorMessage}" HorizontalAlignment="Center" Foreground="Red" Margin="10"/>       
+
+    </StackPanel>
+
+    <StackPanel IsVisible="{Binding VehicleSearch.IsVisibleList}">
+      
+      <TextBox Watermark="Inserisci modello o marca"  Width="350" Margin="20" HorizontalAlignment="Center" Text="{Binding VehicleSearch.SearchQuery}" />
+      
+      <StackPanel HorizontalAlignment="Center" Margin="20" Orientation="Horizontal">
+          <Button Content="Cerca" Command="{Binding VehicleSearch.SearchItemsCommand}" CommandParameter="text" Margin="10"/>
+          <Button Content="Mostra tutte" IsEnabled="{Binding VehicleSearch.EnableShowAll}" Command="{Binding VehicleSearch.SearchItemsCommand}" CommandParameter="all" Margin="10"/>
+      </StackPanel>
+
+      <Grid ColumnDefinitions="2*, 2*, 2*, 2*" Background="#1e1e1e" Margin="10" Width="700">
           <TextBlock Text="ID" Grid.Column="0" TextAlignment="Center" FontWeight="Bold" Margin="5"/>
           <TextBlock Text="Model" Grid.Column="1"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
           <TextBlock Text="Category" Grid.Column="2"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
           <TextBlock Text="Price" Grid.Column="3"  TextAlignment="Center" FontWeight="Bold" Margin="5"/>
       </Grid>      
       <ListBox Padding="0"
-              Width="650"
-              ItemsSource="{Binding Items}"
+              Width="700"
+              ItemsSource="{Binding VehicleSearch.Items}"
               SelectedItem="{Binding SelectedVehicle, Mode=TwoWay}">
           <ListBox.ItemTemplate>
               <DataTemplate>
@@ -81,17 +136,17 @@
           </ListBox.ItemTemplate>
       </ListBox>
 
-      <StackPanel IsVisible="{Binding IsPaginationVisible}" HorizontalAlignment="Center" Orientation="Horizontal" Margin="10">
-        <Button Command="{Binding GoToPreviousPageCommand}" Margin="5" IsEnabled="{Binding IsPreviousPageEnabled}">
+      <StackPanel IsVisible="{Binding VehicleSearch.IsPaginationVisible}" HorizontalAlignment="Center" Orientation="Horizontal" Margin="10">
+        <Button Command="{Binding VehicleSearch.GoToPreviousPageCommand}" Margin="5" IsEnabled="{Binding VehicleSearch.IsPreviousPageEnabled}">
           <Button.Opacity>
-              <Binding Path="PreviousPageOpacity" />
+              <Binding Path="VehicleSearch.PreviousPageOpacity" />
           </Button.Opacity>
           <PathIcon Data="{Binding Source=chevron_left_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Height="10" Width="8"/>
         </Button>
 
-        <Button Command="{Binding GoToNextPageCommand}" Margin="5" IsEnabled="{Binding IsNextPageEnabled}">
+        <Button Command="{Binding VehicleSearch.GoToNextPageCommand}" Margin="5" IsEnabled="{Binding VehicleSearch.IsNextPageEnabled}">
           <Button.Opacity>
-              <Binding Path="NextPageOpacity" />
+              <Binding Path="VehicleSearch.NextPageOpacity" />
           </Button.Opacity>
           <PathIcon Data="{Binding Source=chevron_right_regular, Converter={x:Static converters:TypeConverters.IconConverter}}" Height="10" Width="8"/>
         </Button>

@@ -43,11 +43,10 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingDTO, error) {
 	var bookings []models.BookingDTO
 	for rows.Next() {
 		var booking models.BookingDTO
-		var vehicleID int
 		/*if err := rows.Scan(&booking.ID, &booking.UserID, &booking.VehicleModel, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("data scan error: %w", err)
 		}*/
-		if err := rows.Scan(&booking.ID, &userID, &vehicleID, &booking.VehicleModel, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
+		if err := rows.Scan(&booking.ID, &userID, &booking.VehicleID, &booking.VehicleModel, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("data scan error: %w", err)
 		}
 
@@ -59,7 +58,7 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingDTO, error) {
 		booking.Username = username
 
 		var priceForDay float64
-		err = db.QueryRow(`SELECT price FROM vehicles WHERE id = $1`, vehicleID).Scan(&priceForDay)
+		err = db.QueryRow(`SELECT price FROM vehicles WHERE id = $1`, booking.VehicleID).Scan(&priceForDay)
 		if err != nil {
 			return nil, fmt.Errorf("failed to fetch vehicle details: %w", err)
 		}
@@ -164,10 +163,9 @@ func CreateBooking(booking *models.Booking) (*models.BookingDTO, error) {
 		)
 		RETURNING id, user_id, vehicle_id, start_date, end_date, created_at, updated_at`
 
-	var vehicleID int
 	var newBooking models.BookingDTO
 	err = tx.QueryRow(query, booking.UserID, booking.VehicleID, booking.StartDate, booking.EndDate).
-		Scan(&newBooking.ID, &booking.UserID, &vehicleID, &newBooking.StartDate, &newBooking.EndDate, &newBooking.CreatedAt, &newBooking.UpdatedAt)
+		Scan(&newBooking.ID, &booking.UserID, &newBooking.VehicleID, &newBooking.StartDate, &newBooking.EndDate, &newBooking.CreatedAt, &newBooking.UpdatedAt)
 
 	if err != nil {
 		tx.Rollback()
@@ -179,7 +177,7 @@ func CreateBooking(booking *models.Booking) (*models.BookingDTO, error) {
 
 	// Recupera il modello e il prezzo del veicolo usando l'ID appena estratto
 	var priceForDay float64
-	err = db.QueryRow(`SELECT model, price FROM vehicles WHERE id = $1`, vehicleID).Scan(&newBooking.VehicleModel, &priceForDay)
+	err = db.QueryRow(`SELECT model, price FROM vehicles WHERE id = $1`, booking.VehicleID).Scan(&newBooking.VehicleModel, &priceForDay)
 	if err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf("failed to fetch vehicle details: %w", err)

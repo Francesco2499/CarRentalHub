@@ -12,11 +12,29 @@ namespace Frontend.ViewModels
 {
     public partial class AdminVehicleViewModel : SearchableViewModel<VehicleModel>
     {
+        [ObservableProperty] private Dictionary<int, string>  _showroomsList  = VehicleService.GetAvailableShowrooms(null, null)?.Select((showroom, index) => new { showroom.Name, showroom.Id }).ToDictionary(v => v.Id, v => v.Name) ?? [];
+        public List<string> Showrooms => ShowroomsList?.Values.ToList() ?? [];
+        private string? _selectedShowroom;
+        public int SelectedShowroomId{ get; set; }
+
+        // Proprietà che aggiorna l'ID quando viene selezionato un modello
+        public string? SelectedShowroom
+        {
+            get => _selectedShowroom;
+            set
+            {
+                if (SetProperty(ref _selectedShowroom, value))
+                {
+                    var selectedVehicle = ShowroomsList?.FirstOrDefault(v => v.Value == value);
+                    SelectedShowroomId = selectedVehicle?.Key ?? 0;
+                }
+            }
+        }
         [ObservableProperty] private VehicleModel? _selectedVehicle;
         [ObservableProperty] private string? _successMessage;
         [ObservableProperty] private bool _isConfirmationModalVisible = false;
         [ObservableProperty] private bool _isFormVisible = false;
-        [ObservableProperty] private VehicleModel _editingVehicle = new(0, "", "", 0, "", 0, 0); 
+        [ObservableProperty] private VehicleModel _editingVehicle = new(0, "", "", 0, 0,""); 
     
         public AdminVehicleViewModel()
         {
@@ -29,7 +47,8 @@ namespace Frontend.ViewModels
         {
             SuccessMessage = string.Empty;
             ErrorMessage = string.Empty;
-            EditingVehicle = new VehicleModel(0, "", "", 0, "", 0, 0);
+            SelectedShowroom = "";
+            EditingVehicle = new VehicleModel(0, "", "", 0, 0, "");
             IsVisibleList = false;
             IsFormVisible = true;
         }
@@ -39,6 +58,9 @@ namespace Frontend.ViewModels
         {
             SuccessMessage = string.Empty;
             ErrorMessage = string.Empty;
+
+            SelectedShowroom = SelectedVehicle?.ShowroomName;
+
 
             if (SelectedVehicle == null)
             {
@@ -63,6 +85,8 @@ namespace Frontend.ViewModels
             try {
                 VehicleResponse? vehicleResponse;
                 string? msg;
+
+                EditingVehicle = EditingVehicle with {CarShowroomID = SelectedShowroomId};
 
                 if (EditingVehicle.Id == 0) // Aggiunta di un nuovo veicolo
                 {
@@ -92,7 +116,7 @@ namespace Frontend.ViewModels
             } 
         }
 
-        protected override List<VehicleModel>? LoadAllItemsAsync()
+        protected override List<VehicleModel>? LoadAllItems()
         {
             return VehicleService.GetAllVehicles();
         }
@@ -103,8 +127,7 @@ namespace Frontend.ViewModels
             ErrorMessage = string.Empty;
             return [.. items.Where(v =>
                     v.Model.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-                    v.Category.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-                    v.Location.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)
+                    v.Category.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)
                 )];
         }
 

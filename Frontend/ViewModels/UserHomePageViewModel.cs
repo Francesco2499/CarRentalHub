@@ -13,12 +13,14 @@ namespace Frontend.ViewModels
             SelectBookingCommand = new RelayCommand(() => SelectItem("Le mie prenotazioni"));
             SelectCarCommand = new RelayCommand(() => SelectItem("Nuova prenotazione"));
             GoToMyAreaCommand = new RelayCommand(() => SelectItem("My Area"));
+            GoToMapsCommand = new RelayCommand(() => SelectItem("Mappa"));
+
         }
 
         public RelayCommand SelectBookingCommand { get; }
         public RelayCommand SelectCarCommand { get; }
-
         public RelayCommand GoToMyAreaCommand { get; }
+        public RelayCommand GoToMapsCommand { get; }
 
         private void SelectItem(string label)
         {

@@ -48,12 +48,12 @@ func DeleteVehicle(id int) error {
 	return nil
 }
 
-func GetAllVehicles() ([]models.Vehicle, error) {
+func GetAllVehicles() ([]models.VehicleDTO, error) {
 	cacheKey := "all_vehicles"
 
 	if cachedData, found := cache.VehicleCache.Get(cacheKey); found {
 		log.Println("All vehicles found in cache")
-		return cachedData.([]models.Vehicle), nil
+		return cachedData.([]models.VehicleDTO), nil
 	}
 
 	vehicles, err := repositories.GetAllVehicles()

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
+using Frontend.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -41,10 +41,13 @@ namespace Frontend.ViewModels
         
         protected List<TModel>? _allItems = [];
         
-        protected abstract List<TModel>? LoadAllItemsAsync(); // Metodo che deve essere implementato nelle viewmodel concrete
+        protected abstract List<TModel>? LoadAllItems();
         
-        protected void UpdatePaginatedItems(List<TModel>? listItems)
+        protected void UpdatePaginatedItems(List<TModel>? listItems, bool returnToFirstPage = false)
         {
+            if (returnToFirstPage) {
+                CurrentPage = 1;
+            }
             var skip = (CurrentPage - 1) * PageSize;
             var results = listItems ?? _allItems;
             ErrorMessage = string.Empty;
@@ -70,7 +73,7 @@ namespace Frontend.ViewModels
         
         public void LoadItems()
         {
-            _allItems = LoadAllItemsAsync();
+            _allItems = LoadAllItems();
             UpdatePaginatedItems(null);
         }
     }

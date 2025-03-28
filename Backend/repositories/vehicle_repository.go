@@ -9,21 +9,28 @@ import (
 	"time"
 )
 
-func GetAllVehicles() ([]models.Vehicle, error) {
+func GetAllVehicles() ([]models.VehicleDTO, error) {
 	db := config.GetDB()
-	query := `SELECT id, model, category, price, car_showroom_id FROM vehicles`
+	query := `
+		SELECT v.id, v.model, v.category, v.price, v.car_showroom_id, cs.name
+		FROM vehicles v
+		JOIN car_showrooms cs ON v.car_showroom_id = cs.id;
+	`
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("query error: %w", err)
 	}
 	defer rows.Close()
 
-	var vehicles []models.Vehicle
+	var vehicles []models.VehicleDTO
 	for rows.Next() {
-		var vehicle models.Vehicle
-		if err := rows.Scan(&vehicle.ID, &vehicle.Model, &vehicle.Category, &vehicle.Price, &vehicle.CarShowroomID); err != nil {
+		var vehicle models.VehicleDTO
+		var showroomName string
+
+		if err := rows.Scan(&vehicle.ID, &vehicle.Model, &vehicle.Category, &vehicle.Price, &vehicle.CarShowroomID, &showroomName); err != nil {
 			return nil, fmt.Errorf("data scan error: %w", err)
 		}
+		vehicle.CarShowroomName = showroomName
 		vehicles = append(vehicles, vehicle)
 	}
 	if err := rows.Err(); err != nil {
