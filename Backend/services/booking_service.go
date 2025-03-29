@@ -16,9 +16,6 @@ type BookingRequest struct {
 	Error    chan error
 }
 
-// Cache per le prenotazioni (TTL di 30 secondi)
-//var bookingCache = cache.NewCache(30 * time.Second)
-
 // Canale globale per la gestione concorrente delle prenotazioni
 var bookingChannel = make(chan BookingRequest, 100)
 
@@ -90,48 +87,6 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingDTO, error) {
 
 	return bookings, nil
 }
-
-/*func GetBookingsByUser(userID int) ([]models.Booking, error) {
-	cacheKey := fmt.Sprintf("bookings_user_%d", userID)
-
-	// Controllo se il dato è in cache
-	if cachedData, found := bookingCache.Get(cacheKey); found {
-		log.Println("bookings for user found in cache")
-		return cachedData.([]models.Booking), nil
-	}
-
-	// Recupero dal database
-	bookings, err := repositories.GetBookingsByUser(userID)
-	if err != nil {
-		return nil, err
-	}
-
-	// Salvo in cache
-	bookingCache.Set(cacheKey, bookings)
-
-	return bookings, nil
-}*/
-
-/*func GetBookingById(id int, userID int, isAdmin bool) (*models.Booking, error) {
-	cacheKey := fmt.Sprintf("booking_id_%d_user_%d_admin_%t", id, userID, isAdmin)
-
-	// Controllo se il dato è in cache
-	if cachedData, found := bookingCache.Get(cacheKey); found {
-		log.Println("bookings by id found in cache")
-		return cachedData.(*models.Booking), nil
-	}
-
-	// Recupero dal database
-	booking, err := repositories.GetBookingById(id, userID, isAdmin)
-	if err != nil {
-		return nil, err
-	}
-
-	// Salvo in cache
-	bookingCache.Set(cacheKey, booking)
-
-	return booking, nil
-}*/
 
 func UpdateBooking(booking *models.Booking) (string, error) {
 

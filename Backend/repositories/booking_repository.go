@@ -77,57 +77,6 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingDTO, error) {
 	return bookings, nil
 }
 
-/*func GetBookingsByUser(userID int) ([]models.BookingWithVehicleDTO, error) {
-	db := config.GetDB()
-	//query := `SELECT id, user_id, vehicle_id, start_date, end_date, created_at, updated_at FROM bookings WHERE user_id = $1`
-	query := `SELECT b.id, b.user_id, v.model, b.start_date, b.end_date, b.created_at, b.updated_at
-			FROM bookings b JOIN vehicles v ON b.vehicle_id = v.id WHERE b.user_id = $1`
-	rows, err := db.Query(query, userID)
-	if err != nil {
-		return nil, fmt.Errorf("query error: %w", err)
-	}
-	defer rows.Close()
-
-	var bookings []models.BookingWithVehicleDTO
-	for rows.Next() {
-		var booking models.BookingWithVehicleDTO
-		if err := rows.Scan(&booking.ID, &booking.UserID, &booking.VehicleModel, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("data scan error: %w", err)
-		}
-		bookings = append(bookings, booking)
-	}
-	return bookings, nil
-}*/
-
-/*func GetBookingById(id int, userID int, isAdmin bool) (*models.BookingWithVehicleDTO, error) {
-	db := config.GetDB()
-	var query string
-	var booking models.BookingWithVehicleDTO
-	var err error
-
-	if isAdmin {
-		query = `SELECT b.id, b.user_id, v.model, b.start_date, b.end_date, b.created_at, b.updated_at
-			FROM bookings b JOIN vehicles v ON b.vehicle_id = v.id WHERE b.id = $1`
-		err = db.QueryRow(query, id).Scan(
-			&booking.ID, &booking.UserID, &booking.VehicleModel, &booking.StartDate,
-			&booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt,
-		)
-	} else {
-		query = `SELECT b.id, b.user_id, v.model, b.start_date, b.end_date, b.created_at, b.updated_at
-			FROM bookings b JOIN vehicles v ON b.vehicle_id = v.id WHERE b.id = $1 AND b.user_id = $2`
-		err = db.QueryRow(query, id, userID).Scan(
-			&booking.ID, &booking.UserID, &booking.VehicleModel, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt)
-	}
-
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("booking with ID %d not found", id)
-		}
-		return nil, fmt.Errorf("database query error: %w", err)
-	}
-	return &booking, nil
-}*/
-
 func IsVehicleAvailable(vehicleID int, bookingID int, startDate, endDate time.Time) (bool, error) {
 	db := config.GetDB()
 	query := `SELECT COUNT(*) FROM bookings WHERE vehicle_id = $1 

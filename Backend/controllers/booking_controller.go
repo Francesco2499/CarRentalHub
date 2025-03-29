@@ -23,69 +23,6 @@ func GetAllBookings(c *gin.Context) {
 	c.JSON(http.StatusOK, bookingsDTO)
 }
 
-/*func GetBookingsByUser(c *gin.Context) {
-	log.Println("Received request to fetch bookings by user")
-
-	var userID int
-	var err error
-
-	// Controlliamo se abbiamo ricevuto `user_id` come parametro nella richiesta
-	userIDParam := c.Param("user_id")
-	if userIDParam != "" {
-		userID, err = strconv.Atoi(userIDParam)
-		if err != nil {
-			log.Println("Error: Invalid user ID format")
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
-			return
-		}
-	} else {
-		// Se `user_id` non è presente, proviamo con `username`
-		username := c.Query("username")
-		if username == "" {
-			log.Println("Error: No user ID or username provided")
-			c.JSON(http.StatusBadRequest, gin.H{"error": "You must provide either user_id or username"})
-			return
-		}
-
-		// Recuperiamo user_id dal database usando lo username
-		userID, err = services.GetUserIdByUsername(username)
-		if err != nil {
-			log.Printf("Error retrieving user ID for username %s: %v", username, err)
-			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-			return
-		}
-	}
-
-	// Recuperiamo le prenotazioni dell'utente
-	bookingsDTO, err := services.GetBookingsByUser(userID)
-	if err != nil {
-		log.Printf("Error retrieving bookings: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, bookingsDTO)
-}*/
-
-/*func GetBookingById(c *gin.Context) {
-	log.Println("Received request to fetch a booking")
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		log.Println("Error: Invalid booking ID")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid booking ID"})
-		return
-	}
-	userID, isAdmin := extractUserFromContext(c)
-	bookingDTO, err := services.GetBookingById(id, userID, isAdmin)
-	if err != nil {
-		log.Printf("Error retrieving booking: %v", err)
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, bookingDTO)
-}*/
-
-
 func CreateBooking(c *gin.Context) {
 	log.Println("Received request to create a new booking")
 	userID, _ := extractUserFromContext(c)
@@ -112,9 +49,8 @@ func CreateBooking(c *gin.Context) {
 	}
 
 	log.Println("Booking created successfully")
-	c.JSON(http.StatusCreated, gin.H{"booking": createdBooking, "message": "Prenotazione effettuata!"});
+	c.JSON(http.StatusCreated, gin.H{"booking": createdBooking, "message": "Prenotazione effettuata!"})
 }
-
 
 func UpdateBooking(c *gin.Context) {
 	log.Println("Received request to update a booking")
