@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Windows.Input;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -13,7 +14,7 @@ namespace Frontend.ViewModels
         private readonly HttpClient _httpClient = new();
         [ObservableProperty] private ICommand? _currentFilterCommand;
         [ObservableProperty] string _statsMessage = string.Empty;
-        [ObservableProperty] int _userID = 0;
+        [ObservableProperty] string _userID = string.Empty;
         [ObservableProperty] bool _isVisibleImage = false;
         [ObservableProperty] bool _isVisibleUserBox = false;
         [ObservableProperty] bool _isVisibleText = false;
@@ -56,7 +57,6 @@ namespace Frontend.ViewModels
 
         public StatsViewModel()
         {
-            _httpClient = new HttpClient();
             UpdateDateRange();
         }
 
@@ -85,16 +85,14 @@ namespace Frontend.ViewModels
         public void LoadTopUsers()
         {
             CleanContent(false);
-            StatsMessage = "Ecco la top 3 degli utenti più attivi!";   
-            LoadStatsImage("http://localhost:5005/users/stats/top3");
+            LoadStatsImage("http://localhost:5005/users/stats/top3", "Ecco la top 3 degli utenti più attivi!", false, false);
         }
 
         [RelayCommand]
         public void LoadUsersByRegion()
         {
             CleanContent(false);
-            StatsMessage = "Il grafico mostra da dove provengono gli utenti che utilizzano CarRentalHub, rappresentandone la distribuzione per regione.";   
-            LoadStatsImage("http://localhost:5005/users/stats/regions");
+            LoadStatsImage("http://localhost:5005/users/stats/regions", "Il grafico mostra da dove provengono gli utenti che utilizzano CarRentalHub, rappresentandone la distribuzione per regione.", false, false);
         }
 
         [RelayCommand]
@@ -104,7 +102,6 @@ namespace Frontend.ViewModels
 
             if (StartDate.HasValue && EndDate.HasValue)
             {
-                StatsMessage = "Il grafico mostra il rapporto tra veicoli disponibili e prenotati. Puoi anche decidere il periodo di riferimento!";   
                 
                 string url = "http://localhost:5005/vehicles/stats/availability";
 
@@ -113,22 +110,18 @@ namespace Frontend.ViewModels
                 
                 url += $"?start_date={startDateFormatted}&end_date={endDateFormatted}";
                 
-                LoadStatsImage(url);
-                IsVisibleFilterDate = true;
+                LoadStatsImage(url, "Il grafico mostra il rapporto tra veicoli disponibili e prenotati. Puoi anche decidere il periodo di riferimento!", false, false);
             } else
             {
                 ErrorMessage = "Inserisci le date per la ricerca!";
-                IsVisibleFilterDate = true;
             }
+            IsVisibleFilterDate = true;
+
         }
 
         [RelayCommand]
         public void LoadRevenueTrend()
         {
-            IsVisibleSliderDate = true;
-
-            StatsMessage = "Il grafico mostra il trend per periodo rispetto ai guadagni complessivi";   
-        
 
             string url = "http://localhost:5005/bookings/stats/revenue/trend";
 
@@ -138,7 +131,7 @@ namespace Frontend.ViewModels
                 url += $"?start_date={StartDate.Value:yyyy-MM-dd}&end_date={EndDate.Value:yyyy-MM-dd}";
             }
 
-            LoadStatsImage(url);
+            LoadStatsImage(url, "Il grafico mostra il trend per periodo rispetto ai guadagni complessivi", false, true);
           
         }
 
@@ -147,10 +140,6 @@ namespace Frontend.ViewModels
         {
             CleanContent(true);
 
-            IsVisibleFilterDate = true;
-
-            StatsMessage = "Il grafico mostra la top 5 delle auto più richieste dagli utenti. Scegli anche il periodo di riferimento";   
-           
 
             string url = "http://localhost:5005/vehicles/stats/top5";
 
@@ -160,18 +149,13 @@ namespace Frontend.ViewModels
                 url += $"?start_date={StartDate.Value:yyyy-MM-dd}&end_date={EndDate.Value:yyyy-MM-dd}";
             }
 
-            LoadStatsImage(url);
+            LoadStatsImage(url, "Il grafico mostra la top 5 delle auto più richieste dagli utenti. Scegli anche il periodo di riferimento", true, false);
         }
 
 
         [RelayCommand]
         public void LoadNumberBookings()
         {
-            IsVisibleSliderDate = true;
-
-            StatsMessage = "Il grafico mostra il quantitativo di prenotazioni nel periodo di riferimento";   
-           
-
             string url = "http://localhost:5005/bookings/stats/numbookings/trend";
 
             if (StartDate.HasValue && EndDate.HasValue)
@@ -180,16 +164,12 @@ namespace Frontend.ViewModels
                 url += $"?start_date={StartDate.Value:yyyy-MM-dd}&end_date={EndDate.Value:yyyy-MM-dd}";
             }
 
-            LoadStatsImage(url);
+            LoadStatsImage(url, "Il grafico mostra il quantitativo di prenotazioni nel periodo di riferimento", false, true);
         }
 
         [RelayCommand]
         public void LoadRevenueByVehicle()
         {
-            IsVisibleSliderDate = true;
-
-            StatsMessage = "Il grafico mostra il guadagno relativo ad ogni auto nel periodo di riferimento";   
-           
 
             string url = "http://localhost:5005/bookings/stats/revenueforvehicle/trend";
 
@@ -199,26 +179,27 @@ namespace Frontend.ViewModels
                 url += $"?start_date={StartDate.Value:yyyy-MM-dd}&end_date={EndDate.Value:yyyy-MM-dd}";
             }
 
-            LoadStatsImage(url);
+            LoadStatsImage(url, "Il grafico mostra il guadagno relativo ad ogni auto nel periodo di riferimento", false, true);
         }
 
         [RelayCommand]
         public void LoadUserInfo()
         {
             CleanContent(false);
-            if (UserID != 0) {
+            if (UserID != string.Empty && MyRegex().IsMatch(UserID)) {
                 try
                 {
-                    var response = _httpClient.GetAsync($"http://localhost:5005/users/stats/info/{UserID}").Result;
+                    int id = int.Parse(UserID);
+                    var response = _httpClient.GetAsync($"http://localhost:5005/users/stats/info/{id}").Result;
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        ErrorMessage = "Errore nel recupero dei dati utente.";
+                        var result = JsonSerializer.Deserialize<ErrorInfo>(response.Content.ReadAsStringAsync().Result, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+                        ErrorMessage = result?.Error != null ? result.Error : "Errore nel recupero dei dati utente.";
                         return;
                     }
-
-                    var responseBody = response.Content.ReadAsStringAsync().Result;
-                    var user = JsonSerializer.Deserialize<UserInfo>(responseBody, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+                    
+                    var user = JsonSerializer.Deserialize<UserInfo>(response.Content.ReadAsStringAsync().Result, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
                     if (user != null)
                     {
@@ -237,14 +218,19 @@ namespace Frontend.ViewModels
             }    
         }
 
-        private void LoadStatsImage(string url)
+        private void LoadStatsImage(string url, string message, bool showFilterDate = false, bool showSliderDate = false)
         {
+            StatsMessage = message;
+            IsVisibleFilterDate = showFilterDate;
+            IsVisibleSliderDate = showSliderDate;
+
             try
             {
                 using var response = _httpClient.GetAsync(url).Result;
+
                 if (response.IsSuccessStatusCode)
                 {
-                    var stream = response.Content.ReadAsStream();
+                    using var stream = response.Content.ReadAsStream();
                     StatsImage = new Bitmap(stream);
                     IsVisibleImage = true;
                 }
@@ -332,10 +318,9 @@ namespace Frontend.ViewModels
             IsVisibleUserBox = true;
         }
 
-        // Funzione per eseguire il comando attualmente associato al pulsante "Filtra per date"
         public void ExecuteCurrentFilterCommand()
         {
-            CurrentFilterCommand?.Execute(null);  // Esegui il comando corrente
+            CurrentFilterCommand?.Execute(null);  
         }
 
         [RelayCommand]
@@ -343,7 +328,11 @@ namespace Frontend.ViewModels
         {
             IsVisibleFilterDate = true;
         }
-    }
-    public record UserInfo(int UserId, string Username, int TotalBookings, double TotalSpent);
 
+        [GeneratedRegex("^[0-9]{1,10}?$")]
+        private static partial Regex MyRegex();
+    }
+    
+    public record UserInfo(int UserId, string Username, int TotalBookings, double TotalSpent);
+    public record ErrorInfo(string Error);
 }
