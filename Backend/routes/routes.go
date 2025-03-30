@@ -11,21 +11,22 @@ import (
 func SetupRoutes() *gin.Engine {
 	// Gruppo di rotte per l'autenticazione
 	router := gin.Default()
+	api := router.Group("/api/v1")
 
-	auth := router.Group("/api/v1/auth")
+	auth := api.Group("/auth")
 	{
 		auth.POST("/register", controllers.Register) // Registrazione utente
 		auth.POST("/login", controllers.Login)       // Login utente
 	}
 
-	user := router.Group("/api/v1/user")
+	user := api.Group("/user")
 	user.Use(middleware.AuthMiddleware("")) // Tutti gli utenti autenticati
 	{
 		user.PUT("/update/me", controllers.UpdateCurrentUser)
 		user.DELETE("/delete/me", controllers.DeleteCurrentUser)
 	}
 
-	vehicle := router.Group("/api/v1/vehicle")
+	vehicle := api.Group("/vehicle")
 	vehicle.Use(middleware.AuthMiddleware(""))
 	{
 		vehicle.GET("/getAll", controllers.GetAllVehicles)
@@ -36,16 +37,13 @@ func SetupRoutes() *gin.Engine {
 		vehicle.DELETE("/delete/:id", middleware.AuthMiddleware("admin"), controllers.DeleteVehicle)
 	}
 
-	booking := router.Group("/api/v1/booking")
+	booking := api.Group("/booking")
 	booking.Use(middleware.AuthMiddleware("")) // Protezione generale per TUTTE le route
 	{
 		booking.POST("/new", controllers.CreateBooking)
 		booking.GET("/getAll", controllers.GetAllBookings) // Accesso per utenti autenticati
-		//booking.GET("/getById/:id", controllers.GetBookingById)                                               // Accesso per utenti autenticati
-		//booking.GET("/getByUser/:user_id", middleware.AuthMiddleware("admin"), controllers.GetBookingsByUser) // Solo admin con userID
-		//booking.GET("/getByUser", middleware.AuthMiddleware("admin"), controllers.GetBookingsByUser)          // Solo admin con username
-		booking.PUT("/update/:id", middleware.AuthMiddleware("admin"), controllers.UpdateBooking)    // Solo admin
-		booking.DELETE("/delete/:id", middleware.AuthMiddleware("admin"), controllers.DeleteBooking) // Solo admin
+		booking.PUT("/update/:id", middleware.AuthMiddleware("admin"), controllers.UpdateBooking)
+		booking.DELETE("/delete/:id", middleware.AuthMiddleware("admin"), controllers.DeleteBooking)
 	}
 
 	return router

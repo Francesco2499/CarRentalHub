@@ -14,11 +14,6 @@ var db *sql.DB
 
 func InitDB() (*sql.DB, error) {
 
-	// Carica il file .env (se esiste)
-	/*if err := godotenv.Load(); err != nil {
-		log.Println("Warning: No .env file found, using system environment variables")
-	}*/
-
 	if os.Getenv("APP_ENV") != "prod" {
 		if err := godotenv.Load(); err != nil {
 			log.Println("Warning: No .env file found, using system environment variables")
@@ -41,15 +36,6 @@ func InitDB() (*sql.DB, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// Usa variabili d'ambiente per la connessione al database
-	/*dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s sslmode=disable",
-		getEnv("DB_HOST", "localhost"),
-		getEnv("DB_USER", "postgres"),
-		getEnv("DB_PASSWORD", "password"),
-		getEnv("DB_NAME", "CarRentalHub"),
-	)*/
 
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s sslmode=disable",
@@ -94,15 +80,6 @@ func CreateTables() error {
 			longitude DECIMAL(10,6) NOT NULL
 		);`,
 
-		/*`CREATE TABLE IF NOT EXISTS vehicles (
-			id SERIAL PRIMARY KEY,
-			model VARCHAR(255) NOT NULL,
-			category VARCHAR(255) NOT NULL,
-			price DECIMAL(10,2) NOT NULL,
-			location VARCHAR(255) NOT NULL,
-			latitude DECIMAL(10,6) NOT NULL,
-			longitude DECIMAL(10,6) NOT NULL
-		);`,*/
 		`CREATE TABLE IF NOT EXISTS vehicles (
 			id SERIAL PRIMARY KEY,
 			model VARCHAR(255) NOT NULL,
@@ -342,13 +319,6 @@ func GetDB() *sql.DB {
 	}
 	return db
 }
-
-/*func getEnv(key, fallback string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
-	}
-	return fallback
-}*/
 
 func getEnv(key string) (string, error) {
 	value, exists := os.LookupEnv(key)

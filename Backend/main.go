@@ -43,8 +43,6 @@ func main() {
 	r := routes.SetupRoutes()
 	r.SetTrustedProxies(nil)
 
-	//r.Run(":8085")
-	//log.Println("Server started on port 8085")
 	if err := r.Run(":8085"); err != nil {
 		log.Println("Server startup error:", err)
 	}

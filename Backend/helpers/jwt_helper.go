@@ -2,12 +2,15 @@ package helpers
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/joho/godotenv"
 )
 
-var jwtSecretKey = []byte("secrettoken")
+// var jwtSecretKey = []byte("secrettoken")
+var jwtSecretKey []byte
 
 type Claims struct {
 	UserID int    `json:"user_id"`
@@ -15,7 +18,27 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+// Carica la secret key dal file .env
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Errore nel caricamento del file .env:", err)
+	}
+
+	secret := os.Getenv("JWT_SECRET_KEY")
+	if secret == "" {
+		fmt.Println("JWT_SECRET_KEY non definita nel file .env")
+	} else {
+		jwtSecretKey = []byte(secret)
+	}
+}
+
 func GenerateJWT(userID int, role string) (string, error) {
+
+	if jwtSecretKey == nil {
+		return "", fmt.Errorf("chiave segreta non disponibile")
+	}
+
 	claims := &Claims{
 		UserID: userID,
 		Role:   role,
@@ -35,6 +58,11 @@ func GenerateJWT(userID int, role string) (string, error) {
 }
 
 func ValidateJWT(tokenString string) (*Claims, error) {
+
+	if jwtSecretKey == nil {
+		return nil, fmt.Errorf("chiave segreta non disponibile")
+	}
+
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecretKey, nil
 	})
