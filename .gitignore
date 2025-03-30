@@ -1,5 +1,4 @@
 Backend/.env
-Backend/logs/
 Frontend/obj/
 Frontend/bin/
 __pycache__/
