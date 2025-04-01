@@ -35,7 +35,7 @@ services:
 
   stats:
     build:
-      context: ../Stats  # La directory in cui si trova il Dockerfile per il modulo Python
+      context: ../Stats
       dockerfile: docker/Dockerfile
     container_name: carrentalhub-stats
     restart: always
