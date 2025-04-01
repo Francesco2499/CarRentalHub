@@ -27,7 +27,7 @@ public partial class UserMainViewModel : ViewModelBase
                 new(() => new MyBookingsViewModel(), "book_search_regular", "Le mie prenotazioni"),
                 new(() => new MyAreaViewModel(user), "person_regular", "My Area"),
                 new(() => new TileMapViewModel(), "map_regular", "Mappa"),
-                new(() => new MainWindowViewModel(), "sign_out_regular", "Logout")  // Qui non c'è un ViewModel da creare
+                new(() => new MainWindowViewModel(), "sign_out_regular", "Logout")
             }
             :
             [
@@ -35,7 +35,7 @@ public partial class UserMainViewModel : ViewModelBase
                 new(() => new AdminBookingViewModel(), "book_search_regular", "Gestisci prenotazioni"),
                 new(() => new RegisterViewModel(true), "person_regular", "Aggiungi admin"),
                 new(() => new StatsViewModel(), "document_catch_up_regular", "Visualizza statistiche"),
-                new(() => new MainWindowViewModel(), "sign_out_regular", "Logout")  // Qui non c'è un ViewModel da creare
+                new(() => new MainWindowViewModel(), "sign_out_regular", "Logout")
             ];
 
         Items = [.. templates];
@@ -49,11 +49,11 @@ public partial class UserMainViewModel : ViewModelBase
             if (value.Label == "Logout")
             {
                 TokenHelper.RemoveToken();
-                Logout();  // Esegui l'azione di logout
+                Logout();
             }
             else
             {
-                CurrentPage = value.CreateInstance();  // Crea la vista per gli altri elementi
+                CurrentPage = value.CreateInstance();
             }
         }
     }

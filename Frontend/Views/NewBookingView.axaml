@@ -174,8 +174,8 @@
 
                   <TextBlock Text="{Binding Booking.VehicleModel, StringFormat='🚗 Veicolo scelto: {0}'}" Margin="0,10"/>
                   <TextBlock Text="{Binding Booking.TotalPrice, StringFormat='💰 Prezzo: {0}'}" Margin="0,10"/>
-                  <TextBlock Text="{Binding Booking.StartDate, StringFormat='📅 Inizio: {0:yyyy-MM-dd}'}" Margin="0,10"/>
-                  <TextBlock Text="{Binding Booking.EndDate, StringFormat='📅 Fine: {0:yyyy-MM-dd}'}" Margin="0,10"/>
+                  <TextBlock Text="{Binding Booking.StartDate, StringFormat='📅 Inizio: {0:dd-MM-yyyy}'}" Margin="0,10"/>
+                  <TextBlock Text="{Binding Booking.EndDate, StringFormat='📅 Fine: {0:dd-MM-yyyy}'}" Margin="0,10"/>
 
               <Separator Background="Gray" Height="1" Margin="0,10"/>
               

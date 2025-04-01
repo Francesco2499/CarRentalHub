@@ -25,7 +25,7 @@ public class BookingService
     public static List<BookingModel> GetAllBookings()
     {
         var bookings = HttpService.Get<List<BookingModel>>("http://localhost:8085/api/v1/booking/getAll");
-        return bookings ?? []; // Restituisce una lista vuota se null
+        return bookings ?? []; 
     }
 
     public static void DeleteBooking(int bookingId)

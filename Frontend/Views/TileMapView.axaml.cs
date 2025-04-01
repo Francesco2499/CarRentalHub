@@ -10,10 +10,8 @@ public partial class TileMapView : UserControl
         {
             InitializeComponent();
             
-            // Imposta il DataContext manualmente
             this.DataContext = new TileMapViewModel();
 
-            // Configura la mappa
             SetupMap();
         }
 

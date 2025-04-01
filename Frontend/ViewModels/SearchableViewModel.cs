@@ -2,16 +2,15 @@ using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Text.RegularExpressions;
-using System;
 
 namespace Frontend.ViewModels
 {
     public abstract partial class SearchableViewModel<TModel> : PaginatedViewModel<TModel>
     {
-        [ObservableProperty] private string _searchQuery = string.Empty;  // Per la ricerca testuale (es. modello veicolo)
-
+        [ObservableProperty] private string _searchQuery = string.Empty;
         [ObservableProperty] private bool _enableShowAll = false;
         private List<TModel>? filteredResults;
+        
         protected abstract List<TModel> ApplySearch(List<TModel> items, string query);
 
         protected virtual List<TModel> ApplySearchByBookingId(List<TModel> items, string query)

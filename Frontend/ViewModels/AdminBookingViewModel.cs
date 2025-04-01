@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Frontend.Models;
@@ -14,15 +12,14 @@ namespace Frontend.ViewModels
     {
         [ObservableProperty] private BookingModel? _selectedBooking = null;
         [ObservableProperty] public List<(string VehicleModel, int VehicleId)> _allVehicles = [];
-
         [ObservableProperty] private List<string> _vehicleNameList = [];
-        
-               
+        [ObservableProperty] private bool _isConfirmationModalVisible = false;
+        [ObservableProperty] private string? _successMessage;
+        [ObservableProperty] private bool _isFormVisible = false;
+        [ObservableProperty] private BookingModel _editingBooking = new(0, 0, "", 0, "", 0, DateTime.Now, DateTime.Now, DateTime.Now);
         private string? _selectedVehicleModel;
         public int SelectedVehicleId { get; set; }
-
         public DateTime _newStartDate;
-
         public DateTime NewStartDate
         {
             get => _newStartDate;
@@ -38,9 +35,7 @@ namespace Frontend.ViewModels
 
             }
         }
-
         public DateTime _newEndDate;
-
         public DateTime NewEndDate
         {
             get => _newEndDate;
@@ -53,8 +48,6 @@ namespace Frontend.ViewModels
                 }
             }
         }
-
-        // Proprietà che aggiorna l'ID quando viene selezionato un modello
         public string? SelectedVehicleModel
         {
             get => _selectedVehicleModel;
@@ -62,16 +55,11 @@ namespace Frontend.ViewModels
             {
                 if (SetProperty(ref _selectedVehicleModel, value))
                 {
-                    // Quando il valore cambia, aggiorna l'ID corrispondente
                     var selectedVehicle = AllVehicles?.FirstOrDefault(v => v.VehicleModel == value);
                     SelectedVehicleId = selectedVehicle?.VehicleId ?? 0;
                 }
             }
         }
-        [ObservableProperty] private bool _isConfirmationModalVisible = false;
-        [ObservableProperty] private string? _successMessage;
-        [ObservableProperty] private bool _isFormVisible = false;
-        [ObservableProperty] private BookingModel _editingBooking = new(0, 0, "", 0, "", 0, DateTime.Now, DateTime.Now, DateTime.Now);
 
         public AdminBookingViewModel()
         {
@@ -84,10 +72,8 @@ namespace Frontend.ViewModels
         {
                 var allVehicles = new List<(string VehicleModel, int VehicleId)>();
 
-                // Itera su tutti gli showroom
                 foreach (var showroom in VehicleService.GetAvailableShowrooms(EditingBooking.StartDate, EditingBooking.EndDate))
                 {
-                    // Aggiungi ogni veicolo come una tupla alla lista
                     foreach (var vehicle in showroom.Vehicles) // 'Vehicles' contiene i veicoli dello showroom
                     {
                         allVehicles.Add((vehicle.Model, vehicle.Id));

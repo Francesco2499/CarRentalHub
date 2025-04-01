@@ -1,7 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Threading.Tasks;
-using System.Net.Http;
 using Frontend.Services;
 using System.Collections.ObjectModel;
 
@@ -19,7 +17,7 @@ public partial class RegisterViewModel : ViewModelBase
     [ObservableProperty] private string confirmPassword = string.Empty;
     [ObservableProperty] private string registerMessage = string.Empty;
     [ObservableProperty] private string errorMessage = string.Empty;
-    [ObservableProperty] private string registerTitle = "Registrazioe";
+    [ObservableProperty] private string registerTitle = "Registrazione";
     [ObservableProperty] private bool _isAdmin = false;
     [ObservableProperty] private ObservableCollection<string>? _regions;
     [ObservableProperty] private string? _selectedRegion;

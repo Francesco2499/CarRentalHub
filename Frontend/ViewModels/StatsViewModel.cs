@@ -20,8 +20,8 @@ namespace Frontend.ViewModels
         [ObservableProperty] bool _isVisibleText = false;
         [ObservableProperty] bool _isVisibleFilterDate = false;
         [ObservableProperty] bool _isVisibleSliderDate = false;
-        [ObservableProperty] private Bitmap? _statsImage; // Immagine dei grafici
-        [ObservableProperty] private string? _statsText; // Testo con statistiche numeriche
+        [ObservableProperty] private Bitmap? _statsImage;
+        [ObservableProperty] private string? _statsText;
         [ObservableProperty] private UserInfo? _userInfo;
         [ObservableProperty] private string _errorMessage = string.Empty;
         private DateTime? _startDate;
@@ -31,18 +31,15 @@ namespace Frontend.ViewModels
             set
             {
                 SetProperty(ref _startDate, value);                
-                // Imposta EndDate al giorno successivo, solo se StartDate è selezionata
+
                 if (value.HasValue)
                 {
                     EndDate = value.Value.AddDays(1);
                 }
             }
         }
-
-        [ObservableProperty]
-        private DateTime? _endDate;
-
-         private int _selectedRangeIndex;
+        [ObservableProperty] private DateTime? _endDate;
+        private int _selectedRangeIndex;
         public int SelectedRangeIndex
         {
             get => _selectedRangeIndex;
@@ -127,7 +124,6 @@ namespace Frontend.ViewModels
 
             if (StartDate.HasValue && EndDate.HasValue)
             {
-                // Aggiungi le date come query parameters nell'URL
                 url += $"?start_date={StartDate.Value:yyyy-MM-dd}&end_date={EndDate.Value:yyyy-MM-dd}";
             }
 
@@ -145,7 +141,6 @@ namespace Frontend.ViewModels
 
             if (StartDate.HasValue && EndDate.HasValue)
             {
-                // Aggiungi le date come query parameters nell'URL
                 url += $"?start_date={StartDate.Value:yyyy-MM-dd}&end_date={EndDate.Value:yyyy-MM-dd}";
             }
 
@@ -160,7 +155,6 @@ namespace Frontend.ViewModels
 
             if (StartDate.HasValue && EndDate.HasValue)
             {
-                // Aggiungi le date come query parameters nell'URL
                 url += $"?start_date={StartDate.Value:yyyy-MM-dd}&end_date={EndDate.Value:yyyy-MM-dd}";
             }
 
@@ -175,7 +169,6 @@ namespace Frontend.ViewModels
 
             if (StartDate.HasValue && EndDate.HasValue)
             {
-                // Aggiungi le date come query parameters nell'URL
                 url += $"?start_date={StartDate.Value:yyyy-MM-dd}&end_date={EndDate.Value:yyyy-MM-dd}";
             }
 
@@ -263,7 +256,6 @@ namespace Frontend.ViewModels
             
         }
 
-        // Funzione per cambiare dinamicamente il comando del pulsante "Filtra per date"
         public bool UpdateFilterCommand(string filterType)
         {
             bool result = false;
@@ -298,7 +290,6 @@ namespace Frontend.ViewModels
             return result;
         }
 
-        // Funzione per gestire il cambiamento di selezione nel MenuFlyout e eseguire il comando immediatamente
         [RelayCommand]
         public void OnMenuItemSelected(string filterType)
         {

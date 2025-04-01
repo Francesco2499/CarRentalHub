@@ -7,11 +7,8 @@ using Mapsui.Providers;
 using Mapsui.Projections;
 using System.Linq;
 using Frontend.Services;
-using Frontend.Models;
 using System.Collections.Generic;
 using Mapsui.Widgets;
-using System.Reflection.Metadata.Ecma335;
-using System;
 
 namespace Frontend.ViewModels;
 public class TileMapViewModel : ViewModelBase
@@ -20,7 +17,7 @@ public class TileMapViewModel : ViewModelBase
 
     public TileMapViewModel()
     {
-        MapView = new Map(); // Crea la mappa nel ViewModel
+        MapView = new Map();
         SetupMap();
     }
 
@@ -28,8 +25,6 @@ public class TileMapViewModel : ViewModelBase
     {
 
         MapView.Layers.Add(OpenStreetMap.CreateTileLayer());
-
-
 
         var (x1, y2) = SphericalMercator.FromLonLat(12.4964, 41.9028);
         var centerPoint = new MPoint(x1, y2);
@@ -59,7 +54,7 @@ public class TileMapViewModel : ViewModelBase
             Name = "VehicleMarkers",
             IsMapInfoLayer = true,
             Features = new MemoryProvider(GetLocationFromShowrooms()).Features,
-            Style = SymbolStyles.CreatePinStyle(symbolScale: 0.7) // Puoi cambiare l'icona del marker se lo desideri
+            Style = SymbolStyles.CreatePinStyle(symbolScale: 0.7)
         };
     }
 
@@ -77,23 +72,22 @@ public class TileMapViewModel : ViewModelBase
 
     private static CalloutStyle CreateCalloutStyle(string title, string content)
     {
-        // Crea un callout che mostra le informazioni del veicolo
         return new CalloutStyle
         {
             Type = CalloutType.Detail,
             Title = title,
             Subtitle = content,
             TitleTextAlignment = Alignment.Center,
-            SubtitleFont = { FontFamily = null, Size = 14, Italic = false, Bold = false }, // Font più grande
-            TitleFont = { FontFamily = null, Size = 14, Italic = false, Bold = true }, // Font più grande
-            TitleFontColor = Color.White, // Testo più visibile
+            SubtitleFont = { FontFamily = null, Size = 14, Italic = false, Bold = false },
+            TitleFont = { FontFamily = null, Size = 14, Italic = false, Bold = true },
+            TitleFontColor = Color.White,
             SubtitleFontColor = Color.White,
             BackgroundColor = Color.FromArgb(255, 78, 78, 78),
             MaxWidth = 250,
             RectRadius = 10,
             ShadowWidth = 5,
-            Enabled = false,  // Disabilita per renderlo visibile solo quando richiesto
-            SymbolOffset = new Offset(0, 30), // Posiziona il callout sopra il marker
+            Enabled = false,
+            SymbolOffset = new Offset(0, 30),
         };
     }
 }

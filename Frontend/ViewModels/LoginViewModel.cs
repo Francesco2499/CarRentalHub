@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Threading.Tasks;
-using System.Net.Http;
+
 using Frontend.Services;
 
 namespace Frontend.ViewModels;
@@ -9,14 +8,9 @@ namespace Frontend.ViewModels;
 public partial class LoginViewModel(MainWindowViewModel mainViewModel) : ViewModelBase
 {
     private readonly MainWindowViewModel _mainViewModel = mainViewModel;
-    [ObservableProperty]
-    private string emailOrUsername = string.Empty;
-
-    [ObservableProperty]
-    private string password = string.Empty;
-
-    [ObservableProperty]
-    private string loginMessage = string.Empty;
+    [ObservableProperty] private string emailOrUsername = string.Empty;
+    [ObservableProperty] private string password = string.Empty;
+    [ObservableProperty] private string loginMessage = string.Empty;
 
     [RelayCommand]
     public void SubmitLogin()

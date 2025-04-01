@@ -18,4 +18,14 @@ public class TypeConverters
             Application.Current!.TryFindResource(iconKey, out var resource);
             return resource as StreamGeometry ?? StreamGeometry.Parse(StreamGeometryNotFound);
         });
+
+    public static FuncValueConverter<string?, bool> VisibilityConverter { get; } =
+    new( value => {
+        if (value != null && value is string strValue && !string.IsNullOrEmpty(strValue))
+        {
+            return true;
+        }
+        
+        return false; 
+    });    
 }

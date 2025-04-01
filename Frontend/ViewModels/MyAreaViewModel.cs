@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Frontend.Models;
@@ -10,7 +9,6 @@ namespace Frontend.ViewModels;
 public partial class MyAreaViewModel : ViewModelBase
 {
     private readonly UserModel _originalUser;
-
     [ObservableProperty] private UserModel _editedUser;
     [ObservableProperty] private string? _errorMessage;
     [ObservableProperty] private string? _newPassword;

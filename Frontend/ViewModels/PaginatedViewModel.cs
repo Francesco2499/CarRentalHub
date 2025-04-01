@@ -1,44 +1,22 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
-using Frontend.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 
 namespace Frontend.ViewModels
 {
     public abstract partial class PaginatedViewModel<TModel> : ViewModelBase
     {
         protected const int PageSize = 5;
-
-        [ObservableProperty]
-        private bool _isVisibleList = false;
-        
-        [ObservableProperty]
-        protected ObservableCollection<TModel> _items = [];
-        
-        [ObservableProperty]
-        protected int _currentPage = 1;
-        
-        [ObservableProperty]
-        protected bool _isPreviousPageEnabled = false;
-        
-        [ObservableProperty]
-        protected bool _isNextPageEnabled = false;
-        
-        [ObservableProperty]
-        protected double _previousPageOpacity = 1.0;
-        
-        [ObservableProperty]
-        protected double _nextPageOpacity = 1.0;
-
-        [ObservableProperty]
-        private string? _errorMessage;
-        
-        [ObservableProperty]
-        protected bool _isPaginationVisible = false;
-        
+        [ObservableProperty] private bool _isVisibleList = false;
+        [ObservableProperty] protected ObservableCollection<TModel> _items = [];
+        [ObservableProperty] protected int _currentPage = 1;
+        [ObservableProperty] protected bool _isPreviousPageEnabled = false; 
+        [ObservableProperty] protected bool _isNextPageEnabled = false;
+        [ObservableProperty] protected double _previousPageOpacity = 1.0;
+        [ObservableProperty] protected double _nextPageOpacity = 1.0;
+        [ObservableProperty]  private string? _errorMessage;
+        [ObservableProperty] protected bool _isPaginationVisible = false;
         protected List<TModel>? _allItems = [];
         
         protected abstract List<TModel>? LoadAllItems();

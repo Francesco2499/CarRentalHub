@@ -10,11 +10,8 @@ namespace Frontend.ViewModels
 {
     public partial class MyBookingsViewModel : SearchableViewModel<BookingModel>
     {
-
         [ObservableProperty] private string? _bookingMessage;
-
         [ObservableProperty] private bool _isVisibleList = true;
-
         private DateTime? _startDate;
         public DateTime? StartDate
         {
@@ -23,16 +20,13 @@ namespace Frontend.ViewModels
             {
                 SetProperty(ref _startDate, value);
                 
-                // Imposta EndDate al giorno successivo, solo se StartDate è selezionata
                 if (value.HasValue)
                 {
                     EndDate = value.Value.AddDays(1);
                 }
             }
         }
-
-        [ObservableProperty]
-        private DateTime? _endDate;
+        [ObservableProperty] private DateTime? _endDate;
 
         public MyBookingsViewModel()
         {

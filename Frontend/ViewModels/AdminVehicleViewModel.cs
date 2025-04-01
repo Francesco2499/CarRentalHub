@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Frontend.Models;
@@ -13,11 +11,14 @@ namespace Frontend.ViewModels
     public partial class AdminVehicleViewModel : SearchableViewModel<VehicleModel>
     {
         [ObservableProperty] private Dictionary<int, string>  _showroomsList  = VehicleService.GetAvailableShowrooms(null, null)?.Select((showroom, index) => new { showroom.Name, showroom.Id }).ToDictionary(v => v.Id, v => v.Name) ?? [];
+        [ObservableProperty] private VehicleModel? _selectedVehicle;
+        [ObservableProperty] private string? _successMessage;
+        [ObservableProperty] private bool _isConfirmationModalVisible = false;
+        [ObservableProperty] private bool _isFormVisible = false;
+        [ObservableProperty] private VehicleModel _editingVehicle = new(0, "", "", 0, 0,""); 
         public List<string> Showrooms => ShowroomsList?.Values.ToList() ?? [];
         private string? _selectedShowroom;
         public int SelectedShowroomId{ get; set; }
-
-        // Proprietà che aggiorna l'ID quando viene selezionato un modello
         public string? SelectedShowroom
         {
             get => _selectedShowroom;
@@ -30,11 +31,6 @@ namespace Frontend.ViewModels
                 }
             }
         }
-        [ObservableProperty] private VehicleModel? _selectedVehicle;
-        [ObservableProperty] private string? _successMessage;
-        [ObservableProperty] private bool _isConfirmationModalVisible = false;
-        [ObservableProperty] private bool _isFormVisible = false;
-        [ObservableProperty] private VehicleModel _editingVehicle = new(0, "", "", 0, 0,""); 
     
         public AdminVehicleViewModel()
         {
@@ -88,7 +84,7 @@ namespace Frontend.ViewModels
 
                 EditingVehicle = EditingVehicle with {CarShowroomID = SelectedShowroomId};
 
-                if (EditingVehicle.Id == 0) // Aggiunta di un nuovo veicolo
+                if (EditingVehicle.Id == 0)
                 {
                     vehicleResponse = VehicleService.AddVehicle(EditingVehicle);
                     msg = "Errore nell'aggiunta del veicolo!";
@@ -154,7 +150,6 @@ namespace Frontend.ViewModels
                 return;
             }
             
-            // Mostra la modale di conferma
             IsConfirmationModalVisible = true;
         }
 

@@ -9,8 +9,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
-        // Imposta la schermata iniziale (DashView)
-        CurrentView = new HomeViewModel(this);//this);
+        CurrentView = new HomeViewModel(this);
     }
 
     public void ChangeViewModel(ViewModelBase newView)
