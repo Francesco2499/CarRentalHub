@@ -12,21 +12,17 @@ func UpdateUser(userID int, req *models.UserUpdateRequestDTO) (*models.UserLogin
 		return nil, "Utente non trovato!", fmt.Errorf("")
 	}
 
-	// Verifica password attuale
 	if req.Password != "" && req.NewPassword != "" {
 		if user.Password != req.Password {
 			return nil, "Password errata!", fmt.Errorf("")
 		}
-		// Password corretta, aggiorna con nuova hashata
 		user.Password = req.NewPassword
 	}
 
-	// Aggiorna i campi modificabili
 	user.Username = req.Username
 	user.Email = req.Email
 	user.Region = req.Region
 
-	// Salva nel DB
 	err = repositories.UpdateFullUser(user)
 	if err != nil {
 		return nil, "Errore nella modifica dell'utente", fmt.Errorf("")

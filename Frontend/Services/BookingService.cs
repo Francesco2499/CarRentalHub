@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Frontend.Models;
 
 namespace Frontend.Services;
 
-public class BookingService
+public static class BookingService
 {
-    public static BookingResponse? AddBooking(int vehicleId, DateTime? startDate, DateTime? endDate)
+    public static async Task<BookingResponse?> AddBooking(int vehicleId, DateTime? startDate, DateTime? endDate)
     {
         var requestBody = new Dictionary<string, object>
         {
@@ -19,20 +20,20 @@ public class BookingService
         if (endDate.HasValue)
             requestBody["end_date"] = endDate.Value.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
-        return HttpService.Post<BookingResponse>("http://localhost:8085/api/v1/booking/new", requestBody);
+        return await HttpService.PostAsync<BookingResponse>("http://localhost:8085/api/v1/booking/new", requestBody);
     }
 
-    public static List<BookingModel> GetAllBookings()
+    public static async Task<List<BookingModel>> GetAllBookings()
     {
-        var bookings = HttpService.Get<List<BookingModel>>("http://localhost:8085/api/v1/booking/getAll");
-        return bookings ?? []; 
+        var bookings = await HttpService.GetAsync<List<BookingModel>>("http://localhost:8085/api/v1/booking/getAll");
+        return bookings ?? [];
     }
 
-    public static void DeleteBooking(int bookingId)
+    public static async Task DeleteBooking(int bookingId)
     {
         try
         {
-            HttpService.Delete<dynamic>($"http://localhost:8085/api/v1/booking/delete/{bookingId}");
+            await HttpService.DeleteAsync<dynamic>($"http://localhost:8085/api/v1/booking/delete/{bookingId}");
         }
         catch (Exception ex)
         {
@@ -40,7 +41,7 @@ public class BookingService
         }
     }
 
-    public static BookingResponse? EditBooking(BookingModel booking, int vehicleId)
+    public static async Task<BookingResponse?> EditBooking(BookingModel booking, int vehicleId)
     {
         var requestBody = new Dictionary<string, object>
         {
@@ -50,8 +51,10 @@ public class BookingService
             { "end_date", booking.EndDate.ToString("yyyy-MM-ddTHH:mm:ssZ")}
         };
 
-        return HttpService.Put<BookingResponse>($"http://localhost:8085/api/v1/booking/update/{booking.Id}", requestBody);
+        return await HttpService.PutAsync<BookingResponse>($"http://localhost:8085/api/v1/booking/update/{booking.Id}", requestBody);
     }
+    public record BookingResponse(BookingModel? Booking, string? Message, object? Error);
+
 }
 
-public record BookingResponse(BookingModel? Booking, string? Message, object? Error);
+

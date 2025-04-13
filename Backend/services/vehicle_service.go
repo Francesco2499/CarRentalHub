@@ -10,7 +10,6 @@ import (
 )
 
 // Cache per le prenotazioni (TTL di 30 secondi)
-//var vehicleCache = cache.NewCache(30 * time.Second)
 
 func CreateVehicle(vehicle *models.Vehicle) error {
 	err := repositories.CreateVehicle(vehicle)
@@ -18,7 +17,6 @@ func CreateVehicle(vehicle *models.Vehicle) error {
 		return err
 	}
 
-	//invalida la cache
 	cache.VehicleCache.Invalidate()
 
 	return nil
@@ -30,7 +28,6 @@ func UpdateVehicle(vehicle *models.Vehicle) error {
 		return err
 	}
 
-	//invalida la cache
 	cache.VehicleCache.Invalidate()
 
 	return nil
@@ -42,7 +39,6 @@ func DeleteVehicle(id int) error {
 		return err
 	}
 
-	//invalida la cache
 	cache.VehicleCache.Invalidate()
 
 	return nil
@@ -80,7 +76,6 @@ func GetVehicleById(id int) (*models.Vehicle, error) {
 		return nil, err
 	}
 
-	// Salva in cache
 	cache.VehicleCache.Set(cacheKey, vehicle)
 	return vehicle, nil
 }

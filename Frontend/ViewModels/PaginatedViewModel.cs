@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.Threading.Tasks;
+using System;
 
 namespace Frontend.ViewModels
 {
@@ -19,39 +21,51 @@ namespace Frontend.ViewModels
         [ObservableProperty] protected bool _isPaginationVisible = false;
         protected List<TModel>? _allItems = [];
         
-        protected abstract List<TModel>? LoadAllItems();
+        protected abstract Task<List<TModel>?> LoadAllItems();
         
         protected void UpdatePaginatedItems(List<TModel>? listItems, bool returnToFirstPage = false)
         {
-            if (returnToFirstPage) {
+            if (returnToFirstPage)
                 CurrentPage = 1;
-            }
-            var skip = (CurrentPage - 1) * PageSize;
-            var results = listItems ?? _allItems;
-            ErrorMessage = string.Empty;
-            
-            if (results != null) {
-                Items.Clear();
-                foreach (var item in results.Skip(skip).Take(PageSize))
-                {
-                    Items.Add(item);
-                }
 
-                IsPreviousPageEnabled = CurrentPage > 1;
-                IsNextPageEnabled = CurrentPage * PageSize < results.Count;
-                IsPaginationVisible = _allItems != null && _allItems.Count > PageSize;
-                PreviousPageOpacity = IsPreviousPageEnabled ? 1.0 : 0.5;
-                NextPageOpacity = IsNextPageEnabled ? 1.0 : 0.5;   
-                
-                if (results.Count == 0) {
-                    ErrorMessage = "Nessun risultato trovato. Cambia i parametri di ricerca.";
-                }
+            var results = listItems ?? _allItems;
+            Items.Clear();
+            ErrorMessage = string.Empty;
+
+            if (results == null || results.Count == 0)
+            {
+                ErrorMessage = "Nessun risultato trovato. Cambia i parametri di ricerca.";
+                UpdatePaginationControls(0);
+                return;
             }
+
+            var maxPage = (int)Math.Ceiling(results.Count / (double)PageSize);
+            if (CurrentPage > maxPage)
+                CurrentPage = maxPage;
+
+            var skip = (CurrentPage - 1) * PageSize;
+            foreach (var item in results.Skip(skip).Take(PageSize))
+                Items.Add(item);
+
+            UpdatePaginationControls(results.Count);
+        }
+
+        private void UpdatePaginationControls(int totalCount)
+        {
+            IsPreviousPageEnabled = CurrentPage > 1;
+            IsNextPageEnabled = CurrentPage * PageSize < totalCount;
+            IsPaginationVisible = _allItems != null && _allItems.Count > PageSize;
+            PreviousPageOpacity = IsPreviousPageEnabled ? 1.0 : 0.5;
+            NextPageOpacity = IsNextPageEnabled ? 1.0 : 0.5;
+        }
+
+        public void ResetPagination() {
+            UpdatePaginatedItems(_allItems);
         }
         
-        public void LoadItems()
+        public async Task LoadItems()
         {
-            _allItems = LoadAllItems();
+            _allItems = await LoadAllItems();
             UpdatePaginatedItems(null);
         }
     }

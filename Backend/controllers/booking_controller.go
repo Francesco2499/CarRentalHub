@@ -40,7 +40,6 @@ func CreateBooking(c *gin.Context) {
 	}
 
 	booking.UserID = userID
-	//senza l'uso della goroutine chiamare services.CreateBooking(&booking)
 	createdBooking, err := services.RequestBooking(booking)
 	if err != nil {
 		log.Printf("Error saving booking: %v", err)
@@ -91,26 +90,18 @@ func DeleteBooking(c *gin.Context) {
 		return
 	}
 	log.Printf("Booking ID %d deleted successfully", id)
-	//c.Status(http.StatusNoContent)
 	c.JSON(http.StatusOK, gin.H{"message": "Prenotazione cancellata correttamente!"})
 }
 
 func extractUserFromContext(c *gin.Context) (int, bool) {
-
-	/*for key, value := range c.Keys {
-		log.Printf("Key: %s, Value: %v", key, value)
-	}*/
-
-	// Recupera userID dal contesto della richiesta
 	userID, exists := c.Get("userID")
 	if !exists {
-		return 0, false // Nessun utente autenticato
+		return 0, false
 	}
 
-	// Recupera il ruolo dell'utente (admin o customer)
 	role, exists := c.Get("role")
 	if !exists {
-		return userID.(int), false // Assume che sia un cliente di default
+		return userID.(int), false 
 	}
 
 	isAdmin := (role == "admin")

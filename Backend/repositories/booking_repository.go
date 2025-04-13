@@ -22,7 +22,6 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingDTO, error) {
 				b.id, b.user_id, v.id, v.model, b.start_date, b.end_date, b.created_at, b.updated_at
 			FROM bookings b
 			JOIN vehicles v ON b.vehicle_id = v.id`
-		//log.Printf("Executing query: %s", query)
 		rows, err = db.Query(query)
 	} else {
 		query = `
@@ -31,7 +30,6 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingDTO, error) {
 			FROM bookings b
 			JOIN vehicles v ON b.vehicle_id = v.id
 			WHERE b.user_id = $1`
-		//log.Printf("Executing query: %s with userID: %d", query, userID)
 		rows, err = db.Query(query, userID)
 	}
 
@@ -43,9 +41,7 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingDTO, error) {
 	var bookings []models.BookingDTO
 	for rows.Next() {
 		var booking models.BookingDTO
-		/*if err := rows.Scan(&booking.ID, &booking.UserID, &booking.VehicleModel, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("data scan error: %w", err)
-		}*/
+
 		if err := rows.Scan(&booking.ID, &userID, &booking.VehicleID, &booking.VehicleModel, &booking.StartDate, &booking.EndDate, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("data scan error: %w", err)
 		}
@@ -65,7 +61,7 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingDTO, error) {
 
 		days := int(booking.EndDate.Truncate(24*time.Hour).Sub(booking.StartDate.Truncate(24*time.Hour)).Hours()/24) + 1
 		if days < 1 {
-			days = 1 // fallback di sicurezza
+			days = 1 
 		}
 		booking.TotalPrice = priceForDay * float64(days)
 
@@ -82,9 +78,6 @@ func IsVehicleAvailable(vehicleID int, bookingID int, startDate, endDate time.Ti
 	query := `SELECT COUNT(*) FROM bookings WHERE vehicle_id = $1 
 		AND id != $2 
 		AND	(start_date, end_date) OVERLAPS ($3::timestamp, $4::timestamp)`
-	//AND (
-	//(start_date <= $3 AND end_date >= $2) -- La nuova prenotazione inizia dentro un'altra
-	//)
 
 	var count int
 	err := db.QueryRow(query, vehicleID, bookingID, startDate, endDate).Scan(&count)
@@ -102,7 +95,6 @@ func CreateBooking(booking *models.Booking) (*models.BookingDTO, error) {
 		return nil, fmt.Errorf("failed to start transaction: %w", err)
 	}
 
-	// Query per inserire la prenotazione SOLO se il veicolo è disponibile e restituire i dettagli base
 	query := `
 		INSERT INTO bookings (user_id, vehicle_id, start_date, end_date) 
 		SELECT $1, $2, $3, $4
@@ -124,7 +116,6 @@ func CreateBooking(booking *models.Booking) (*models.BookingDTO, error) {
 		return nil, fmt.Errorf("booking entry error: %w", err)
 	}
 
-	// Recupera il modello e il prezzo del veicolo usando l'ID appena estratto
 	var priceForDay float64
 	err = db.QueryRow(`SELECT model, price FROM vehicles WHERE id = $1`, booking.VehicleID).Scan(&newBooking.VehicleModel, &priceForDay)
 	if err != nil {
@@ -134,7 +125,7 @@ func CreateBooking(booking *models.Booking) (*models.BookingDTO, error) {
 
 	days := int(newBooking.EndDate.Truncate(24*time.Hour).Sub(newBooking.StartDate.Truncate(24*time.Hour)).Hours()/24) + 1
 	if days < 1 {
-		days = 1 // fallback di sicurezza
+		days = 1 
 	}
 	newBooking.TotalPrice = priceForDay * float64(days)
 
@@ -146,7 +137,6 @@ func CreateBooking(booking *models.Booking) (*models.BookingDTO, error) {
 	}
 	newBooking.Username = username
 
-	// Conferma la transazione
 	err = tx.Commit()
 	if err != nil {
 		return nil, fmt.Errorf("failed to commit transaction: %w", err)
@@ -171,7 +161,6 @@ func UpdateBooking(booking *models.Booking) error {
 		return fmt.Errorf("booking update error: %w", err)
 	}
 
-	// Conferma la transazione
 	err = tx.Commit()
 	if err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)
@@ -200,7 +189,6 @@ func DeleteBooking(id int) error {
 		return errors.New("booking not found")
 	}
 
-	// Conferma la transazione
 	err = tx.Commit()
 	if err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)

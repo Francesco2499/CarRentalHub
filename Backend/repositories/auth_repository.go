@@ -5,7 +5,6 @@ import (
 	"Backend/models"
 )
 
-// FindByEmail cerca un utente per email
 func FindByEmail(email string) (*models.User, error) {
 	db := config.GetDB()
 	var user models.User
@@ -17,7 +16,6 @@ func FindByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-// FindByUsername cerca un utente per username
 func FindByUsername(username string) (*models.User, error) {
 	db := config.GetDB()
 	var user models.User
@@ -29,7 +27,6 @@ func FindByUsername(username string) (*models.User, error) {
 	return &user, nil
 }
 
-// SaveUser salva un nuovo utente nel database
 func SaveUser(user *models.User) error {
 	db := config.GetDB()
 

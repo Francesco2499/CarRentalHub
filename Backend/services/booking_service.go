@@ -9,22 +9,19 @@ import (
 	"log"
 )
 
-// Struttura per la richiesta di prenotazione
 type BookingRequest struct {
 	Booking  models.Booking
 	Response chan *models.BookingDTO
 	Error    chan error
 }
 
-// Canale globale per la gestione concorrente delle prenotazioni
 var bookingChannel = make(chan BookingRequest, 100)
 
 func init() {
 	log.Println("Avviando Goroutine processBookingRequests()...")
-	go processBookingRequests() // Avvio della Goroutine worker
+	go processBookingRequests()
 }
 
-// Goroutine che processa le richieste di prenotazione
 func processBookingRequests() {
 	log.Println("Goroutine processBookingRequests avviata!")
 	for req := range bookingChannel {
@@ -45,14 +42,12 @@ func CreateBooking(booking *models.Booking) (*models.BookingDTO, error) {
 		return nil, err
 	}
 
-	// Invalida la cache quando viene creata una nuova prenotazione
 	cache.BookingCache.Invalidate()
 	cache.VehicleCache.Invalidate()
 
 	return createdBooking, nil
 }
 
-// Funzione chiamata dal controller per gestire la prenotazione
 func RequestBooking(booking models.Booking) (*models.BookingDTO, error) {
 	log.Println("Inviando richiesta di prenotazione al canale...")
 	response := make(chan *models.BookingDTO)
@@ -71,7 +66,6 @@ func RequestBooking(booking models.Booking) (*models.BookingDTO, error) {
 
 func GetAllBookings(userID int, isAdmin bool) ([]models.BookingDTO, error) {
 	cacheKey := fmt.Sprintf("bookings_user_%d_admin_%t", userID, isAdmin)
-	// Controllo se il dato è in cache
 	if cachedData, found := cache.BookingCache.Get(cacheKey); found {
 		log.Println("all bookings found in cache")
 		return cachedData.([]models.BookingDTO), nil
@@ -82,7 +76,6 @@ func GetAllBookings(userID int, isAdmin bool) ([]models.BookingDTO, error) {
 		return nil, err
 	}
 
-	// Salvo in cache
 	cache.BookingCache.Set(cacheKey, bookings)
 
 	return bookings, nil
@@ -103,7 +96,6 @@ func UpdateBooking(booking *models.Booking) (string, error) {
 		return "Errore nell'aggiornamento della prenotazione", err
 	}
 
-	// Invalida la cache dopo l'aggiornamento
 	cache.BookingCache.Invalidate()
 	cache.VehicleCache.Invalidate()
 
@@ -116,7 +108,6 @@ func DeleteBooking(id int) error {
 		return err
 	}
 
-	// Invalida la cache dopo la cancellazione
 	cache.BookingCache.Invalidate()
 	cache.VehicleCache.Invalidate()
 

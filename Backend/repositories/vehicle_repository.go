@@ -74,7 +74,6 @@ func CreateVehicle(vehicle *models.Vehicle) error {
 		return fmt.Errorf("vehicle entry error: %w", err)
 	}
 
-	// Conferma la transazione
 	err = tx.Commit()
 	if err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)
@@ -96,7 +95,6 @@ func UpdateVehicle(vehicle *models.Vehicle) error {
 		return fmt.Errorf("vehicle update error: %w", err)
 	}
 
-	// Conferma la transazione
 	err = tx.Commit()
 	if err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)
@@ -123,7 +121,6 @@ func DeleteVehicle(id int) error {
 		return errors.New("vehicle not found")
 	}
 
-	// Conferma la transazione
 	err = tx.Commit()
 	if err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)
@@ -163,11 +160,8 @@ func GetAvailableVehicles(startDate, endDate *time.Time) ([]models.CarShowroomVe
 	}
 	defer rows.Close()
 
-	//evito i duplicati, con la chiave cs_id se è già stato processato, aggiungo solo i nuovi veicoli
 	showroomMap := make(map[int]*models.CarShowroomVehiclesDTO)
 
-	//legge i dati dell’autosalone e del veicolo associato
-	//li inserisce nella mappa showroomMap
 	for rows.Next() {
 		var (
 			csID        int
@@ -186,7 +180,6 @@ func GetAvailableVehicles(startDate, endDate *time.Time) ([]models.CarShowroomVe
 			return nil, fmt.Errorf("error scanning row: %w", err)
 		}
 
-		//Se non esiste ancora l'autosalone nella mappa, lo creo
 		if showroomMap[csID] == nil {
 			showroomMap[csID] = &models.CarShowroomVehiclesDTO{
 				ID:        csID,
@@ -198,7 +191,6 @@ func GetAvailableVehicles(startDate, endDate *time.Time) ([]models.CarShowroomVe
 			}
 		}
 
-		//Aggiungo il veicolo corrente alla lista Vehicles del relativo autosalone.
 		showroomMap[csID].Vehicles = append(showroomMap[csID].Vehicles, models.Vehicle{
 			ID:            vID,
 			Model:         vModel,
