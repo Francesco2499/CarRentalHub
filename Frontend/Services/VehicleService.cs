@@ -1,32 +1,32 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Frontend.Models;
 
 namespace Frontend.Services
 {
-    public class VehicleService
+    public static class VehicleService
     {
-        public static List<ShowroomModel> GetAvailableShowrooms(DateTime? startDate, DateTime? endDate)
+        public static async Task<List<ShowroomModel>> GetAvailableShowrooms(DateTime? startDate, DateTime? endDate)
         {
             string url = "http://localhost:8085/api/v1/vehicle/getAllAvailable";
-            
-            if (startDate != null && endDate != null) {
+
+            if (startDate != null && endDate != null)
+            {
                 url += $"?start_date={startDate:yyyy-MM-dd}&end_date={endDate:yyyy-MM-dd}";
             }
-            
-            var showrooms = HttpService.Get<List<ShowroomModel>>(url);
 
+            var showrooms = await HttpService.GetAsync<List<ShowroomModel>>(url);
             return showrooms ?? [];
         }
 
-        public static List<VehicleModel> GetAllVehicles()
+        public static async Task<List<VehicleModel>> GetAllVehicles()
         {
-            var vehicles = HttpService.Get<List<VehicleModel>>("http://localhost:8085/api/v1/vehicle/getAll");
-
+            var vehicles = await HttpService.GetAsync<List<VehicleModel>>("http://localhost:8085/api/v1/vehicle/getAll");
             return vehicles ?? [];
         }
 
-        public static VehicleResponse? AddVehicle(VehicleModel vehicle)
+        public static async Task<VehicleResponse?> AddVehicle(VehicleModel vehicle)
         {
             var requestBody = new Dictionary<string, object>
             {
@@ -36,12 +36,10 @@ namespace Frontend.Services
                 { "car_showroom_id", vehicle.CarShowroomID }
             };
 
-            var result = HttpService.Post<VehicleResponse>("http://localhost:8085/api/v1/vehicle/new", requestBody);
-
-            return result;
+            return await HttpService.PostAsync<VehicleResponse>("http://localhost:8085/api/v1/vehicle/new", requestBody);
         }
 
-        public static VehicleResponse? EditVehicle(VehicleModel vehicle)
+        public static async Task<VehicleResponse?> EditVehicle(VehicleModel vehicle)
         {
             var requestBody = new Dictionary<string, object>
             {
@@ -51,16 +49,14 @@ namespace Frontend.Services
                 { "car_showroom_id", vehicle.CarShowroomID }
             };
 
-            var updatedVehicle = HttpService.Put<VehicleResponse>($"http://localhost:8085/api/v1/vehicle/update/{vehicle.Id}", requestBody);
-
-            return updatedVehicle;
+            return await HttpService.PutAsync<VehicleResponse>($"http://localhost:8085/api/v1/vehicle/update/{vehicle.Id}", requestBody);
         }
 
-        public static void DeleteVehicle(int vehicleId)
+        public static async Task DeleteVehicle(int vehicleId)
         {
             try
             {
-                HttpService.Delete<dynamic>($"http://localhost:8085/api/v1/vehicle/delete/{vehicleId}");
+                await HttpService.DeleteAsync<dynamic>($"http://localhost:8085/api/v1/vehicle/delete/{vehicleId}");
             }
             catch (Exception ex)
             {
@@ -70,5 +66,4 @@ namespace Frontend.Services
     }
 
     public record VehicleResponse(VehicleModel? Vehicle, string? Message, object? Error);
-
 }

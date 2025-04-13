@@ -17,7 +17,7 @@ type Cache struct {
 
 func NewCache(ttl time.Duration) *Cache {
 	c := &Cache{ttl: ttl}
-	go c.cleanupExpiredEntries() // Avvio di una Goroutine per pulire la cache
+	go c.cleanupExpiredEntries()
 	return c
 }
 
@@ -57,5 +57,5 @@ func (c *Cache) cleanupExpiredEntries() {
 }
 
 func (c *Cache) Invalidate() {
-	c.store = sync.Map{} // Svuota la cache
+	c.store = sync.Map{}
 }

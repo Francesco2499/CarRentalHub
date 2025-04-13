@@ -3,12 +3,15 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Frontend.Models;
 using Frontend.Services;
+using System.Threading.Tasks;
+using System;
 
 namespace Frontend.ViewModels;
 
 public partial class MyAreaViewModel : ViewModelBase
 {
     private readonly UserModel _originalUser;
+    
     [ObservableProperty] private UserModel _editedUser;
     [ObservableProperty] private string? _errorMessage;
     [ObservableProperty] private string? _newPassword;
@@ -16,28 +19,19 @@ public partial class MyAreaViewModel : ViewModelBase
     [ObservableProperty] private bool _showEditPasswordBtn = true;
     [ObservableProperty] private bool _showEditPasswordForm = false;
 
-    public ObservableCollection<string> Regions { get; } =
-    [
+    public static ObservableCollection<string> Regions { get; } =
+    new ObservableCollection<string>
+    {
         "Abruzzo", "Basilicata", "Calabria", "Campania", "Emilia-Romagna",
         "Friuli-Venezia Giulia", "Lazio", "Liguria", "Lombardia", "Marche",
         "Molise", "Piemonte", "Puglia", "Sardegna", "Sicilia",
         "Toscana", "Trentino-Alto Adige", "Umbria", "Valle d'Aosta", "Veneto"
-    ];
+    };
 
     public MyAreaViewModel(UserModel User)
     {
         _originalUser = User with { };
         EditedUser = User;
-    }
-
-    private bool CheckModified()
-    {
-        ErrorMessage = "";
-
-        return EditedUser.Username != _originalUser.Username ||
-                        EditedUser.Email != _originalUser.Email ||
-                        EditedUser.Region != _originalUser.Region ||
-                        EditedUser.Password != _originalUser.Password;   
     }
 
     [RelayCommand]
@@ -48,34 +42,42 @@ public partial class MyAreaViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void Save()
+    private async Task Save()
     {
-        SuccessMessage ="";
+        SuccessMessage = "";
         ErrorMessage = "";
-        
+
         if (string.IsNullOrWhiteSpace(EditedUser.Email) 
-        || string.IsNullOrWhiteSpace(EditedUser.Region) 
-        || string.IsNullOrWhiteSpace(EditedUser.Username) 
-        || (ShowEditPasswordForm && (string.IsNullOrWhiteSpace(EditedUser.Password) || string.IsNullOrWhiteSpace(NewPassword))))
+            || string.IsNullOrWhiteSpace(EditedUser.Region) 
+            || string.IsNullOrWhiteSpace(EditedUser.Username) 
+            || (ShowEditPasswordForm && (string.IsNullOrWhiteSpace(EditedUser.Password) || string.IsNullOrWhiteSpace(NewPassword))))
         {
             ErrorMessage = "Inserisci un valore per tutti i campi!";
             return;
         }
 
-        if (!CheckModified()) {
+        if (EditedUser == _originalUser) {
             ErrorMessage = "Modifica uno dei campi!";
             return;
         }
 
-        var editResponse = UserService.EditProfile(EditedUser, NewPassword);
+        try
+        {
+            var editResponse = await UserService.EditProfile(EditedUser, NewPassword);
 
-        if (editResponse?.User != null && !string.IsNullOrEmpty(editResponse.Message)) {
-            SuccessMessage = editResponse.Message;
-        } else {
-            ErrorMessage = editResponse?.Message ?? "Errore nella modifica del profilo!";
+            if (editResponse?.User != null && !string.IsNullOrEmpty(editResponse.Message))
+            {
+                SuccessMessage = editResponse.Message;
+            }
+            else
+            {
+                ErrorMessage = editResponse?.Message ?? "Errore nella modifica del profilo!";
+            }
         }
-
-        
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Errore: {ex.Message}";
+        }
     }
 
     [RelayCommand]

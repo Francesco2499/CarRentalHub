@@ -13,34 +13,27 @@ func isEmail(s string) bool {
 	return re.MatchString(s)
 }
 
-// RegisterUser registra un nuovo utente utilizzando il repository
 func RegisterUser(user models.User) (*models.UserLoginResponseDTO, string, error) {
-	// Verifica se l'email è già in uso
 	if _, err := repositories.FindByEmail(user.Email); err == nil {
 		return nil, "Email già in uso", fmt.Errorf("")
 	}
 
-	// Verifica se lo username è già in uso
 	if _, err := repositories.FindByUsername(user.Username); err == nil {
 		return nil, "Username già in uso", fmt.Errorf("")
 	}
 
-	// Se il ruolo non è specificato, assegna il valore di default
 	if user.Role == "" {
 		user.Role = "customer"
 	}
 
-	// Salva il nuovo utente nel database
 	if err := repositories.SaveUser(&user); err != nil {
 		return nil, "Error", err
 	}
 
 	userDTO := models.ToUserLoginResponseDTO(&user)
-	//return &user, "Registration done!", nil
 	return userDTO, "Registrazione effettuata!", nil
 }
 
-// AuthenticateUser esegue l'autenticazione dell'utente e restituisce un token JWT.
 func AuthenticateUser(username, password string) (string, string, *models.UserLoginResponseDTO, error) {
 	var user *models.User
 	var err error

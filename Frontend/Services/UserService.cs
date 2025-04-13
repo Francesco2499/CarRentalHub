@@ -1,12 +1,13 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Frontend.Models;
 using Frontend.Helpers;
+
 namespace Frontend.Services;
 
 public class UserService
 {
-
-    public static LoginResponse? Authenticate(string username, string password)
+    public static async Task<LoginResponse?> Authenticate(string username, string password)
     {
         var requestBody = new Dictionary<string, object>
         {
@@ -14,7 +15,7 @@ public class UserService
             { "password", PasswordHasher.HashPassword(password) }
         };
 
-        var loginResponse = HttpService.Post<LoginResponse>("http://localhost:8085/api/v1/auth/login", requestBody);
+        var loginResponse = await HttpService.PostAsync<LoginResponse>("http://localhost:8085/api/v1/auth/login", requestBody);
 
         if (loginResponse != null && !string.IsNullOrEmpty(loginResponse.Token))
         {
@@ -24,7 +25,7 @@ public class UserService
         return loginResponse;
     }
 
-    public static RegistrationResponse? Register(string email, string username, string password, bool isAdmin, string region)
+    public static async Task<RegistrationResponse?> Register(string email, string username, string password, bool isAdmin, string region)
     {
         var requestBody = new Dictionary<string, object>
         {
@@ -35,10 +36,10 @@ public class UserService
             { "role", isAdmin ? "admin" : "" }
         };
 
-        return HttpService.Post<RegistrationResponse>("http://localhost:8085/api/v1/auth/register", requestBody);
+        return await HttpService.PostAsync<RegistrationResponse>("http://localhost:8085/api/v1/auth/register", requestBody);
     }
 
-    public static RegistrationResponse? EditProfile(UserModel user, string? newPassword)
+    public static async Task<RegistrationResponse?> EditProfile(UserModel user, string? newPassword)
     {
         var requestBody = new Dictionary<string, object>
         {
@@ -53,10 +54,12 @@ public class UserService
             requestBody["new_password"] = PasswordHasher.HashPassword(newPassword);
         }
 
-        return HttpService.Put<RegistrationResponse>("http://localhost:8085/api/v1/user/update/me", requestBody);
+        return await HttpService.PutAsync<RegistrationResponse>("http://localhost:8085/api/v1/user/update/me", requestBody);
     }
+    public record RegistrationResponse(string? Message, UserModel? User, object? Error);
+
+    public record LoginResponse(string? Message, string? Token, UserModel? User, object? Error);
 }
 
-public record RegistrationResponse(string? Message, UserModel? User, object? Error);
 
-public record LoginResponse(string? Message, string? Token, UserModel? User, object? Error);
+

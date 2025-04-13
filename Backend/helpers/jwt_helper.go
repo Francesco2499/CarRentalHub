@@ -9,7 +9,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// var jwtSecretKey = []byte("secrettoken")
 var jwtSecretKey []byte
 
 type Claims struct {
@@ -18,7 +17,6 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-// Carica la secret key dal file .env
 func init() {
 	err := godotenv.Load()
 	if err != nil {
@@ -51,7 +49,7 @@ func GenerateJWT(userID int, role string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtSecretKey)
 	if err != nil {
-		return "", fmt.Errorf("Unable to generate token: %v", err)
+		return "", fmt.Errorf("unable to generate token: %v", err)
 	}
 
 	return tokenString, nil
@@ -68,12 +66,12 @@ func ValidateJWT(tokenString string) (*Claims, error) {
 	})
 
 	if err != nil || !token.Valid {
-		return nil, fmt.Errorf("Invalid token")
+		return nil, fmt.Errorf("invalid token")
 	}
 
 	claims, ok := token.Claims.(*Claims)
 	if !ok {
-		return nil, fmt.Errorf("Token malformed")
+		return nil, fmt.Errorf("token malformed")
 	}
 
 	return claims, nil

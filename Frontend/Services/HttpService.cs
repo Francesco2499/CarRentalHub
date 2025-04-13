@@ -4,11 +4,12 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Frontend.Helpers;
 
 namespace Frontend.Services
 {
-    public class HttpService
+    public static class HttpService
     {
         private static readonly HttpClient _httpClient = new();
 
@@ -18,27 +19,27 @@ namespace Frontend.Services
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
 
-        public static TResponse? Post<TResponse>(string url, object requestBody)
+        public static async Task<TResponse?> PostAsync<TResponse>(string url, object requestBody)
         {
-            return SendRequest<TResponse>(HttpMethod.Post, url, requestBody);
+            return await SendRequestAsync<TResponse>(HttpMethod.Post, url, requestBody);
         }
 
-        public static TResponse? Put<TResponse>(string url, object requestBody)
+        public static async Task<TResponse?> PutAsync<TResponse>(string url, object requestBody)
         {
-            return SendRequest<TResponse>(HttpMethod.Put, url, requestBody);
+            return await SendRequestAsync<TResponse>(HttpMethod.Put, url, requestBody);
         }
 
-        public static TResponse? Delete<TResponse>(string url)
+        public static async Task<TResponse?> DeleteAsync<TResponse>(string url)
         {
-            return SendRequest<TResponse>(HttpMethod.Delete, url, null);
+            return await SendRequestAsync<TResponse>(HttpMethod.Delete, url, null);
         }
 
-        public static TResponse? Get<TResponse>(string url)
+        public static async Task<TResponse?> GetAsync<TResponse>(string url)
         {
-            return SendRequest<TResponse>(HttpMethod.Get, url, null);
+            return await SendRequestAsync<TResponse>(HttpMethod.Get, url, null);
         }
 
-        private static TResponse? SendRequest<TResponse>(HttpMethod method, string url, object? requestBody)
+        private static async Task<TResponse?> SendRequestAsync<TResponse>(HttpMethod method, string url, object? requestBody)
         {
             try
             {
@@ -49,21 +50,22 @@ namespace Frontend.Services
                     _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 }
 
-                HttpRequestMessage requestMessage = new(method, url);
+                using HttpRequestMessage requestMessage = new(method, url);
 
                 if (requestBody != null)
                 {
                     requestMessage.Content = JsonContent.Create(requestBody);
                 }
 
-                HttpResponseMessage response = _httpClient.Send(requestMessage);
+                using HttpResponseMessage response = await _httpClient.SendAsync(requestMessage);
+                response.EnsureSuccessStatusCode();
 
-                string responseBody = response.Content.ReadAsStringAsync().Result;
-
-                if (string.IsNullOrWhiteSpace(responseBody))
+                if (response.Content.Headers.ContentLength == 0)
                 {
                     return default;
                 }
+
+                var responseBody = await response.Content.ReadAsStringAsync();
 
                 return JsonSerializer.Deserialize<TResponse>(responseBody, JsonOptions);
             }

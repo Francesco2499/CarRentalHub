@@ -4,12 +4,12 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Frontend.Models;
 using Frontend.Services;
-
+using System.Threading.Tasks;
 
 namespace Frontend.ViewModels
 {
     public partial class SearchShowroomViewModel : SearchableViewModel<ShowroomModel>
-    {        
+    {
         [ObservableProperty] private BookingModel? _booking;
         [ObservableProperty] private bool _isBookingSummaryVisible = false;
         [ObservableProperty] private bool _isVisibleSubTitle = true;
@@ -27,7 +27,7 @@ namespace Frontend.ViewModels
             set
             {
                 SetProperty(ref _startDate, value);
-                
+
                 if (value.HasValue)
                 {
                     EndDate = value.Value.AddDays(1);
@@ -35,16 +35,16 @@ namespace Frontend.ViewModels
             }
         }
 
-        protected override List<ShowroomModel> LoadAllItems()
+        protected override async Task<List<ShowroomModel>?> LoadAllItems()
         {
-            return VehicleService.GetAvailableShowrooms(StartDate, EndDate);
+            return await VehicleService.GetAvailableShowrooms(StartDate, EndDate);
         }
 
         protected override List<ShowroomModel> ApplySearch(List<ShowroomModel> items, string query)
         {
             return [.. items.Where(v =>
                     v.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-                    v.Location.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) 
+                    v.Location.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)
                 )];
         }
     }

@@ -18,10 +18,6 @@ namespace Frontend.ViewModels
             return items;
         }
 
-        public void ResetPagination() {
-            UpdatePaginatedItems(_allItems);
-        }
-
         [RelayCommand]
         private void SearchItems(string parameter)
         {

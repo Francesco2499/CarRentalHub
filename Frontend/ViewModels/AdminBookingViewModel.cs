@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Frontend.Models;
@@ -17,37 +18,40 @@ namespace Frontend.ViewModels
         [ObservableProperty] private string? _successMessage;
         [ObservableProperty] private bool _isFormVisible = false;
         [ObservableProperty] private BookingModel _editingBooking = new(0, 0, "", 0, "", 0, DateTime.Now, DateTime.Now, DateTime.Now);
+
         private string? _selectedVehicleModel;
         public int SelectedVehicleId { get; set; }
-        public DateTime _newStartDate;
+
+        private DateTime _newStartDate;
         public DateTime NewStartDate
         {
             get => _newStartDate;
             set
             {
-                if (SelectedBooking != null) {
-                    
+                if (SelectedBooking != null)
+                {
                     SetProperty(ref _newStartDate, value);
-                    EditingBooking = SelectedBooking with {StartDate = value, EndDate = NewEndDate};
-                    AllVehicles = GetVehicles();
-                    
+                    EditingBooking = SelectedBooking with { StartDate = value, EndDate = NewEndDate };
+                    _ = LoadVehicles();
                 }
-
             }
         }
-        public DateTime _newEndDate;
+
+        private DateTime _newEndDate;
         public DateTime NewEndDate
         {
             get => _newEndDate;
             set
             {
-                if (SelectedBooking != null) {
+                if (SelectedBooking != null)
+                {
                     SetProperty(ref _newEndDate, value);
-                    EditingBooking = SelectedBooking with {StartDate = NewStartDate, EndDate = value};
-                    AllVehicles = GetVehicles();
+                    EditingBooking = SelectedBooking with { StartDate = NewStartDate, EndDate = value };
+                    _ = LoadVehicles();
                 }
             }
         }
+
         public string? SelectedVehicleModel
         {
             get => _selectedVehicleModel;
@@ -63,40 +67,43 @@ namespace Frontend.ViewModels
 
         public AdminBookingViewModel()
         {
-            AllVehicles = GetVehicles();
+            _ = LoadVehicles();
             IsVisibleList = true;
-            LoadItems();
+            _ = LoadItems();
         }
 
-        protected List<(string VehicleModel, int VehicleId)> GetVehicles()
+        private async Task<List<(string VehicleModel, int VehicleId)>> LoadVehicles()
         {
-                var allVehicles = new List<(string VehicleModel, int VehicleId)>();
+            var allVehicles = new List<(string VehicleModel, int VehicleId)>();
 
-                foreach (var showroom in VehicleService.GetAvailableShowrooms(EditingBooking.StartDate, EditingBooking.EndDate))
+            var showrooms = await VehicleService.GetAvailableShowrooms(EditingBooking.StartDate, EditingBooking.EndDate);
+            foreach (var showroom in showrooms)
+            {
+                foreach (var vehicle in showroom.Vehicles)
                 {
-                    foreach (var vehicle in showroom.Vehicles) // 'Vehicles' contiene i veicoli dello showroom
-                    {
-                        allVehicles.Add((vehicle.Model, vehicle.Id));
-                    }
+                    allVehicles.Add((vehicle.Model, vehicle.Id));
                 }
+            }
 
-                VehicleNameList = [.. allVehicles.Select((v) => { return v.VehicleModel;})];    
-
-                return allVehicles;
+            AllVehicles = allVehicles;
+            VehicleNameList = [.. allVehicles.Select(v => v.VehicleModel)];
+            return allVehicles;
         }
 
-        protected override List<BookingModel>? LoadAllItems()
+        protected override async Task<List<BookingModel>?> LoadAllItems()
         {
-            return BookingService.GetAllBookings();
+            return await BookingService.GetAllBookings();
         }
-       
+
+
         protected override List<BookingModel> ApplySearch(List<BookingModel> items, string query)
         {
             SuccessMessage = string.Empty;
             ErrorMessage = string.Empty;
-            return [.. items.Where(b => b.VehicleModel.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                b.Username.Contains(query, StringComparison.OrdinalIgnoreCase)
-            )];
+
+            return [.. items.Where(b =>
+                b.VehicleModel.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                b.Username.Contains(query, StringComparison.OrdinalIgnoreCase))];
         }
 
         protected override List<BookingModel> ApplySearchByBookingId(List<BookingModel> items, string query)
@@ -105,14 +112,12 @@ namespace Frontend.ViewModels
             ErrorMessage = string.Empty;
             return [.. items.Where(b => b.Id.ToString().Contains(query))];
         }
-        
 
         [RelayCommand]
-        private void ShowEditBookingForm()
+        private async Task ShowEditBookingForm()
         {
             SuccessMessage = string.Empty;
             ErrorMessage = string.Empty;
-
 
             if (SelectedBooking == null)
             {
@@ -124,17 +129,18 @@ namespace Frontend.ViewModels
             NewEndDate = SelectedBooking.EndDate;
 
             AllVehicles.Add((SelectedBooking.VehicleModel, SelectedBooking.VehicleId));
-            VehicleNameList = [.. AllVehicles.Select((v) => { return v.VehicleModel;})];    
+            VehicleNameList = [.. AllVehicles.Select(v => v.VehicleModel)];
             SelectedVehicleModel = SelectedBooking.VehicleModel;
-        
 
             EditingBooking = SelectedBooking with { };
             IsVisibleList = false;
             IsFormVisible = true;
+
+            await LoadVehicles();
         }
 
         [RelayCommand]
-        private void SaveBooking()
+        private async Task SaveBooking()
         {
             SuccessMessage = string.Empty;
             ErrorMessage = string.Empty;
@@ -147,13 +153,16 @@ namespace Frontend.ViewModels
 
             try
             {
-                var bookingResponse = BookingService.EditBooking(EditingBooking, SelectedVehicleId);
-                if (bookingResponse?.Booking != null) {
-                    LoadItems();
-                    SuccessMessage = bookingResponse?.Message;
+                var bookingResponse = await BookingService.EditBooking(EditingBooking, SelectedVehicleId);
+                if (bookingResponse?.Booking != null)
+                {
+                    _ = LoadItems();
+                    SuccessMessage = bookingResponse.Message;
                     IsFormVisible = false;
-                    IsVisibleList = true;  
-                } else {
+                    IsVisibleList = true;
+                }
+                else
+                {
                     ErrorMessage = bookingResponse?.Message ?? "Errore nella modifica della prenotazione!";
                 }
             }
@@ -184,12 +193,12 @@ namespace Frontend.ViewModels
                 ErrorMessage = "Seleziona una prenotazione da eliminare.";
                 return;
             }
-            
+
             IsConfirmationModalVisible = true;
         }
 
         [RelayCommand]
-        private void ConfirmDelete()
+        private async Task ConfirmDelete()
         {
             SuccessMessage = string.Empty;
             ErrorMessage = string.Empty;
@@ -202,11 +211,9 @@ namespace Frontend.ViewModels
 
             try
             {
-                VehicleService.DeleteVehicle(SelectedBooking.Id);
+                await BookingService.DeleteBooking(SelectedBooking.Id);
                 SuccessMessage = $"Prenotazione con ID '{SelectedBooking.Id}' eliminata correttamente!";
-
-                LoadItems();
-                
+                _ = LoadItems();
                 IsConfirmationModalVisible = false;
             }
             catch (Exception ex)

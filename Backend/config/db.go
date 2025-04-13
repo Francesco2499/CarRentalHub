@@ -42,14 +42,12 @@ func InitDB() (*sql.DB, error) {
 		host, user, password, dbname,
 	)
 
-	//var err error
 	db, err = sql.Open("postgres", dsn)
 	if err != nil {
 		log.Fatal("Errore nella connessione al database:", err)
 		return nil, err
 	}
 
-	// Testa la connessione con Ping()
 	if err := db.Ping(); err != nil {
 		log.Fatal("Database ping error:", err)
 		return nil, err
@@ -69,7 +67,6 @@ func InitDB() (*sql.DB, error) {
 	return db, nil
 }
 
-// CreateTables crea le tabelle se non esistono
 func CreateTables() error {
 	tables := []string{
 		`CREATE TABLE IF NOT EXISTS car_showrooms (
@@ -117,7 +114,6 @@ func CreateTables() error {
 
 	fmt.Println("Tables created/verified successfully!")
 
-	// Creazione della funzione per aggiornare `updated_at`
 	_, err := db.Exec(`
 		CREATE OR REPLACE FUNCTION update_timestamp()
 		RETURNS TRIGGER AS $$
@@ -131,7 +127,6 @@ func CreateTables() error {
 		return fmt.Errorf("error creating update_timestamp function: %w", err)
 	}
 
-	// Verifica se il trigger esiste prima di crearlo
 	var triggerExists bool
 	err = db.QueryRow("SELECT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trigger_update_booking_timestamp')").Scan(&triggerExists)
 	if err != nil {
@@ -159,7 +154,7 @@ func CreateTables() error {
 func SeedData() error {
 	var count int
 
-	// Seeding per utenti
+	// Users seeding
 	err := db.QueryRow("SELECT COUNT(*) FROM users").Scan(&count)
 	if err != nil {
 		return err
@@ -189,13 +184,13 @@ func SeedData() error {
 		fmt.Println("User data already present, no new entries inserted.")
 	}
 
-	// Seeding per veicoli
+	// Showrooms and Vehicles seeding
 	err = db.QueryRow("SELECT COUNT(*) FROM car_showrooms").Scan(&count)
 	if err != nil {
 		return err
 	}
 
-	if count == 0 { // Inserisce i dati solo se la tabella è vuota
+	if count == 0 {
 		_, err := db.Exec(`
 		INSERT INTO car_showrooms (name, location, latitude, longitude) VALUES 
 			('CarShowroom CT', 'Catania', 37.502361, 15.087372),
@@ -221,13 +216,13 @@ func SeedData() error {
 
 	///////////////////////////////////////////////////////////////////////////////
 
-	// Seeding per veicoli
+	// Vehicles seeding
 	err = db.QueryRow("SELECT COUNT(*) FROM vehicles").Scan(&count)
 	if err != nil {
 		return err
 	}
 
-	if count == 0 { // Inserisce i dati solo se la tabella è vuota
+	if count == 0 {
 		_, err := db.Exec(`
 		INSERT INTO vehicles (model, category, price, car_showroom_id) VALUES 
 			('Toyota Corolla', 'Berlina', 50.00, 1),
@@ -263,13 +258,13 @@ func SeedData() error {
 		fmt.Println("Vehicle data already present, no new entries inserted.")
 	}
 
-	// Seeding per prenotazioni
+	// Booking seeding
 	err = db.QueryRow("SELECT COUNT(*) FROM bookings").Scan(&count)
 	if err != nil {
 		return err
 	}
 
-	if count == 0 { // Inserisce i dati solo se la tabella è vuota
+	if count == 0 {
 		_, err := db.Exec(`
 		INSERT INTO bookings (user_id, vehicle_id, start_date, end_date) VALUES 
 			(4, 5, '2024-01-10', '2024-01-15'),

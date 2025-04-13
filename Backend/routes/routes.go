@@ -7,20 +7,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// SetupRoutes imposta tutte le rotte per l'applicazione
 func SetupRoutes() *gin.Engine {
-	// Gruppo di rotte per l'autenticazione
 	router := gin.Default()
 	api := router.Group("/api/v1")
 
 	auth := api.Group("/auth")
 	{
-		auth.POST("/register", controllers.Register) // Registrazione utente
-		auth.POST("/login", controllers.Login)       // Login utente
+		auth.POST("/register", controllers.Register) 
+		auth.POST("/login", controllers.Login)       
 	}
 
 	user := api.Group("/user")
-	user.Use(middleware.AuthMiddleware("")) // Tutti gli utenti autenticati
+	user.Use(middleware.AuthMiddleware(""))
 	{
 		user.PUT("/update/me", controllers.UpdateCurrentUser)
 		user.DELETE("/delete/me", controllers.DeleteCurrentUser)
@@ -38,10 +36,10 @@ func SetupRoutes() *gin.Engine {
 	}
 
 	booking := api.Group("/booking")
-	booking.Use(middleware.AuthMiddleware("")) // Protezione generale per TUTTE le route
+	booking.Use(middleware.AuthMiddleware("")) 
 	{
 		booking.POST("/new", controllers.CreateBooking)
-		booking.GET("/getAll", controllers.GetAllBookings) // Accesso per utenti autenticati
+		booking.GET("/getAll", controllers.GetAllBookings) 
 		booking.PUT("/update/:id", middleware.AuthMiddleware("admin"), controllers.UpdateBooking)
 		booking.DELETE("/delete/:id", middleware.AuthMiddleware("admin"), controllers.DeleteBooking)
 	}

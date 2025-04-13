@@ -9,6 +9,7 @@ using System.Linq;
 using Frontend.Services;
 using System.Collections.Generic;
 using Mapsui.Widgets;
+using System.Threading.Tasks;
 
 namespace Frontend.ViewModels;
 public class TileMapViewModel : ViewModelBase
@@ -18,10 +19,10 @@ public class TileMapViewModel : ViewModelBase
     public TileMapViewModel()
     {
         MapView = new Map();
-        SetupMap();
+        _ = SetupMap();
     }
 
-    private void SetupMap()
+    private async Task SetupMap()
     {
 
         MapView.Layers.Add(OpenStreetMap.CreateTileLayer());
@@ -29,7 +30,7 @@ public class TileMapViewModel : ViewModelBase
         var (x1, y2) = SphericalMercator.FromLonLat(12.4964, 41.9028);
         var centerPoint = new MPoint(x1, y2);
 
-        MapView.Layers.Add(CreateMarkerLayer());
+        MapView.Layers.Add(await CreateMarkerLayer());
         
         MapView.Info += MapOnInfo;
 
@@ -47,20 +48,25 @@ public class TileMapViewModel : ViewModelBase
         }
     }
 
-    private static MemoryLayer CreateMarkerLayer()
+    private static async Task<MemoryLayer> CreateMarkerLayer()
     {
         return new MemoryLayer
         {
             Name = "VehicleMarkers",
             IsMapInfoLayer = true,
-            Features = new MemoryProvider(GetLocationFromShowrooms()).Features,
+            Features = new MemoryProvider(await GetLocationFromShowrooms()).Features,
             Style = SymbolStyles.CreatePinStyle(symbolScale: 0.7)
         };
     }
 
-    private static IEnumerable<IFeature> GetLocationFromShowrooms()
+    private static async Task<IEnumerable<IFeature>> GetLocationFromShowrooms()
     {
-        var showrooms = VehicleService.GetAvailableShowrooms(null, null);
+        var showrooms = await VehicleService.GetAvailableShowrooms(null, null);
+
+        if (showrooms == null || showrooms.Count == 0)
+        {
+            return [];
+        }
 
         return showrooms.Select(c =>
         {
@@ -69,6 +75,7 @@ public class TileMapViewModel : ViewModelBase
             return feature;
         });
     }
+
 
     private static CalloutStyle CreateCalloutStyle(string title, string content)
     {

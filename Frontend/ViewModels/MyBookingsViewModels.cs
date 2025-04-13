@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Frontend.Models;
 using Frontend.Services;
+using System.Threading.Tasks;
 
 namespace Frontend.ViewModels
 {
@@ -13,6 +14,7 @@ namespace Frontend.ViewModels
         [ObservableProperty] private string? _bookingMessage;
         [ObservableProperty] private bool _isVisibleList = true;
         private DateTime? _startDate;
+        [ObservableProperty] private DateTime? _endDate;
         public DateTime? StartDate
         {
             get => _startDate;
@@ -26,29 +28,37 @@ namespace Frontend.ViewModels
                 }
             }
         }
-        [ObservableProperty] private DateTime? _endDate;
 
         public MyBookingsViewModel()
         {
-            LoadItems();
+            _ = LoadItems();
         }
 
-        protected override List<BookingModel>? LoadAllItems()
+        protected override async Task<List<BookingModel>?> LoadAllItems()
         {
-            var bookings = BookingService.GetAllBookings();
-            if (bookings == null || bookings.Count == 0)
+            try
             {
-                BookingMessage = "Non hai ancora effettuata nessuna prenotazione";
+                var bookings = await BookingService.GetAllBookings();  
+                if (bookings == null || bookings.Count == 0)
+                {
+                    BookingMessage = "Non hai ancora effettuato nessuna prenotazione";
+                    IsVisibleList = false;
+                    return [];
+                }
+                IsVisibleList = true;
+                return bookings;
+            }
+            catch (Exception ex)
+            {
+                BookingMessage = $"Si è verificato un errore: {ex.Message}";
                 IsVisibleList = false;
                 return [];
             }
-            IsVisibleList = true;
-            return bookings;
         }
 
         protected override List<BookingModel> ApplySearch(List<BookingModel> items, string query)
         {
-            return [.. items.Where(b => b.VehicleModel.Contains(query, StringComparison.OrdinalIgnoreCase))];
+            return items.Where(b => b.VehicleModel.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
         }
 
         [RelayCommand]
@@ -57,13 +67,18 @@ namespace Frontend.ViewModels
             if (StartDate == null || EndDate == null)
                 return;
 
-            if(_allItems != null) {
-               EnableShowAll = true;
-                var bookings = new List<BookingModel>(_allItems.Where(b => b.StartDate >= StartDate.Value && b.EndDate <= EndDate.Value)    );
+            if (_allItems != null)
+            {
+                EnableShowAll = true;
+
+                var bookings = _allItems.Where(b => b.StartDate >= StartDate.Value && b.EndDate <= EndDate.Value).ToList();
+
                 UpdatePaginatedItems(bookings, false);
-                if (bookings.Count == 0) {
+
+                if (bookings.Count == 0)
+                {
                     ErrorMessage = "Nessun risultato trovato. Cambia i parametri di ricerca.";
-                } 
+                }
             }
         }
     }

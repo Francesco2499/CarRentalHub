@@ -1,9 +1,9 @@
 using System;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Frontend.Models;
 using Frontend.Services;
-
 
 namespace Frontend.ViewModels
 {
@@ -23,7 +23,7 @@ namespace Frontend.ViewModels
         [ObservableProperty] private string _location = string.Empty;
 
         [RelayCommand]
-        private void SearchShowrooms()
+        private async Task SearchShowrooms()
         {
             FirstErrorMessage = string.Empty;
 
@@ -45,23 +45,23 @@ namespace Frontend.ViewModels
                 return;
             }
 
-            ShowroomSearch.LoadItems();
+            await ShowroomSearch.LoadItems();
 
-            if (ShowroomSearch.Items != null && ShowroomSearch.Items is { Count: > 0 })
+            if (ShowroomSearch.Items != null && ShowroomSearch.Items.Count > 0)
             {
                 ShowroomSearch.IsVisibleList = true;
                 IsVisibleSearchDate = false;    
             } else {
-                BookingMessage = "Nelle date richieste on ci sono auto disponibili per l'autosalone selezionato";
+                BookingMessage = "Nelle date richieste non ci sono auto disponibili per l'autosalone selezionato";
             }
         }
 
         [RelayCommand]
-        private void SearchVehicles()
+        private async Task SearchVehicles()
         {
             if (SelectedShowroom == null)
             {
-                ErrorMessage = "Seleziona entrambe le date (inizio e fine).";
+                ErrorMessage = "Seleziona un autosalone!";
                 return;
             }
 
@@ -69,18 +69,19 @@ namespace Frontend.ViewModels
 
             VehicleSearch.SetShowroom(SelectedShowroom);
 
-            if (VehicleSearch.Items != null && VehicleSearch.Items is { Count: > 0 })
+            await VehicleSearch.LoadItems();
+
+            if (VehicleSearch.Items != null && VehicleSearch.Items.Count > 0)
             {
                 VehicleSearch.IsVisibleList = true;
                 IsVisibleSearchDate = false;    
             } else {
-                BookingMessage = "Nelle date richieste on ci sono auto disponibili per l'autosalone selezionato";
+                BookingMessage = "Nelle date richieste non ci sono veicoli disponibili per l'autosalone selezionato";
             }
         }
 
-    
         [RelayCommand]
-        private void AddBooking()
+        private async Task AddBooking()
         {
             if (SelectedVehicle == null)
             {
@@ -88,7 +89,7 @@ namespace Frontend.ViewModels
                 return;
             }  
 
-            var bookingResponse = BookingService.AddBooking(SelectedVehicle.Id, ShowroomSearch.StartDate, ShowroomSearch.EndDate);
+            var bookingResponse = await BookingService.AddBooking(SelectedVehicle.Id, ShowroomSearch.StartDate, ShowroomSearch.EndDate);
             
             if (bookingResponse?.Booking != null)
             {

@@ -8,30 +8,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Register gestisce la registrazione di un nuovo utente.
 func Register(c *gin.Context) {
 	var user models.User
 
-	// Legge i dati del corpo della richiesta
 	if err := c.ShouldBindJSON(&user); err != nil {
-		// Se la richiesta non è valida, restituisce errore
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
 		return
 	}
 
-	// Chiamata al servizio di registrazione
 	newUser, message, err := services.RegisterUser(user)
 	if err != nil {
-		// Gestisce eventuali errori durante la registrazione
 		c.JSON(http.StatusInternalServerError, gin.H{"message": message, "error": fmt.Errorf("")})
 		return
 	}
 
-	// Restituisce una risposta di successo con i dati dell'utente
 	c.JSON(http.StatusOK, gin.H{"message": message, "user": newUser})
 }
 
-// Login gestisce il login degli utenti esistenti.
 func Login(c *gin.Context) {
 	var user models.User
 
