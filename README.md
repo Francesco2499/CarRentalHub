@@ -41,7 +41,6 @@ Assicurarsi che Docker sia avviato e seguire i seguenti passaggi:
 Il modulo Frontend sarà ora disponibile per l'interazione, mentre i moduli Backend e Stats saranno eseguiti nei rispettivi container Docker.
 
 ## Porte Utilizzate
-- **Frontend**: Porta dinamica assegnata da .NET
 - **Backend**: 8085
 - **Stats**: 5005
 - **Database (PostgreSQL)**: 5432
