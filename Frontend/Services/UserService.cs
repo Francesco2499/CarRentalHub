@@ -5,7 +5,7 @@ using Frontend.Helpers;
 
 namespace Frontend.Services;
 
-public class UserService
+public static class UserService
 {
     public static async Task<LoginResponse?> Authenticate(string username, string password)
     {

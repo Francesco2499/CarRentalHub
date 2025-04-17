@@ -11,7 +11,6 @@ namespace Frontend.ViewModels;
 public partial class MyAreaViewModel : ViewModelBase
 {
     private readonly UserModel _originalUser;
-    
     [ObservableProperty] private UserModel _editedUser;
     [ObservableProperty] private string? _errorMessage;
     [ObservableProperty] private string? _newPassword;
@@ -20,13 +19,12 @@ public partial class MyAreaViewModel : ViewModelBase
     [ObservableProperty] private bool _showEditPasswordForm = false;
 
     public static ObservableCollection<string> Regions { get; } =
-    new ObservableCollection<string>
-    {
+    [
         "Abruzzo", "Basilicata", "Calabria", "Campania", "Emilia-Romagna",
         "Friuli-Venezia Giulia", "Lazio", "Liguria", "Lombardia", "Marche",
         "Molise", "Piemonte", "Puglia", "Sardegna", "Sicilia",
         "Toscana", "Trentino-Alto Adige", "Umbria", "Valle d'Aosta", "Veneto"
-    };
+    ];
 
     public MyAreaViewModel(UserModel User)
     {
