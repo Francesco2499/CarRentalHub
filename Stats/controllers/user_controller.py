@@ -1,5 +1,9 @@
 from flask import Blueprint, request
-from services.user_service import *
+from services.user_service import (
+    generate_top_users_plot,
+    generate_users_by_region_plot,
+    get_user_info
+)
 
 user_stats_blueprint = Blueprint("user_stats", __name__)
 

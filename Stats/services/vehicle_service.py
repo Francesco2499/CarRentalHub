@@ -2,7 +2,10 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import os
 from flask import send_file
-from repositories.vehicle_repository import *
+from repositories.vehicle_repository import (
+    get_vehicle_availability,
+    get_top_5_vehicles
+)
 import textwrap
 
 IMAGE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "static", "images"))

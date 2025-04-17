@@ -1,5 +1,8 @@
 from flask import Blueprint, request
-from services.booking_service import *
+from services.booking_service import (
+    generate_revenue_trend_plot, 
+    generate_booking_trend_plot,
+    generate_revenue_per_vehicle_plot)
 from utils.date_utils import validate_and_get_date_range
 
 booking_stats_blueprint = Blueprint('booking_stats', __name__)

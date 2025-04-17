@@ -1,5 +1,8 @@
 from flask import Blueprint, request
-from services.vehicle_service import *
+from services.vehicle_service import (
+    generate_availability_plot,
+    generate_top_vehicles_plot
+)
 from utils.date_utils import validate_and_get_date_range
 
 vehicle_stats_blueprint = Blueprint('vehicle_stats', __name__)

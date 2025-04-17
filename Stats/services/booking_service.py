@@ -2,7 +2,11 @@ import matplotlib.pyplot as plt
 import os
 from flask import send_file
 import matplotlib.ticker as ticker
-from repositories.booking_repository import *
+from repositories.booking_repository import (
+    get_revenue_trend,
+    get_booking_trend,
+    get_revenue_per_vehicle
+)
 import textwrap
 
 IMAGE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "static", "images"))

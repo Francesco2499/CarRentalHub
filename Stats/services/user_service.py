@@ -2,7 +2,11 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import os
 from flask import send_file, jsonify
-from repositories.user_repository import *
+from repositories.user_repository import (
+    get_top_3_users,
+    get_users_by_region,
+    get_user_statistics
+)
 
 IMAGE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "static", "images"))
 os.makedirs(IMAGE_DIR, exist_ok=True)
