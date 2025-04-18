@@ -46,6 +46,3 @@ Il modulo Frontend sarà ora disponibile per l'interazione, mentre i moduli Back
 - **Database (PostgreSQL)**: 5432
 
 Assicurarsi che le porte siano libere prima dell'avvio.
-
-## Note Finali
-L'applicazione è pensata per essere modulare e scalabile. Ogni modulo può essere aggiornato e gestito in modo indipendente grazie all'architettura containerizzata tramite Docker.
